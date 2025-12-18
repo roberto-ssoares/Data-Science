@@ -1,1 +1,0 @@
-# Modelagem de Séries Temporais
