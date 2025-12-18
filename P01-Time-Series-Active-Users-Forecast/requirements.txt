@@ -1,0 +1,26 @@
+# Base
+pip>=24.0
+setuptools>=70.0
+wheel>=0.43
+
+# Jupyter + exportação
+jupyterlab>=4.2,<5
+nbconvert>=7.16,<8
+nbclient>=0.10,<1
+jupyter-client>=8.6,<9
+pyzmq==25.1.2
+
+# Científico
+numpy>=1.26,<3
+pandas>=2.1,<3
+scipy>=1.11,<2
+
+# Séries temporais
+statsmodels>=0.14,<0.15
+
+# Métricas
+scikit-learn>=1.4,<2
+
+# Visualização
+matplotlib>=3.8,<4
+

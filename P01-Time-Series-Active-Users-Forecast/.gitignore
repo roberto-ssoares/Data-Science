@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Virtual env
+.venv/
+.venv-*/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Dados grandes
+data/raw/
+data/interim/
+data/processed/
+*.parquet
+
+# Pastas de anotações
+__annotation/
+
+# Logs
+*.log
+
+# Secrets
+.env
+
