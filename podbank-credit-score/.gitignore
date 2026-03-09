@@ -1,0 +1,20 @@
+# data layers (não versionar)
+data/00-raw/
+data/01-bronze/
+data/02-silver/
+data/03-abt/
+
+# python
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+
+# duckdb
+*.duckdb
+*.wal
+
+# os/editor
+.DS_Store
+Thumbs.db
+.vscode/

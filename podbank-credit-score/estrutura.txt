@@ -1,0 +1,75 @@
+Listagem de caminhos de pasta
+O número de série do volume é E8EF-E414
+D:.
+|   .editorconfig
+|   .gitignore
+|   .python-version
+|   estrutura.txt
+|   Makefile
+|   pyproject.toml
+|   README.md
+|   uv.lock
+|   
++---data
+|   +---00-raw
+|   +---01-bronze
+|   +---02-silver
+|   +---03-gold
+|   \---99-samples
++---docs
+|   +---00-contexto
+|   |       problema-negocio.md
+|   |       
+|   +---01-dados
+|   |       dicionario-dados.md
+|   |       
+|   +---02-decissoes
+|   |       split-temporal-e-leakage.md
+|   |       stack-duckdb-spark.md
+|   |       
+|   \---99-checklists
+|           dq-checklist.md
+|           release-checklist.md
+|           
++---notebooks
+|       01-business-understanding.ipynb
+|       02-data-understanding-eda.ipynb
+|       03-data-preparation-abt.ipynb
+|       04-modeling.ipynb
+|       05-evaluation.ipynb
+|       06-deployment.ipynb
+|       
++---reports
+|   +---figures
+|   \---tables
++---scripts
+|       00-bootstrap.ps1
+|       01-download.ps1
+|       02-bronze.ps1
+|       03-silver.ps1
+|       04-abt.ps1
+|       
+\---src
+    \---podbank
+        |   config.py
+        |   __init__.py
+        |   
+        +---dq
+        |       checks.py
+        |       __init__.py
+        |       
+        +---etl
+        |       abt.py
+        |       bronze.py
+        |       silver.py
+        |       __init__.py
+        |       
+        +---io
+        |       download.py
+        |       paths.py
+        |       __init__.py
+        |       
+        \---utils
+                logging.py
+                __init__.py
+                
