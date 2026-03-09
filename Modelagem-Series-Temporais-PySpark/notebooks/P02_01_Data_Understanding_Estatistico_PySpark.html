@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>P02_01_Data_Understanding_Estatistico_PySpark</title>
+<!-- JupyterLab Light Theme -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/jupyterlab/3.6.3/themes/JupyterLab-light-theme.css" rel="stylesheet"/>
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css"> -->
+<!-- Highlight.js para sintaxe -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@300;400;600&amp;family=Reddit+Sans:wght@300;400;600&amp;family=Courier+Prime:wght@400;700&amp;family=Montserrat:wght@300;400;600&amp;family=Source+Code+Pro:wght@400&amp;family=Red+Hat+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<!-- MathJax (necessário para renderizar LaTeX em HTML) -->
+<script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['\\(', '\\)'], ['$', '$']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+          ignoreHtmlClass: 'tex2jax_ignore',
+          processHtmlClass: 'mathjax_process'
+        }
+      };
+    </script>
+<script async="" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+<style>
+      /* ====== GLOBAL ====== */
+        body{
+            font-family:'Montserrat','Reddit Sans';
+            font-size:14px;
+            background:#f5f5f5;
+            padding:100px 0;
+            color:#333;
+        }
+        .container{
+            max-width:1550px;
+            margin:auto;
+            background:#fff;
+            padding:20px 30px;
+            border-radius:6px;
+            box-shadow:0 4px 12px rgba(0,0,0,.1);
+        }
+        h1.title-header{
+            font-family:'Montserrat','Reddit Sans';
+            font-size:14px;
+            font-weight:600;
+            color:#8eb4c4;
+            text-transform:uppercase;
+            text-align:center;
+            margin-bottom:24px;
+        }
+        /* ====== MARKDOWN ====== */
+        .markdown{
+            background:#f3f2ee;
+            font-family:'Montserrat','Noto Sans Mono';
+            font-size:14px;
+            padding:10px 15px;              /* mais espaço interno */
+            /* padding-left: 5px;*/
+            border-left:5px solid #ff9800;  /* faixa laranja mais visível */
+            border-radius:4px;
+            margin:4px 0;                  /* mais respiro entre blocos */
+            margin-bottom:8px;
+            line-height:1.5;
+            /* Centralização vertical com flexbox */
+            /* display: flex; */
+            align-items: center; /* ou baseline — veja qual alinha melhor */
+        }
+        /* No <style> do template .tpl */
+        img, svg, figure img {
+            max-width: 100%;      /* nunca ultrapassa o container */
+            height: auto;         /* mantém proporção */
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            border: 1px solid #ddd;                /* borda leve */
+            border-radius: 6px;                    /* cantos arredondados */
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* sombra sutil */        
+        }
+        /* Legendas */
+        figure {
+          margin: 20px auto;
+          text-align: center;
+        }
+        figure figcaption {
+          font-size: 13px;
+          color: #555;
+          margin-top: 6px;
+        }
+
+        /* Ajuste em telas menores */
+        @media (max-width: 768px) {
+          .container {
+            max-width: 100%;
+            padding: 15px;
+          }
+        }
+        /* ====== CODE ====== */
+        .code_cell{
+            background:#f7f7f7;
+            border-left:5px solid #4caf50;
+            padding:4px;
+            /* padding-left: 5px;*/
+            margin:4px 0;
+            overflow-x:auto;
+            border-radius:4px;
+            display: flex;
+            align-items: center; /* ou baseline — veja qual alinha melhor */            
+        }
+        .code_cell pre,
+        .code_cell .hljs{
+            background:transparent!important;
+            font-family:'Red Hat Mono','Reddit Sans';
+            font-size:14px;
+            line-height:1.5;
+        }
+        /* ====== OUTPUT ====== */
+        .output{
+            background:#f3f9fa;
+            border-left:5px solid #2196f3;
+            padding:10px 6px;              /* mais espaço interno */
+            padding-left: 8px;            
+            margin:4px 0;                  /* mais respiro entre blocos */
+            margin-bottom:0px;
+            font-family:'Red Hat Mono','Noto Sans Mono';
+            font-size:14px;
+            text-align:left;
+            line-height:1.5;
+            white-space:pre-wrap;        
+            overflow-x:auto;
+            border-radius:4px;
+            align-items: center; /* ou baseline — veja qual alinha melhor */            
+        }
+        .output img{
+            max-width:100%;
+            height:auto;
+            display:block;
+            margin:auto;
+        }
+        /* Caixa específica para stream outputs (ex: print, watermark, logs) */
+        .output-stream {
+            background:#f3f9fa;
+            border-left:5px solid #2196f3;
+            padding: 6px 10px;
+            margin:4px 0;
+        }
+        /* ====== FOOTER ====== */
+        .footer{
+            text-align:right;
+            margin-top:30px;
+            padding:12px;
+            background:#e9ecef;
+            border-radius:4px;
+            font-size:14px;
+            color:#555;
+        }        
+
+        /* Tabelas */
+        table.dataframe {
+            border-collapse: collapse;
+            border: none;
+            margin: 0;
+            padding: 0;
+            font-family:'Red Hat Mono','Noto Sans Mono';
+            font-size: 14px;
+            line-height: 1.4;
+            width: auto;
+        }
+        table.dataframe th, table.dataframe td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        table.dataframe thead {
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
+        table.dataframe tr:nth-child(even) {
+            background-color: #f6f8fa;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<h1 class="title-header">P02_01_Data_Understanding_Estatistico_PySpark</h1>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#F3F2EE">
+<br/><br/>
+<p style="text-align: center;">
+<font color="#0A1781" size="6">
+<strong>
+                    Séries Temporais para Projetos de Data Science
+                </strong>
+</font>
+</p>
+<p style="text-align: center;">
+<font color="#C58A1E" size="6">
+<strong>
+                    Projeto 02 - Previsão de vendas
+                </strong>
+</font>
+</p>
+<p style="text-align: center;">
+<font color="#C58A1E" size="5">
+<strong>
+                    Data Understanding Estatístico (PySpark em Cluster Docker)
+                </strong>
+</font>
+</p>
+<br/>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#F3F2EE">
+<p style="text-align: right;">
+<font color="#444444" size="4">
+            Roberto SSoares - LfLngLrnng
+      </font>
+</p>
+<p style="text-align: right;"><font color="#444444" size="2">
+<a href="https://www.linkedin.com/in/roberto-dos-santos-soares/">in/roberto-dos-santos-soares</a><br/><a href="https://roberto-ssoares.github.io/meu-portfolio/">Portifólio: roberto-ssoares</a>
+</font></p>
+<p style="text-align: right;">
+<font color="#444444" size="4">
+            " [+] Faturamento,<br \=""/> [-] Custo,<br \=""/> [+] Qualidade de vida "
+        </font>
+<br>
+<font color="#918e8e" size="2">"Bruno Jardim"
+        </font>
+</br></p>
+<p style="text-align: right;">
+<font color="#918e8e" size="2">
+</font>
+</p>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 Objetivo</strong></font></p>
+<font color="#66666" size="2">
+<p>Construir e avaliar um <strong>baseline replicável</strong> para previsão de vendas ao longo do tempo usando PySpark MLlib, com:</p>
+<ul>
+<li>Split <strong>temporal</strong> (sem leakage)</li>
+<li>Pipeline (VectorAssembler + LinearRegression)</li>
+<li>Avaliação (RMSE e R²)</li>
+<li>Persistência do modelo e previsões em <strong>artifacts/</strong></li>
+<li>Evidências de execução distribuída via Spark UI / History Server</li>
+</ul>
+<blockquote>
+<p>Nota: baseline simples serve como diagnóstico para orientar evolução (lags, médias móveis, modelos não lineares).</p>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h1 id="%E2%9C%94%EF%B8%8F-SETUP-(Instala%C3%A7%C3%A3o-e-Importa%C3%A7%C3%A3o-dos-pacotes)"><font color="#CC403E" size="5"><strong>✔️ SETUP (Instalação e Importação dos pacotes)</strong></font><a class="anchor-link" href="#%E2%9C%94%EF%B8%8F-SETUP-(Instala%C3%A7%C3%A3o-e-Importa%C3%A7%C3%A3o-dos-pacotes)">¶</a></h1><p><font color="#66666" size="3"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h2 id="%F0%9F%93%9A-Instalando-e-Carregando-os-Pacotes"><font color="#FF5733" size="4"><strong>📚 Instalando e Carregando os Pacotes</strong></font><a class="anchor-link" href="#%F0%9F%93%9A-Instalando-e-Carregando-os-Pacotes">¶</a></h2><p><font color="#66666" size="3"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Para atualizar um pacote, execute o comando abaixo no terminal ou prompt de comando:
+# pip install -U nome_pacote
+
+# Para instalar a versão exata de um pacote, execute o comando abaixo no terminal ou prompt de comando:
+# !pip install nome_pacote==versão_desejada
+
+# Depois de instalar ou atualizar o pacote, reinicie o jupyter notebook.
+
+# Instala o pacote watermark. 
+# Esse pacote é usado para gravar as versões de outros pacotes usados neste jupyter notebook.
+#!pip install -q -U watermark</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h2 id="%F0%9F%93%9A-Importando-Bibliotecas"><font color="#FF5733" size="4"><strong>📚 Importando Bibliotecas</strong></font><a class="anchor-link" href="#%F0%9F%93%9A-Importando-Bibliotecas">¶</a></h2><p><font color="#66666" size="3"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Imports para manipulação de dados
+import os
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, count, isnan, lit, when, year, month, to_date, min as fmin, max as fmax
+from functools import reduce
+from pyspark.sql import DataFrame
+from pyspark.ml.feature import VectorAssembler
+from pyspark.ml.stat import Summarizer
+from pyspark.ml.stat import Correlation
+
+# Filtrando warnings
+import warnings
+warnings.filterwarnings("ignore")</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Versões dos pacotes usados neste jupyter notebook
+%reload_ext watermark
+%watermark -a "RobertoSSoares-LfLngLrnng"</code></pre>
+</div>
+<div class="output output-stream">
+<pre>Author: RobertoSSoares-LfLngLrnng
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h1 id="%E2%9C%94%EF%B8%8F-Business-Understanding-%E2%80%94-Previs%C3%A3o-de-vendas"><font color="#CC403E" size="5"><strong>✔️ Business Understanding — Previsão de vendas</strong></font><a class="anchor-link" href="#%E2%9C%94%EF%B8%8F-Business-Understanding-%E2%80%94-Previs%C3%A3o-de-vendas">¶</a></h1><p><font color="#66666" size="3"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>Observe:</strong></font></p>
+<font color="#66666" size="2">
+<ul>
+<li>Pergunta de negócio implícita<ul>
+<li><strong>“Com base no histórico, conseguimos antecipar o comportamento das vendas ao longo do tempo para apoiar planejamento e decisão?”</strong></li>
+</ul>
+</li>
+</ul>
+<p>📌 Importante:</p>
+<ul>
+<li>Não se promete alta acurácia, promete previsibilidade inicial.</li>
+<li>Isso justifica um baseline simples.</li>
+</ul>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h1 id="%E2%9C%94%EF%B8%8F-Data-Understanding---Estat%C3%ADstica"><font color="#CC403E" size="5"><strong>✔️ Data Understanding - Estatística</strong></font><a class="anchor-link" href="#%E2%9C%94%EF%B8%8F-Data-Understanding---Estat%C3%ADstica">¶</a></h1><p><font color="#66666" size="3"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 PySpark em Cluster Docker</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<p><strong>Objetivo desta etapa</strong></p>
+<ul>
+<li>Entender o comportamento das vendas ao longo do tempo, verificando:<ul>
+<li>qualidade e consistência do dataset (schema, nulos, datas)</li>
+<li>tendência e sazonalidade (agregações por ano/mês)</li>
+<li>estatísticas descritivas (Summarizer)</li>
+<li>correlação entre variáveis temporais e vendas</li>
+<li>evidências para validar a estratégia de modelagem baseline (Year/Month → Sales)</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p><strong>Ambiente</strong></p>
+<ul>
+<li>Driver: Jupyter (container <strong>jupyter-rss</strong>)</li>
+<li>Cluster: Spark Master + 2 Workers (Docker)</li>
+<li>Event logs: habilitados (History Server)</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h2 id="%F0%9F%93%8C-Conex%C3%A3o-com-o-Spark-(cluster)"><font color="#CC403E" size="3"><strong>📌 Conexão com o Spark (cluster)</strong></font><a class="anchor-link" href="#%F0%9F%93%8C-Conex%C3%A3o-com-o-Spark-(cluster)">¶</a></h2><font color="#66666" size="2">
+<ul>
+<li><strong>Objetivo:</strong> garantir que o notebook está operando como driver conectado ao cluster Spark (master + workers).</li>
+<li><strong>Ação:</strong> criar/obter <strong>SparkSession</strong> apontando para <strong>spark://spark-master-rss:7077</strong>.</li>
+<li><strong>Justificativa técnica:</strong> a validação de execução distribuída é parte do requisito de <strong>ambiente realista</strong> e permite inspecionar Spark UI/History.</li>
+<li><strong>Resultado esperado:</strong> SparkSession ativa e job simples executando (sanity check).</li>
+</ul>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h3 id="%E2%9A%99%EF%B8%8F-SparkSession-+-sanity-check-(Code)"><font color="#CC403E" size="3"><strong>⚙️ SparkSession + sanity check (Code)</strong></font><a class="anchor-link" href="#%E2%9A%99%EF%B8%8F-SparkSession-+-sanity-check-(Code)">¶</a></h3><p><font color="#66666" size="3"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">spark = (
+    SparkSession.builder
+    .appName("P02_Data_Understanding")
+    .master("spark://spark-master-rss:7077")
+    .getOrCreate()
+)
+
+spark.sparkContext.setLogLevel("WARN")
+spark.sparkContext._jsc.sc().setLogLevel("ERROR")</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Sanity check (rápido)
+_ = spark.range(1, 1_000_000).count()
+print(_)
+print("Spark conectado ao cluster com sucesso.")</code></pre>
+</div>
+<div class="output output-stream text-danger">
+<pre>[Stage 0:&gt;                                                          (0 + 4) / 4]</pre>
+</div>
+<div class="output output-stream">
+<pre>999999
+Spark conectado ao cluster com sucesso.
+</pre>
+</div>
+<div class="output output-stream text-danger">
+<pre>                                                                                </pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h2 id="%F0%9F%93%8C-Par%C3%A2metros-do-dataset"><font color="#CC403E" size="3"><strong>📌 Parâmetros do dataset</strong></font><a class="anchor-link" href="#%F0%9F%93%8C-Par%C3%A2metros-do-dataset">¶</a></h2><font color="#66666" size="2">
+<ul>
+<li><strong>Objetivo:</strong> padronizar caminhos e nomes de colunas.</li>
+<li><strong>Ação:</strong> definir caminho do dataset e colunas principais.</li>
+<li><strong>Justificativa técnica:</strong> reprodutibilidade e menor risco de hardcode no notebook.</li>
+<li><strong>Resultado esperado:</strong> variáveis definidas para leitura e validações.</li>
+</ul>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h3 id="%E2%9A%99%EF%B8%8F-Par%C3%A2metros-de-entrada/sa%C3%ADda"><font color="#CC403E" size="3"><strong>⚙️ Parâmetros de entrada/saída</strong></font><a class="anchor-link" href="#%E2%9A%99%EF%B8%8F-Par%C3%A2metros-de-entrada/sa%C3%ADda">¶</a></h3><p><font color="#66666" size="3"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">DATA_PATH = os.getenv("DATA_PATH", "/opt/spark/dados/dataset.csv")
+DATE_COL = "Date"
+TARGET_COL = "Sales"
+
+print("DATA_PATH =", DATA_PATH)</code></pre>
+</div>
+<div class="output output-stream">
+<pre>DATA_PATH = /opt/spark/dados/dataset.csv
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h2 id="%F0%9F%93%8C-Leitura-do-dataset"><font color="#CC403E" size="3"><strong>📌 Leitura do dataset</strong></font><a class="anchor-link" href="#%F0%9F%93%8C-Leitura-do-dataset">¶</a></h2><font color="#66666" size="2">
+<ul>
+<li><strong>Objetivo:</strong> carregar dados e validar schema.</li>
+<li><strong>Ação:</strong> leitura CSV com inferência de schema e header.</li>
+<li><strong>Justificativa técnica:</strong> schema correto evita erros silenciosos em cast e features temporais.</li>
+<li><strong>Resultado esperado:</strong> DataFrame carregado, schema consistente e amostra de linhas.</li>
+</ul>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h3 id="%E2%9A%99%EF%B8%8F-Leitura-+-schema-+-sample-(Code)"><font color="#CC403E" size="3"><strong>⚙️ Leitura + schema + sample (Code)</strong></font><a class="anchor-link" href="#%E2%9A%99%EF%B8%8F-Leitura-+-schema-+-sample-(Code)">¶</a></h3><p><font color="#66666" size="3"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">df_raw = spark.read.csv(DATA_PATH, header=True, inferSchema=True)
+
+print(df_raw.printSchema())
+print(df_raw.show(5, truncate=False))
+print("Rows:", df_raw.count())</code></pre>
+</div>
+<div class="output output-stream text-danger">
+<pre>                                                                                </pre>
+</div>
+<div class="output output-stream">
+<pre>root
+ |-- Date: timestamp (nullable = true)
+ |-- Sales: integer (nullable = true)
+
+None
++-------------------+-----+
+|Date               |Sales|
++-------------------+-----+
+|2013-01-01 00:00:00|113  |
+|2013-02-01 00:00:00|119  |
+|2013-03-01 00:00:00|134  |
+|2013-04-01 00:00:00|129  |
+|2013-05-01 00:00:00|121  |
++-------------------+-----+
+only showing top 5 rows
+
+None
+Rows: 144
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h2 id="%F0%9F%93%8C-Sanity-checks-(qualidade-do-dado)"><font color="#CC403E" size="3"><strong>📌 Sanity checks (qualidade do dado)</strong></font><a class="anchor-link" href="#%F0%9F%93%8C-Sanity-checks-(qualidade-do-dado)">¶</a></h2><font color="#66666" size="2">
+<ul>
+<li><strong>Objetivo:</strong> entender se existem nulos, tipos inconsistentes e datas inválidas.</li>
+<li><strong>Ações:</strong><ul>
+<li>contagem de nulos por coluna</li>
+<li>validação de datas (cast para date)</li>
+</ul>
+</li>
+<li><strong>Justificativa técnica:</strong> problemas em <strong>Date</strong> afetam diretamente agregações e split temporal; problemas em <strong>Sales</strong> impactam métricas e regressão.</li>
+<li><strong>Resultado esperado:</strong> visão clara de nulos/invalidos e plano de correção.</li>
+</ul>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h3 id="%E2%9A%99%EF%B8%8F-Nulos-por-coluna-(Code)"><font color="#CC403E" size="3"><strong>⚙️ Nulos por coluna (Code)</strong></font><a class="anchor-link" href="#%E2%9A%99%EF%B8%8F-Nulos-por-coluna-(Code)">¶</a></h3><p><font color="#66666" size="3"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Nulos (inclui NaN para colunas numéricas)
+#from pyspark.sql.functions import col, count, when, isnan, lit
+#from functools import reduce
+
+dtypes = dict(df_raw.dtypes)
+
+exprs = []
+for c in df_raw.columns:
+    is_null = col(c).isNull()
+
+    # se for numérica, inclui isnan(col(c)); senão, usa lit(False) (ainda é Column)
+    is_nan = isnan(col(c)) if dtypes.get(c) in ("double", "float") else lit(False)
+
+    exprs.append(count(when(is_null | is_nan, 1)).alias(c))
+
+nulls_df = df_raw.select(exprs)
+nulls_df.show(truncate=False)</code></pre>
+</div>
+<div class="output output-stream">
+<pre>+----+-----+
+|Date|Sales|
++----+-----+
+|0   |0    |
++----+-----+
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">df_raw.printSchema()</code></pre>
+</div>
+<div class="output output-stream">
+<pre>root
+ |-- Date: timestamp (nullable = true)
+ |-- Sales: integer (nullable = true)
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h2 id="%F0%9F%93%8C-Padroniza%C3%A7%C3%A3o-de-data-e-cria%C3%A7%C3%A3o-de-features-temporais-(Year,-Month)"><font color="#CC403E" size="3"><strong>📌 Padronização de data e criação de features temporais (Year, Month)</strong></font><a class="anchor-link" href="#%F0%9F%93%8C-Padroniza%C3%A7%C3%A3o-de-data-e-cria%C3%A7%C3%A3o-de-features-temporais-(Year,-Month)">¶</a></h2><font color="#66666" size="2">
+<ul>
+<li><strong>Objetivo:</strong> garantir que <strong>Date</strong> é uma data válida e criar variáveis temporais.</li>
+<li><strong>Ação:</strong> cast para <strong>date</strong>, derivar <strong>Year</strong> e <strong>Month</strong>.</li>
+<li><strong>Justificativa técnica:</strong> Year/Month são a base do baseline e suportam análises de tendência/sazonalidade.</li>
+<li><strong>Resultado esperado:</strong> DataFrame com colunas <strong>Date</strong>, <strong>Year</strong>, <strong>Month</strong> prontas para exploração.</li>
+</ul>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h3 id="%E2%9A%99%EF%B8%8F-Transforma%C3%A7%C3%A3o-temporal-(Code)"><font color="#CC403E" size="3"><strong>⚙️ Transformação temporal (Code)</strong></font><a class="anchor-link" href="#%E2%9A%99%EF%B8%8F-Transforma%C3%A7%C3%A3o-temporal-(Code)">¶</a></h3><p><font color="#66666" size="3"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">df = df_raw.withColumn(DATE_COL, to_date(col(DATE_COL))) \
+           .withColumn("Year", year(col(DATE_COL))) \
+           .withColumn("Month", month(col(DATE_COL)))
+
+df.select(DATE_COL, "Year", "Month", TARGET_COL).show(5, truncate=False)
+
+df.select(
+    fmin(col(DATE_COL)).alias("min_date"),
+    fmax(col(DATE_COL)).alias("max_date")
+).show()</code></pre>
+</div>
+<div class="output output-stream">
+<pre>+----------+----+-----+-----+
+|Date      |Year|Month|Sales|
++----------+----+-----+-----+
+|2013-01-01|2013|1    |113  |
+|2013-02-01|2013|2    |119  |
+|2013-03-01|2013|3    |134  |
+|2013-04-01|2013|4    |129  |
+|2013-05-01|2013|5    |121  |
++----------+----+-----+-----+
+only showing top 5 rows
+
++----------+----------+
+|  min_date|  max_date|
++----------+----------+
+|2013-01-01|2024-12-01|
++----------+----------+
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h2 id="%F0%9F%93%8C-Perfil-b%C3%A1sico-de-vendas"><font color="#CC403E" size="3"><strong>📌 Perfil básico de vendas</strong></font><a class="anchor-link" href="#%F0%9F%93%8C-Perfil-b%C3%A1sico-de-vendas">¶</a></h2><font color="#66666" size="2">
+<ul>
+<li><strong>Objetivo:</strong> entender escala e distribuição inicial do alvo (<strong>Sales</strong>).</li>
+<li><strong>Ação:</strong> descrever estatísticas e checar outliers potenciais.</li>
+<li><strong>Justificativa técnica:</strong> ajuda a interpretar RMSE depois e identificar necessidade de transformação/robustez.</li>
+<li><strong>Resultado esperado:</strong> estatísticas gerais e sinais de variabilidade.</li>
+</ul>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h3 id="%E2%9A%99%EF%B8%8F-Estat%C3%ADsticas-simples-(Code)"><font color="#CC403E" size="3"><strong>⚙️ Estatísticas simples (Code)</strong></font><a class="anchor-link" href="#%E2%9A%99%EF%B8%8F-Estat%C3%ADsticas-simples-(Code)">¶</a></h3><p><font color="#66666" size="3"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">df.select(TARGET_COL).describe().show()</code></pre>
+</div>
+<div class="output output-stream">
+<pre>+-------+------------------+
+|summary|             Sales|
++-------+------------------+
+|  count|               144|
+|   mean|280.34027777777777|
+| stddev|119.91728869764205|
+|    min|               104|
+|    max|               622|
++-------+------------------+
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h2 id="%F0%9F%93%8C-Estat%C3%ADsticas-avan%C3%A7adas-(Summarizer)"><font color="#CC403E" size="3"><strong>📌 Estatísticas avançadas (Summarizer)</strong></font><a class="anchor-link" href="#%F0%9F%93%8C-Estat%C3%ADsticas-avan%C3%A7adas-(Summarizer)">¶</a></h2><font color="#66666" size="2">
+<ul>
+<li><strong>Objetivo:</strong> obter métricas como média, variância, min e max do alvo.</li>
+<li><strong>Ação:</strong> usar <strong>pyspark.ml.stat.Summarizer</strong>.</li>
+<li><strong>Justificativa técnica:</strong> sumarização formal para report e consistência com MLlib.</li>
+<li><strong>Resultado esperado:</strong> métricas consolidadas para <strong>Sales</strong>.</li>
+</ul>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h3 id="%E2%9A%99%EF%B8%8F-Summarizer-(Code)"><font color="#CC403E" size="3"><strong>⚙️ Summarizer (Code)</strong></font><a class="anchor-link" href="#%E2%9A%99%EF%B8%8F-Summarizer-(Code)">¶</a></h3><p><font color="#66666" size="3"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">#from pyspark.ml.feature import VectorAssembler
+#from pyspark.ml.stat import Summarizer
+#from pyspark.sql.functions import col
+
+assembler = VectorAssembler(inputCols=[TARGET_COL], outputCol="sales_vec")
+df_vec = assembler.transform(df.select(TARGET_COL).dropna())
+
+summary = df_vec.select(
+    Summarizer.metrics("mean", "variance", "min", "max").summary(col("sales_vec")).alias("summary")
+)
+
+summary.show(truncate=False)</code></pre>
+</div>
+<div class="output output-stream">
+<pre>+-------------------------------------------------------------+
+|summary                                                      |
++-------------------------------------------------------------+
+|{[280.34027777777777], [14380.15612859363], [104.0], [622.0]}|
++-------------------------------------------------------------+
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h3 id="%E2%9A%99%EF%B8%8F-Estat%C3%ADsticas-avan%C3%A7adas-%22SQL-Aggregations%22-(Code)"><font color="#CC403E" size="3"><strong>⚙️ Estatísticas avançadas "SQL Aggregations" (Code)</strong></font><a class="anchor-link" href="#%E2%9A%99%EF%B8%8F-Estat%C3%ADsticas-avan%C3%A7adas-%22SQL-Aggregations%22-(Code)">¶</a></h3><p><font color="#66666" size="3"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">from pyspark.sql.functions import avg, variance, min as fmin, max as fmax
+
+df.select(
+    avg(col(TARGET_COL)).alias("mean"),
+    variance(col(TARGET_COL)).alias("variance"),
+    fmin(col(TARGET_COL)).alias("min"),
+    fmax(col(TARGET_COL)).alias("max"),
+).show()
+</code></pre>
+</div>
+<div class="output output-stream">
+<pre>+------------------+-----------------+---+---+
+|              mean|         variance|min|max|
++------------------+-----------------+---+---+
+|280.34027777777777|14380.15612859363|104|622|
++------------------+-----------------+---+---+
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h2 id="%F0%9F%93%8C-Agrega%C3%A7%C3%B5es-por-tempo-(sazonalidade-e-tend%C3%AAncia)"><font color="#CC403E" size="3"><strong>📌 Agregações por tempo (sazonalidade e tendência)</strong></font><a class="anchor-link" href="#%F0%9F%93%8C-Agrega%C3%A7%C3%B5es-por-tempo-(sazonalidade-e-tend%C3%AAncia)">¶</a></h2><font color="#66666" size="2">
+<ul>
+<li><strong>Objetivo:</strong> avaliar evidências de sazonalidade (mês) e tendência (ano).</li>
+<li><strong>Ações:</strong><ul>
+<li>média e soma de vendas por mês</li>
+<li>média e soma de vendas por ano</li>
+</ul>
+</li>
+<li><strong>Justificativa técnica:</strong> se houver diferenças sistemáticas por mês, <strong>Month</strong> tende a carregar sinal; se houver mudança por ano, <strong>Year</strong> pode capturar tendência.</li>
+<li><strong>Resultado esperado:</strong> tabelas ordenadas com comportamento temporal.</li>
+</ul>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h3 id="%E2%9A%99%EF%B8%8F-Por-m%C3%AAs-(Code)"><font color="#CC403E" size="3"><strong>⚙️ Por mês (Code)</strong></font><a class="anchor-link" href="#%E2%9A%99%EF%B8%8F-Por-m%C3%AAs-(Code)">¶</a></h3><p><font color="#66666" size="3"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">from pyspark.sql.functions import avg, sum as fsum, count
+
+by_month = (
+    df.groupBy("Month")
+      .agg(
+          count("*").alias("n"),
+          avg(col("Sales")).alias("avg_sales"),
+          fsum(col("Sales")).alias("sum_sales"),
+      )
+      .orderBy("Month")
+)
+
+by_month.show(12, truncate=False)</code></pre>
+</div>
+<div class="output output-stream">
+<pre>+-----+---+------------------+---------+
+|Month|n  |avg_sales         |sum_sales|
++-----+---+------------------+---------+
+|1    |12 |241.91666666666666|2903     |
+|2    |12 |235.08333333333334|2821     |
+|3    |12 |270.3333333333333 |3244     |
+|4    |12 |267.0833333333333 |3205     |
+|5    |12 |271.8333333333333 |3262     |
+|6    |12 |311.6666666666667 |3740     |
+|7    |12 |351.3333333333333 |4216     |
+|8    |12 |351.0833333333333 |4213     |
+|9    |12 |302.4166666666667 |3629     |
+|10   |12 |266.5833333333333 |3199     |
+|11   |12 |232.91666666666666|2795     |
+|12   |12 |261.8333333333333 |3142     |
++-----+---+------------------+---------+
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h3 id="%E2%9A%99%EF%B8%8F-Por-ano-(Code)"><font color="#CC403E" size="3"><strong>⚙️ Por ano (Code)</strong></font><a class="anchor-link" href="#%E2%9A%99%EF%B8%8F-Por-ano-(Code)">¶</a></h3><p><font color="#66666" size="3"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">from pyspark.sql.functions import avg, sum as fsum, count
+
+by_year = (
+    df.groupBy("Year")
+      .agg(
+          count("*").alias("n"),
+          avg(col("Sales")).alias("avg_sales"),
+          fsum(col("Sales")).alias("sum_sales"),
+      )
+      .orderBy("Year")
+)
+
+by_year.show(100, truncate=False)</code></pre>
+</div>
+<div class="output output-stream">
+<pre>+----+---+------------------+---------+
+|Year|n  |avg_sales         |sum_sales|
++----+---+------------------+---------+
+|2013|12 |127.0             |1524     |
+|2014|12 |139.66666666666666|1676     |
+|2015|12 |170.16666666666666|2042     |
+|2016|12 |197.16666666666666|2366     |
+|2017|12 |225.0             |2700     |
+|2018|12 |238.91666666666666|2867     |
+|2019|12 |284.0             |3408     |
+|2020|12 |328.25            |3939     |
+|2021|12 |368.4166666666667 |4421     |
+|2022|12 |381.0             |4572     |
+|2023|12 |428.3333333333333 |5140     |
+|2024|12 |476.1666666666667 |5714     |
++----+---+------------------+---------+
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h2 id="%F0%9F%93%8C-Hip%C3%B3teses-(evid%C3%AAncia-por-agrupamento)"><font color="#CC403E" size="3"><strong>📌 Hipóteses (evidência por agrupamento)</strong></font><a class="anchor-link" href="#%F0%9F%93%8C-Hip%C3%B3teses-(evid%C3%AAncia-por-agrupamento)">¶</a></h2><font color="#66666" size="2">
+<p><strong>Hipótese de sazonalidade:</strong></p>
+<ul>
+<li><strong>H0</strong>: não há diferença relevante no nível médio de vendas entre meses.</li>
+<li><strong>Evidência empírica</strong>: variações consistentes em <strong>avg_sales</strong> por mês sugerem sazonalidade.</li>
+</ul>
+<p><strong>Hipótese de tendência:</strong></p>
+<ul>
+<li><strong>H0</strong>: não há mudança relevante de vendas entre anos.</li>
+<li><strong>Evidência empírica</strong>: variações em <strong>avg_sales</strong> e/ou <strong>sum_sales</strong> ao longo dos anos sugerem tendência.</li>
+</ul>
+<blockquote>
+<p>Nota: aqui usamos evidência empírica (EDA) como base para justificar features. Testes formais podem ser adicionados em uma evolução do projeto.</p>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h2 id="%F0%9F%93%8C-Correla%C3%A7%C3%A3o-(Year,-Month,-Sales)"><font color="#CC403E" size="3"><strong>📌 Correlação (Year, Month, Sales)</strong></font><a class="anchor-link" href="#%F0%9F%93%8C-Correla%C3%A7%C3%A3o-(Year,-Month,-Sales)">¶</a></h2><font color="#66666" size="2">
+<ul>
+<li><strong>Objetivo:</strong> medir se existe relação linear entre variáveis temporais e vendas.</li>
+<li><strong>Ação:</strong> gerar matriz de correlação para <strong>[Year, Month, Sales]</strong>.</li>
+<li><strong>Justificativa técnica:</strong> se a correlação linear for baixa, um baseline com regressão linear tende a ter R² baixo, reforçando a necessidade de features com memória temporal (lags / médias móveis).</li>
+<li><strong>Resultado esperado:</strong> matriz de correlação interpretável.</li>
+</ul>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h3 id="%E2%9A%99%EF%B8%8F-Correla%C3%A7%C3%A3o-(Code)"><font color="#CC403E" size="3"><strong>⚙️ Correlação (Code)</strong></font><a class="anchor-link" href="#%E2%9A%99%EF%B8%8F-Correla%C3%A7%C3%A3o-(Code)">¶</a></h3><p><font color="#66666" size="3"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">#from pyspark.ml.stat import Correlation
+#from pyspark.ml.feature import VectorAssembler
+
+vec = VectorAssembler(inputCols=["Year", "Month", TARGET_COL], outputCol="features_corr")
+df_corr = vec.transform(df.select("Year", "Month", TARGET_COL).dropna()).select("features_corr")
+
+corr = Correlation.corr(df_corr, "features_corr").head()[0]  # DenseMatrix
+corr</code></pre>
+</div>
+<div class="output output-stream text-danger">
+<pre>                                                                                </pre>
+</div>
+<div class="output">
+<pre>DenseMatrix(3, 3, [1.0, 0.0, 0.9217, 0.0, 1.0, 0.0634, 0.9217, 0.0634, 1.0], False)</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 Interpretação esperada</strong></font></p>
+<font color="#66666" size="2">
+<ul>
+<li><strong>Correlação Month ↔ Sales</strong>: sinal de sazonalidade (se diferente de 0)</li>
+<li><strong>Correlação Year ↔ Sales</strong>: sinal de tendência (se diferente de 0)</li>
+<li>Se ambas forem fracas, é esperado que um baseline linear com Year/Month tenha R² baixo.</li>
+</ul>
+<blockquote>
+<p>Resultado deste notebook deve ser coerente com o Notebook 2: o baseline funciona como diagnóstico.</p>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h2 id="%F0%9F%93%8C-Checklist-de-consist%C3%AAncia-para-o-baseline-(Year/Month-%E2%86%92-Sales)"><font color="#CC403E" size="3"><strong>📌 Checklist de consistência para o baseline (Year/Month → Sales)</strong></font><a class="anchor-link" href="#%F0%9F%93%8C-Checklist-de-consist%C3%AAncia-para-o-baseline-(Year/Month-%E2%86%92-Sales)">¶</a></h2><font color="#66666" size="2">
+<p>Antes de modelar, confirme:</p>
+<ul>
+<li><strong>Date</strong> está em formato date (sem nulos relevantes)</li>
+<li><strong>Sales</strong> é numérico e sem nulos relevantes</li>
+<li><strong>Year</strong> e <strong>Month</strong> foram derivados corretamente</li>
+<li>há evidência de padrão por tempo (mesmo que fraca)</li>
+</ul>
+<p>Se o sinal temporal for fraco, a próxima evolução é incluir:</p>
+<ul>
+<li><strong>lag_1</strong>, <strong>lag_2</strong>, <strong>lag_3</strong>… (memória)</li>
+<li>médias móveis (janela 3/6/12)</li>
+<li>variáveis exógenas (se existirem)</li>
+</ul>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h2 id="%F0%9F%93%8C-Conclus%C3%B5es-e-pr%C3%B3ximos-passos"><font color="#CC403E" size="3"><strong>📌 Conclusões e próximos passos</strong></font><a class="anchor-link" href="#%F0%9F%93%8C-Conclus%C3%B5es-e-pr%C3%B3ximos-passos">¶</a></h2><font color="#66666" size="2">
+<p><strong>Conclusão desta etapa (Data Understanding):</strong></p>
+<ul>
+<li>Identificamos a qualidade do dataset e a faixa temporal disponível.</li>
+<li>Quantificamos a variabilidade de <strong>Sales</strong>.</li>
+<li>Analisamos evidências de sazonalidade/tendência por agregações temporais.</li>
+<li>Avaliamos correlação linear entre tempo e vendas, justificando o baseline e orientando melhorias.</li>
+</ul>
+<p><strong>Próximos passos (Data Preparation / Modeling):</strong></p>
+<ul>
+<li>Criar features com memória temporal (lags).</li>
+<li>Incluir médias móveis com window functions.</li>
+<li>Reexecutar baseline e comparar ganhos.</li>
+<li>Comparar modelos (Linear vs GBT/RF).</li>
+</ul>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h3 id="%E2%9A%99%EF%B8%8F-Fechar-Spark-(Code)"><font color="#CC403E" size="3"><strong>⚙️ Fechar Spark (Code)</strong></font><a class="anchor-link" href="#%E2%9A%99%EF%B8%8F-Fechar-Spark-(Code)">¶</a></h3><p><font color="#66666" size="3"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">spark.stop()</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="6"><strong>Fim</strong></font></p>
+<p><font color="#66666" size="3"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">#!pip install nbconvert -U -q
+!jupyter nbconvert P02_01_Data_Understanding_Estatistico_PySpark.ipynb --to html --template my-template-html-v07.tpl</code></pre>
+</div>
+</div>
+<div class="footer">
+<p>RobertoSSoares-LfLngLrnng — <span id="datetime"></span></p>
+</div>
+<script>
+            document.getElementById("datetime").innerText = new Date().toLocaleString('pt-BR');
+        </script>
+</div>
+</body>
+</html>

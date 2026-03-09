@@ -1,0 +1,15 @@
+# Para um ambiente moderno com Python 3.12 utilizando o uv, estas são as versões estáveis e recomendadas 
+# (baseadas nos lançamentos de Fevereiro de 2026) para garantir máxima performance e compatibilidade:
+
+
+numpy			# Versão moderna com suporte nativo a melhorias de performance do Python 3.12 e 3.13.
+pandas			# Lançada em Janeiro de 2026, traz melhorias significativas de performance e integração.
+pyarrow			# Essencial para interoperabilidade ultra-rápida entre Polars, Pandas e DuckDB.
+matplotlib		# Versão que garante suporte pleno ao novo gerenciamento de memória do Python 3.12.
+seaborn			# Oferece a interface estável de objetos (seaborn.objects) recomendada para visualizações modernas.
+polars			# O Polars evolui rápido; utilize a versão estável mais recente para suporte nativo a Arrow no Python 3.12.
+scikit-learn		# Introduziu suporte nativo a Array API, permitindo algumas acelerações em GPU via PyTorch/CuPy.
+ipykernel		# Versão otimizada para Python 3.12, essencial para a execução de notebooks.
+duckdb			# Versão altamente estável para análise OLAP e integração direta com Polars/Pandas.
+jupyterlab		# Inclui suporte a subshells e melhorias no gerenciamento de extensões via PyPI.
+jupyter			# Acompanha a transição para o novo ecossistema do Notebook v7.
