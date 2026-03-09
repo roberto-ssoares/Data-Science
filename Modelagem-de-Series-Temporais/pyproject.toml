@@ -1,0 +1,56 @@
+[project]
+name = "modelagem-de-series-temporais"
+version = "0.1.0"
+description = "Monorepo - Modelagem de Séries Temporais (P01, P02) com DX"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+  "numpy>=1.26",
+  "pandas>=2.2",
+  "pyarrow>=15",
+  "matplotlib>=3.8",
+  "statsmodels>=0.14",
+  "scikit-learn>=1.4",
+  "jupyterlab>=4.2",
+  "ipykernel>=6.29",
+  "nbconvert>=7.16",
+  "rich>=13.7",
+  "ruff>=0.15.2",
+  "pre-commit>=4.5.1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "ruff>=0.6",
+  "pytest>=8.3",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+fix = true
+show-fixes = true
+exclude = [
+  ".venv",
+  "**/.ipynb_checkpoints",
+  "**/bkp/**",
+  "**/.bkp/**",
+  "**/.bkps/**",
+  "**/_archive/**",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]  # comprimento de linha é controlado por line-length
+unfixable = ["F401"]  # evita "apagar" imports que às vezes são usados em notebooks
+
+[tool.ruff.lint.isort]
+known-first-party = ["tsutils"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+
+
+

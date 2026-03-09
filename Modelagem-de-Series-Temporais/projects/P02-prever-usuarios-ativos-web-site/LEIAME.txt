@@ -1,0 +1,50 @@
+# Projeto 1 - Modelagem de Séries Temporais Para Prever Usuários Ativos em Um Web Site ao Longo do Tempo
+
+# Abra o terminal ou prompt de comando, navegue até a pasta com os arquivos e execute o comando abaixo para criar um ambiente virtual:
+
+conda create --name dsamodp1 python=3.13
+
+# Ative o ambiente:
+
+conda activate dsamodp1 (ou: source activate dsamodp1)
+
+# Instale o pip e as dependências:
+
+conda install pip
+pip install -r requirements.txt 
+
+# Execute o jupyter notebook
+
+jupyter notebook
+
+# Acesse o jupyter pelo seu navegador padrão.
+
+# Use os comandos abaixo para desativar o ambiente virtual e remover o ambiente (opcional):
+
+conda deactivate
+conda remove --name dsamodp1 --all
+
+
+
+=======================================================================
+
+
+
+Opção 2 — Ficar no 3.13 (via conda-forge)
+
+Se você precisa do 3.13, adicione o canal conda-forge e priorize-o. Obs.: alguns pacotes ainda não têm build para 3.13 e podem gerar conflitos.
+
+conda update -n base -c defaults conda -y
+
+conda config --add channels conda-forge
+conda config --set channel_priority strict
+
+conda create -n series-temporais-p1 python=3.13 -y
+conda activate series-temporais-p1
+python --version
+
+
+Se ainda assim não achar o 3.13, cheque explicitamente:
+
+conda search -c conda-forge python=3.13
+conda search -c defaults python=3.13
