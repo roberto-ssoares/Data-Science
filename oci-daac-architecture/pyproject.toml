@@ -1,0 +1,17 @@
+[project]
+name = "oci-daac-architecture"
+version = "0.1.0"
+description = "Diagram-as-Code for OCI architectures and Hackathon project diagrams"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "diagrams==0.24.4",
+    "graphviz==0.20.3",
+]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = []

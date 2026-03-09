@@ -1,0 +1,18 @@
+Listagem de caminhos de pasta
+O número de série do volume é E8EF-E414
+D:.
+|   .gitignore
+|   .python-version
+|   estrutura.txt
+|   main.py
+|   pyproject.toml
+|   README.md
+|   requirements.txt
+|   
++---diagrams_src
+|   +---logical
+|   \---physical
++---docs
+\---outputs
+    +---png
+    \---svg

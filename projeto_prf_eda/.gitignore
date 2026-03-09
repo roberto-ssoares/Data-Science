@@ -1,0 +1,63 @@
+# ==========================
+# Python
+# ==========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.egg
+*.egg-info/
+dist/
+build/
+*.spec
+
+# ==========================
+# Virtual Environments
+# ==========================
+.venv/
+venv/
+env/
+.env
+ENV/
+
+# ==========================
+# Dados (manter apenas .gitkeep)
+# ==========================
+data/00-raw/*.csv
+data/01-processed/*.parquet
+data/02-database/*.db
+data/02-database/*.sqlite
+
+# ==========================
+# Jupyter / Notebooks
+# ==========================
+notebooks/.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ==========================
+# IDEs e Editores
+# ==========================
+.vscode/
+.idea/
+*.swp
+*.swo
+.cursor/
+
+# ==========================
+# OS Files
+# ==========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ==========================
+# Streamlit
+# ==========================
+.streamlit/secrets.toml
+
+# ==========================
+# Misc
+# ==========================
+*.log
+.gemini/
