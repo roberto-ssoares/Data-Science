@@ -367,8 +367,6 @@ No próximo passo, eu monto o `hackathon_physical.py` já no mesmo padrão.
 
 ---
 
-
-
 # 1️⃣ Criar o diretório do projeto
 
 No PowerShell:
@@ -403,8 +401,6 @@ Para nosso projeto, vamos **adaptar a estrutura**.
 # 3️⃣ Ajustar a estrutura do projeto
 
 Crie as pastas:
-
-
 
 ```powershell
 mkdir diagrams_src  
@@ -536,8 +532,6 @@ with Diagram("Teste", show=False):
  Rack("OCI Resource")
 ```
 
-
-
 Execute:
 
 ```powershell
@@ -609,7 +603,5 @@ Data Flow Jobs
    │  
 Data Science Notebook  
    │  
-IAM / Policies / Groups
+IAM / Policies / Groupsuv
 ```
-
-

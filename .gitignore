@@ -1,0 +1,78 @@
+# =============================
+# Python
+# =============================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# =============================
+# Jupyter
+# =============================
+.ipynb_checkpoints/
+
+# =============================
+# VS Code
+# =============================
+.vscode/
+
+# =============================
+# Streamlit
+# =============================
+.streamlit/secrets.toml
+
+# =============================
+# Logs
+# =============================
+*.log
+
+# =============================
+# Data files (large / temporary)
+# =============================
+*.parquet
+*.feather
+*.arrow
+*.hdf5
+*.csv
+
+# Exception: keep raw examples if needed
+
+# Ignore processed data
+data/01-processed/*
+data/02-database/*
+
+# Allow raw sample data
+!data/00-raw/Dados_PRF_2023_utf8.csv
+
+# =============================
+# Databases
+# =============================
+*.db
+*.sqlite
+*.sqlite3
+*.duckdb
+
+# =============================
+# OS files
+# =============================
+.DS_Store
+Thumbs.db
+
+# =============================
+# Python packaging
+# =============================
+build/
+dist/
+*.egg-info/
+
+# =============================
+# UV / Python tooling
+# =============================
+.python-version

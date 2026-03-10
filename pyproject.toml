@@ -1,7 +1,18 @@
 [project]
 name = "data-science"
 version = "0.1.0"
-description = "Add your description here"
+description = "Monorepo de projetos de Data Science"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12,<3.14"
 dependencies = []
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.uv.workspace]
+members = ["projeto_prf_eda"]
+
+[tool.setuptools]
+packages = []
+py-modules = []

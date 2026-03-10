@@ -130,7 +130,7 @@ Este projeto é hospedável gratuitamente no **Streamlit Community Cloud**:
 
 1. Faça fork/push deste repositório para o seu GitHub
 2. Acesse [share.streamlit.io](https://share.streamlit.io)
-3. https://data-science-5vxxdtyzosfhcssdzw2pt6.streamlit.app
+3. 
 4. Conecte seu repositório e aponte para `app/main.py`
 5. Configure os dados (via upload ou fonte externa)
 
