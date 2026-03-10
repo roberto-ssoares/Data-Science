@@ -1,7 +1,6 @@
 import streamlit as st
 import duckdb
 import pandas as pd
-import pydeck as pdk
 from pathlib import Path
 import plotly.express as px
 import plotly.graph_objects as go
@@ -16,173 +15,10 @@ PARQUET_PATH = BASE_DIR / "data" / "01-processed" / "acidentes.parquet"
 
 @st.cache_data
 def load_data():
+    # Usando DuckDB para ler o parquet de forma ultra rápida
     con = duckdb.connect()
     df = con.execute(f"SELECT * FROM read_parquet('{PARQUET_PATH}')").df()
-    con.close()
     return df
-
-
-def ensure_text_column(df: pd.DataFrame, col: str, default: str = "") -> pd.Series:
-    if col not in df.columns:
-        return pd.Series([default] * len(df), index=df.index, dtype="object")
-    return df[col].fillna(default).astype(str)
-
-
-def build_map_dataframe(filtered_df: pd.DataFrame) -> pd.DataFrame:
-    map_data = filtered_df.copy()
-
-    map_data["latitude"] = pd.to_numeric(
-        map_data["latitude"].astype(str).str.replace(",", ".", regex=False),
-        errors="coerce",
-    )
-    map_data["longitude"] = pd.to_numeric(
-        map_data["longitude"].astype(str).str.replace(",", ".", regex=False),
-        errors="coerce",
-    )
-
-    map_data = map_data.dropna(subset=["latitude", "longitude"])
-
-    # Faixa aproximada do Brasil para evitar coordenadas inválidas
-    map_data = map_data[
-        map_data["latitude"].between(-35, 10)
-        & map_data["longitude"].between(-75, -30)
-    ].copy()
-
-    # Limita volume para performance
-    map_data = map_data.head(500).copy()
-
-    # Colunas textuais para tooltip
-    map_data["br_label"] = ensure_text_column(map_data, "br", "N/A")
-    map_data["km_label"] = ensure_text_column(map_data, "km", "N/A")
-    map_data["uf_label"] = ensure_text_column(map_data, "uf", "N/A")
-    map_data["municipio_label"] = ensure_text_column(map_data, "municipio", "N/A")
-    map_data["causa_label"] = ensure_text_column(map_data, "causa_acidente", "N/A")
-
-    if "data_inversa" in map_data.columns:
-        map_data["data_label"] = (
-            pd.to_datetime(map_data["data_inversa"], errors="coerce")
-            .dt.strftime("%Y-%m-%d")
-            .fillna("N/A")
-        )
-    else:
-        map_data["data_label"] = "N/A"
-
-    if "horario" in map_data.columns:
-        map_data["horario_label"] = map_data["horario"].fillna("N/A").astype(str)
-    else:
-        map_data["horario_label"] = "N/A"
-
-    # Texto pronto para aproveitar no módulo de tasks
-    map_data["task_local"] = (
-        "Intervenção em BR "
-        + map_data["br_label"]
-        + " | KM "
-        + map_data["km_label"]
-        + " | "
-        + map_data["municipio_label"]
-        + "/"
-        + map_data["uf_label"]
-    )
-
-    return map_data
-
-
-def render_map(map_data: pd.DataFrame):
-    if map_data.empty:
-        st.warning("Sem coordenadas válidas para exibir no mapa.")
-        return None, None
-
-    center_lat = map_data["latitude"].mean()
-    center_lon = map_data["longitude"].mean()
-
-    layer = pdk.Layer(
-        "ScatterplotLayer",
-        id="acidentes-layer",
-        data=map_data,
-        get_position="[longitude, latitude]",
-        get_radius=800,
-        get_fill_color="[255, 99, 71, 180]",
-        pickable=True,
-        stroked=True,
-        filled=True,
-        radius_min_pixels=4,
-        radius_max_pixels=20,
-        line_width_min_pixels=1,
-    )
-
-    deck = pdk.Deck(
-        layers=[layer],
-        initial_view_state=pdk.ViewState(
-            latitude=center_lat,
-            longitude=center_lon,
-            zoom=4,
-            pitch=0,
-        ),
-        tooltip={
-            "html": """
-                <b>Rodovia:</b> BR {br_label}<br/>
-                <b>KM:</b> {km_label}<br/>
-                <b>UF:</b> {uf_label}<br/>
-                <b>Município:</b> {municipio_label}<br/>
-                <b>Data:</b> {data_label}<br/>
-                <b>Horário:</b> {horario_label}<br/>
-                <b>Causa:</b> {causa_label}
-            """,
-            "style": {
-                "backgroundColor": "rgba(20, 20, 20, 0.92)",
-                "color": "white",
-                "fontSize": "12px",
-            },
-        },
-    )
-
-    event = st.pydeck_chart(
-        deck,
-        use_container_width=True,
-        on_select="rerun",
-        selection_mode="single-object",
-    )
-
-    return event, map_data
-
-
-def show_selected_location(event, map_data: pd.DataFrame):
-    if not event:
-        return
-
-    selection = event.selection if hasattr(event, "selection") else event.get("selection")
-    if not selection:
-        return
-
-    indices = selection.get("indices", {})
-    selected_indices = indices.get("acidentes-layer", [])
-    if not selected_indices:
-        return
-
-    idx = selected_indices[0]
-    if idx >= len(map_data):
-        return
-
-    selected_row = map_data.iloc[idx]
-
-    st.success("📍 Local selecionado para possível criação de tarefa")
-
-    c1, c2 = st.columns([3, 2])
-    with c1:
-        st.markdown(
-            f"""
-**Local:** BR {selected_row['br_label']} • KM {selected_row['km_label']}  
-**Município/UF:** {selected_row['municipio_label']} / {selected_row['uf_label']}  
-**Data/Hora:** {selected_row['data_label']} • {selected_row['horario_label']}  
-**Causa:** {selected_row['causa_label']}
-"""
-        )
-    with c2:
-        st.code(selected_row["task_local"], language="text")
-
-    st.info(
-        "Sugestão: use esse texto como título ou referência da tarefa na página de gestão."
-    )
 
 
 def main():
@@ -199,7 +35,7 @@ def main():
     # Sidebar Filtros
     st.sidebar.header("Filtros")
     ufs = st.sidebar.multiselect(
-        "Selecione o Estado (UF)", options=sorted(df["uf"].dropna().unique()), default=[]
+        "Selecione o Estado (UF)", options=sorted(df["uf"].unique()), default=[]
     )
 
     filtered_df = df if not ufs else df[df["uf"].isin(ufs)]
@@ -228,7 +64,6 @@ def main():
     with col_left:
         st.subheader("Top 10 Causas de Acidentes")
         causas = filtered_df["causa_acidente"].value_counts().head(10).reset_index()
-        causas.columns = ["causa_acidente", "count"]
         fig_causas = px.bar(
             causas,
             x="count",
@@ -243,13 +78,8 @@ def main():
     with col_right:
         st.subheader("Acidentes por Dia da Semana")
         dias = filtered_df["dia_semana"].value_counts().reset_index()
-        dias.columns = ["dia_semana", "count"]
         fig_dias = px.pie(
-            dias,
-            values="count",
-            names="dia_semana",
-            hole=0.4,
-            template="plotly_dark",
+            dias, values="count", names="dia_semana", hole=0.4, template="plotly_dark"
         )
         st.plotly_chart(fig_dias, use_container_width=True)
 
@@ -266,12 +96,11 @@ def main():
         timeline_df["data_inversa"], errors="coerce"
     )
     timeline_df = timeline_df.dropna(subset=["data_inversa"])
+    # Agrupar por mês e UF
     timeline_df["mes"] = timeline_df["data_inversa"].dt.to_period("M").dt.to_timestamp()
-
     time_series = (
         timeline_df.groupby(["mes", "uf"]).size().reset_index(name="ocorrencias")
     )
-
     fig_timeline = px.line(
         time_series,
         x="mes",
@@ -294,17 +123,29 @@ def main():
     st.plotly_chart(fig_timeline, use_container_width=True)
 
     st.markdown("---")
-
-    # Mapa interativo
-    st.subheader("🗺️ Visualização Geográfica (Top 500 ocorrências)")
-    st.caption(
-        "Passe o mouse sobre o ponto para ver Rodovia e KM. "
-        "Clique no ponto para selecionar um local candidato à criação de tarefa."
+    st.subheader("Visualização Geográfica (Top 500 ocorrencias)")
+    # Nota: Arquivo da PRF tem latitude/longitude. Vamos filtrar para exibir.
+    map_data = filtered_df.dropna(subset=["latitude", "longitude"]).head(500)
+    
+    # Converter lat/long para float (PRF às vezes usa ponto/vírgula inconsistente)
+    #map_data["latitude"] = map_data["latitude"].str.replace(",", ".").astype(float)
+    map_data["latitude"] = pd.to_numeric(
+    map_data["latitude"].astype(str).str.replace(",", ".", regex=False),
+    errors="coerce"
+    )
+    #map_data["longitude"] = map_data["longitude"].str.replace(",", ".").astype(float)
+    map_data["longitude"] = pd.to_numeric(
+        map_data["longitude"].astype(str).str.replace(",", ".", regex=False),
+        errors="coerce"
     )
 
-    map_data = build_map_dataframe(filtered_df)
-    event, prepared_map_data = render_map(map_data)
-    show_selected_location(event, prepared_map_data)
+    map_data = map_data.dropna(subset=["latitude", "longitude"])
+    map_data = map_data[
+        map_data["latitude"].between(-35, 10) &
+        map_data["longitude"].between(-75, -30)
+    ]
+
+    st.map(map_data[["latitude", "longitude"]])
 
     st.markdown("---")
 
@@ -322,7 +163,6 @@ def main():
         .reset_index()
     )
     sev_agg = sev_agg.sort_values("mortos", ascending=False).head(12)
-
     fig_sev = go.Figure()
     fig_sev.add_bar(
         name="Ilesos",
@@ -366,7 +206,6 @@ def main():
         heat_df["horario"], format="%H:%M:%S", errors="coerce"
     ).dt.hour
     heat_df = heat_df.dropna(subset=["hora"])
-
     dias_ordem = [
         "segunda-feira",
         "terça-feira",
@@ -376,7 +215,6 @@ def main():
         "sábado",
         "domingo",
     ]
-
     heat_pivot = (
         heat_df.groupby(["dia_semana", "hora"])
         .size()
@@ -385,7 +223,6 @@ def main():
         .reindex(dias_ordem)
         .fillna(0)
     )
-
     fig_heat = px.imshow(
         heat_pivot,
         color_continuous_scale="YlOrRd",
@@ -419,7 +256,6 @@ def main():
     clima_df = clima_df[clima_df["condicao_metereologica"] != "Ignorado"].sort_values(
         "letalidade_pct", ascending=False
     )
-
     fig_clima = px.bar(
         clima_df,
         x="condicao_metereologica",
@@ -443,5 +279,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-    
