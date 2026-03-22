@@ -1,0 +1,12 @@
+pandas
+numpy
+matplotlib
+networkx
+scikit-learn
+jupyter
+jupyterlab
+ipykernel
+GraphRicciCurvature
+scipy
+seaborn
+tqdm

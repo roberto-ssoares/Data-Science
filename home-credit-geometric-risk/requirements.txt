@@ -1,0 +1,25 @@
+# --- Core Data Engineering (Bronze & Silver) ---
+duckdb>=0.10.0
+polars==0.19.19
+pyarrow==14.0.1
+
+# --- Graph Theory & Geometry (Gold) ---
+networkx==3.1
+GraphRicciCurvature==0.5.3
+
+# --- Machine Learning & Math ---
+scikit-learn==1.3.2
+lightgbm==4.1.0
+numpy==1.26.2
+pandas==2.1.3
+
+# --- DX, UI & Monitoring ---
+tqdm==4.66.1
+matplotlib==3.8.2
+seaborn==0.13.0
+plotly==5.18.0
+kaleido==0.2.1
+watermark
+
+
+

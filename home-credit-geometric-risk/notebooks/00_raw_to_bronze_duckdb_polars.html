@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>00_raw_to_bronze_duckdb_polars</title>
+<!-- JupyterLab Light Theme -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/jupyterlab/3.6.3/themes/JupyterLab-light-theme.css" rel="stylesheet"/>
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css"> -->
+<!-- Highlight.js para sintaxe -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@300;400;600&amp;family=Reddit+Sans:wght@300;400;600&amp;family=Courier+Prime:wght@400;700&amp;family=Montserrat:wght@300;400;600&amp;family=Source+Code+Pro:wght@400&amp;family=Red+Hat+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<!-- MathJax (necessário para renderizar LaTeX em HTML) -->
+<script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['\\(', '\\)'], ['$', '$']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+          ignoreHtmlClass: 'tex2jax_ignore',
+          processHtmlClass: 'mathjax_process'
+        }
+      };
+    </script>
+<script async="" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+<style>
+      /* ====== GLOBAL ====== */
+        body{
+            font-family:'Montserrat','Reddit Sans';
+            font-size:14px;
+            background:#f5f5f5;
+            padding:100px 0;
+            color:#333;
+        }
+        .container{
+            max-width:1550px;
+            margin:auto;
+            background:#fff;
+            padding:20px 30px;
+            border-radius:6px;
+            box-shadow:0 4px 12px rgba(0,0,0,.1);
+        }
+        h1.title-header{
+            font-family:'Montserrat','Reddit Sans';
+            font-size:14px;
+            font-weight:600;
+            color:#8eb4c4;
+            text-transform:uppercase;
+            text-align:center;
+            margin-bottom:24px;
+        }
+        /* ====== MARKDOWN ====== */
+        .markdown{
+            background:#f3f2ee;
+            font-family:'Montserrat','Noto Sans Mono';
+            font-size:14px;
+            padding:10px 15px;              /* mais espaço interno */
+            /* padding-left: 5px;*/
+            border-left:5px solid #ff9800;  /* faixa laranja mais visível */
+            border-radius:4px;
+            margin:4px 0;                  /* mais respiro entre blocos */
+            margin-bottom:8px;
+            line-height:1.5;
+            /* Centralização vertical com flexbox */
+            /* display: flex; */
+            align-items: center; /* ou baseline — veja qual alinha melhor */
+        }
+        /* No <style> do template .tpl */
+        img, svg, figure img {
+            max-width: 100%;      /* nunca ultrapassa o container */
+            height: auto;         /* mantém proporção */
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            border: 1px solid #ddd;                /* borda leve */
+            border-radius: 6px;                    /* cantos arredondados */
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* sombra sutil */        
+        }
+        /* Legendas */
+        figure {
+          margin: 20px auto;
+          text-align: center;
+        }
+        figure figcaption {
+          font-size: 13px;
+          color: #555;
+          margin-top: 6px;
+        }
+
+        /* Ajuste em telas menores */
+        @media (max-width: 768px) {
+          .container {
+            max-width: 100%;
+            padding: 15px;
+          }
+        }
+        /* ====== CODE ====== */
+        .code_cell{
+            background:#f7f7f7;
+            border-left:5px solid #4caf50;
+            padding:4px;
+            /* padding-left: 5px;*/
+            margin:4px 0;
+            overflow-x:auto;
+            border-radius:4px;
+            display: flex;
+            align-items: center; /* ou baseline — veja qual alinha melhor */            
+        }
+        .code_cell pre,
+        .code_cell .hljs{
+            background:transparent!important;
+            font-family:'Red Hat Mono','Reddit Sans';
+            font-size:14px;
+            line-height:1.5;
+        }
+        /* ====== OUTPUT ====== */
+        .output{
+            background:#f3f9fa;
+            border-left:5px solid #2196f3;
+            padding:10px 6px;              /* mais espaço interno */
+            padding-left: 8px;            
+            margin:4px 0;                  /* mais respiro entre blocos */
+            margin-bottom:0px;
+            font-family:'Red Hat Mono','Noto Sans Mono';
+            font-size:14px;
+            text-align:left;
+            line-height:1.5;
+            white-space:pre-wrap;        
+            overflow-x:auto;
+            border-radius:4px;
+            align-items: center; /* ou baseline — veja qual alinha melhor */            
+        }
+        .output img{
+            max-width:100%;
+            height:auto;
+            display:block;
+            margin:auto;
+        }
+        /* Caixa específica para stream outputs (ex: print, watermark, logs) */
+        .output-stream {
+            background:#f3f9fa;
+            border-left:5px solid #2196f3;
+            padding: 6px 10px;
+            margin:4px 0;
+        }
+        /* ====== FOOTER ====== */
+        .footer{
+            text-align:right;
+            margin-top:30px;
+            padding:12px;
+            background:#e9ecef;
+            border-radius:4px;
+            font-size:14px;
+            color:#555;
+        }        
+
+        /* Tabelas */
+        table.dataframe {
+            border-collapse: collapse;
+            border: none;
+            margin: 0;
+            padding: 0;
+            font-family:'Red Hat Mono','Noto Sans Mono';
+            font-size: 14px;
+            line-height: 1.4;
+            width: auto;
+        }
+        table.dataframe th, table.dataframe td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        table.dataframe thead {
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
+        table.dataframe tr:nth-child(even) {
+            background-color: #f6f8fa;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<h1 class="title-header">00_raw_to_bronze_duckdb_polars</h1>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#F3F2EE">
+<br/><br/>
+<p style="text-align: center;">
+<font color="#0A1781" size="6">
+<strong>
+                    Data Science Projects
+                </strong>
+</font>
+</p>
+<p style="text-align: center;">
+<font color="#C58A1E" size="6">
+<strong>
+                    Home Credit Geometric Risk
+                </strong>
+</font>
+</p>
+<p style="text-align: center;">
+<font color="#C58A1E" size="5">
+<strong>
+                    Raw to Bronze with DuckDB + Polars
+                </strong>
+</font>
+</p>
+<br/>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#F3F2EE">
+<p style="text-align: right;">
+<font color="#444444" size="4">
+            Roberto SSoares - LfLngLrnng
+      </font>
+</p>
+<p style="text-align: right;"><font color="#444444" size="2">
+<a href="https://www.linkedin.com/in/roberto-dos-santos-soares/">in/roberto-dos-santos-soares</a><br/><a href="https://roberto-ssoares.github.io/meu-portfolio/">Portifólio: roberto-ssoares</a>
+</font></p>
+<p style="text-align: right;">
+<font color="#444444" size="4">
+            " [+] Faturamento,<br \=""/> [-] Custo,<br \=""/> [+] Qualidade de vida "
+        </font>
+<br>
+<font color="#918e8e" size="2">"Mestre Bruno Jardim"
+        </font>
+</br></p>
+<p style="text-align: right;">
+<font color="#918e8e" size="2">
+</font>
+</p>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>🎯 Objetivo</strong></font></p>
+<font color="#66666" size="2">
+<ul>
+<li>Converter os arquivos CSV da camada raw para Parquet na camada bronze com alta performance, garantindo auditoria, rastreabilidade e qualidade mínima dos dados.</li>
+</ul>
+<p>⚙️ Ações realizadas</p>
+<ul>
+<li>Ingestão de CSV → Parquet com DuckDB</li>
+<li>Geração de auditoria de execução</li>
+<li>Criação de schema registry (estrutura das tabelas)</li>
+<li>Profiling automático por coluna</li>
+<li>Análise de valores nulos</li>
+</ul>
+<p>🧠 Justificativa técnica</p>
+<ul>
+<li>DuckDB permite ingestão extremamente rápida e eficiente.</li>
+<li>Polars oferece manipulação leve, rápida e moderna para auditoria e profiling.</li>
+</ul>
+<p>✅ Resultados esperados</p>
+<ul>
+<li>Arquivos <code>.parquet</code> na camada bronze</li>
+<li>Relatório de auditoria</li>
+<li>Catálogo de schema</li>
+<li>Perfil estatístico das colunas</li>
+<li>Análise de qualidade (nulls)</li>
+</ul>
+<blockquote>
+<ul>
+<li>A Ingestão precisa entregar:<ul>
+<li>ingestão reprodutível</li>
+<li>auditoria mínima</li>
+<li>sanidade dos arquivos</li>
+<li>logs claros</li>
+<li>artefatos de controle</li>
+<li>DX decente para manutenção futura</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 Variáveis de controle.</strong></font></p>
+<font color="#66666" size="2">
+<ul>
+<li>Incluir:<ul>
+<li>run_id: identificador único da execução</li>
+<li>ingestion_ts: timestamp da ingestão</li>
+<li>source_file</li>
+<li>target_file</li>
+<li>status</li>
+<li>elapsed_seconds</li>
+<li>row_count</li>
+<li>column_count</li>
+<li>file_size_mb_csv</li>
+<li>file_size_mb_parquet</li>
+<li>compression_ratio_aprox</li>
+<li>sanity_check_passed</li>
+<li>error_message</li>
+</ul>
+</li>
+</ul>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 Testes de sanidade.</strong></font></p>
+<font color="#66666" size="2">
+<ul>
+<li>Para cada arquivo:<ul>
+<li>verificar se o CSV existe</li>
+<li>verificar se o Parquet foi criado</li>
+<li>contar linhas do CSV e do Parquet</li>
+<li>comparar contagem de linhas</li>
+<li>verificar se número de colunas é maior que zero</li>
+<li>capturar schema inferido</li>
+<li>marcar sucesso ou erro no log</li>
+</ul>
+</li>
+</ul>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h2 id="%F0%9F%93%9A-Instalando-e-Carregando-os-Pacotes"><font color="#FF5733" size="3"><strong>📚 Instalando e Carregando os Pacotes</strong></font><a class="anchor-link" href="#%F0%9F%93%9A-Instalando-e-Carregando-os-Pacotes">¶</a></h2><font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Objetivo:<ul>
+<li>Importar bibliotecas necessárias para manipulação de dados, construção do grafo,</li>
+<li>cálculo de curvatura e modelagem preditiva.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Ações realizadas:<ul>
+<li>Importação de bibliotecas de análise, ML e grafos</li>
+<li>Configuração de warnings</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Justificativa técnica:<ul>
+<li>Este projeto integra processamento tabular com modelagem em grafos.</li>
+<li>Por isso, precisamos combinar bibliotecas clássicas de ciência de dados</li>
+<li>com bibliotecas de análise de redes.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Resultados esperados:<ul>
+<li>Ambiente pronto para carga, preparação, construção do grafo e modelagem.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 00 - Imports</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">import sys
+#!{sys.executable} -m pip install duckdb polars
+#!{sys.executable} -m pip install watermark -q -U</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">import warnings
+warnings.filterwarnings("ignore")
+
+from __future__ import annotations
+
+import os
+import glob
+import time
+import uuid
+from datetime import datetime
+from pathlib import Path
+
+import duckdb
+import polars as pl</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Versões dos pacotes usados neste jupyter notebook
+%reload_ext watermark
+%watermark -a "RobertoSSoares-LfLngLrnng"</code></pre>
+</div>
+<div class="output output-stream">
+<pre>Author: RobertoSSoares-LfLngLrnng
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 01 - Funções Utilitárias</strong></font></p>
+<font color="#66666" size="2">
+<ol>
+<li>Garante que um diretório exista.</li>
+<li>Converte bytes para megabytes</li>
+<li>Retorna o tamanho do arquivo em MB, ou None se o arquivo não existir.</li>
+<li>Gera o nome do arquivo parquet de saída a partir do CSV de entrada.</li>
+</ol>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">def ensure_dir(path: str | Path) -&gt; Path:
+    """
+    Garante que um diretório exista.
+    """
+    path = Path(path)
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def bytes_to_mb(num_bytes: int) -&gt; float:
+    """
+    Converte bytes para megabytes.
+    """
+    return round(num_bytes / (1024 * 1024), 4)
+
+
+def safe_file_size_mb(path: str | Path) -&gt; float | None:
+    """
+    Retorna o tamanho do arquivo em MB, ou None se o arquivo não existir.
+    """
+    path = Path(path)
+    if path.exists():
+        return bytes_to_mb(path.stat().st_size)
+    return None
+
+
+def normalize_output_name(file_path: str | Path) -&gt; str:
+    """
+    Gera o nome do arquivo parquet de saída a partir do CSV de entrada.
+    """
+    return Path(file_path).stem + ".parquet"
+
+
+def now_str() -&gt; str:
+    """
+    Timestamp amigável para auditoria.
+    """
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 01.1 - Função Principal - Ingestão RAW -&gt; BRONZE usando DuckDB + auditoria em Polars.</strong></font>
+<font color="#66666" size="2"></font></p>
+<p>🧠 Ajuste importante de conceito</p>
+<ul>
+<li>Polars trabalha melhor com:<ul>
+<li>estruturas imutáveis</li>
+<li>execução vetorizada</li>
+<li>schemas explícitos</li>
+</ul>
+</li>
+<li>Mas aqui usamos Polars apenas para:<ul>
+<li>consolidar auditoria</li>
+<li>persistir resultados</li>
+<li>inspeção leve</li>
+</ul>
+</li>
+</ul>
+<hr/>
+<p></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Função principal (VERSÃO POLARS)
+def raw_to_bronze_duckdb(
+    raw_dir: str = "../data/00-raw",
+    bronze_dir: str = "../data/01-bronze",
+    audit_dir: str = "../data/99-audit",
+    glob_pattern: str = "*.csv",
+    sample_size: int = -1,
+    all_varchar: bool = False,
+    ignore_errors: bool = False,
+    filename: bool = True,
+    union_by_name: bool = False,
+    compression: str = "zstd",
+    overwrite: bool = True,
+    verbose: bool = True,
+) -&gt; pl.DataFrame:
+    """
+    Ingestão RAW -&gt; BRONZE usando DuckDB + auditoria em Polars.
+    """
+
+    run_id = datetime.now().strftime("%Y%m%d_%H%M%S") + "_" + uuid.uuid4().hex[:8]
+    ingestion_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    raw_path = Path(raw_dir)
+    bronze_path = ensure_dir(bronze_dir)
+    audit_path = ensure_dir(audit_dir)
+
+    csv_files = sorted(glob.glob(str(raw_path / glob_pattern)))
+
+    if not csv_files:
+        raise FileNotFoundError(f"Nenhum CSV encontrado em {raw_dir}")
+
+    if verbose:
+        print("=" * 90)
+        print("🚀 RAW → BRONZE (DuckDB + Polars)")
+        print(f"Run ID: {run_id}")
+        print("=" * 90)
+
+    audit_rows = []
+    start_all = time.time()
+
+    con = duckdb.connect()
+
+    for file_path in csv_files:
+        start_file = time.time()
+
+        source_path = Path(file_path)
+        target_path = bronze_path / (source_path.stem + ".parquet")
+
+        if verbose:
+            print(f"📦 {source_path.name}")
+
+        try:
+            csv_size_mb = safe_file_size_mb(source_path)
+
+            read_csv_relation = f"""
+                read_csv_auto(
+                    '{str(source_path).replace("\\", "/")}',
+                    sample_size={sample_size},
+                    all_varchar={str(all_varchar).lower()},
+                    ignore_errors={str(ignore_errors).lower()}
+                )"""
+
+            if target_path.exists() and overwrite:
+                target_path.unlink()
+
+            # COPY → Parquet
+            con.execute(f"""
+                COPY (
+                    SELECT *
+                    FROM {read_csv_relation}
+                )
+                TO '{str(target_path).replace("\\", "/")}'
+                (FORMAT PARQUET, COMPRESSION '{compression}');
+            """)
+
+            # Contagens
+            csv_rows = con.execute(
+                f"SELECT COUNT(*) FROM {read_csv_relation}"
+            ).fetchone()[0]
+
+            parquet_rows = con.execute(
+                f"SELECT COUNT(*) FROM read_parquet('{str(target_path).replace("\\", "/")}')"
+            ).fetchone()[0]
+
+            column_count = con.execute(f"""
+                SELECT COUNT(*) FROM (
+                    DESCRIBE SELECT * FROM read_parquet('{str(target_path).replace("\\", "/")}')
+                )
+            """).fetchone()[0]
+
+            parquet_size_mb = safe_file_size_mb(target_path)
+
+            sanity = (
+                target_path.exists()
+                and csv_rows == parquet_rows
+                and column_count &gt; 0
+            )
+
+            compression_ratio = None
+            if csv_size_mb and parquet_size_mb:
+                compression_ratio = round(csv_size_mb / parquet_size_mb, 4)
+
+            audit_rows.append({
+                "run_id": run_id,
+                "file": source_path.name,
+                "status": "SUCCESS" if sanity else "WARNING",
+                "csv_rows": csv_rows,
+                "parquet_rows": parquet_rows,
+                "columns": column_count,
+                "csv_mb": csv_size_mb,
+                "parquet_mb": parquet_size_mb,
+                "compression_ratio": compression_ratio,
+                "sanity": sanity,
+                "elapsed": round(time.time() - start_file, 4),
+            })
+
+        except Exception as e:
+            audit_rows.append({
+                "run_id": run_id,
+                "file": source_path.name,
+                "status": "ERROR",
+                "error": str(e),
+                "elapsed": round(time.time() - start_file, 4),
+            })
+
+            if verbose:
+                print(f"❌ {e}")
+
+    con.close()
+
+    # 🔥 Aqui entra o Polars
+    audit_df = pl.DataFrame(audit_rows)
+
+    # Persistência
+    audit_df.write_csv(audit_path / "raw_to_bronze_audit.csv")
+    audit_df.write_parquet(audit_path / "raw_to_bronze_audit.parquet")
+
+    if verbose:
+        print("=" * 90)
+        print("🏁 FINALIZADO")
+    
+        if audit_df.height &gt; 0 and "status" in audit_df.columns:
+            print("Resumo por status:")
+            print(
+                audit_df
+                .group_by("status")
+                .len()
+                .rename({"len": "qtd_arquivos"})
+                .sort("status")
+            )
+        else:
+            print("Nenhum registro de auditoria foi gerado.")
+    
+        print("=" * 90)
+
+    return audit_df</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Execução
+audit_df = raw_to_bronze_duckdb(
+    raw_dir="../data/00-raw",
+    bronze_dir="../data/01-bronze",
+    audit_dir="../data/99-audit",
+    glob_pattern="*.csv",
+    sample_size=-1,      # inferência mais confiável
+    all_varchar=False,   # mantém inferência automática
+    ignore_errors=False, # mais rigoroso
+    compression="zstd",
+    overwrite=True,
+    verbose=True,
+)
+
+audit_df</code></pre>
+</div>
+<div class="output output-stream">
+<pre>==========================================================================================
+🚀 RAW → BRONZE (DuckDB + Polars)
+Run ID: 20260320_221107_77ddda88
+==========================================================================================
+📦 POS_CASH_balance.csv
+📦 application_test.csv
+📦 application_train.csv
+📦 bureau.csv
+📦 bureau_balance.csv
+📦 credit_card_balance.csv
+📦 installments_payments.csv
+📦 previous_application.csv
+==========================================================================================
+🏁 FINALIZADO
+Resumo por status:
+shape: (1, 2)
+┌─────────┬──────────────┐
+│ status  ┆ qtd_arquivos │
+│ ---     ┆ ---          │
+│ str     ┆ u32          │
+╞═════════╪══════════════╡
+│ SUCCESS ┆ 8            │
+└─────────┴──────────────┘
+==========================================================================================
+</pre>
+</div>
+<div class="output table-output">
+<div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (8, 11)</small><table border="1" class="dataframe"><thead><tr><th>run_id</th><th>file</th><th>status</th><th>csv_rows</th><th>parquet_rows</th><th>columns</th><th>csv_mb</th><th>parquet_mb</th><th>compression_ratio</th><th>sanity</th><th>elapsed</th></tr><tr><td>str</td><td>str</td><td>str</td><td>i64</td><td>i64</td><td>i64</td><td>f64</td><td>f64</td><td>f64</td><td>bool</td><td>f64</td></tr></thead><tbody><tr><td>"20260320_221107_77ddda88"</td><td>"POS_CASH_balance.csv"</td><td>"SUCCESS"</td><td>10001358</td><td>10001358</td><td>8</td><td>374.5109</td><td>84.0572</td><td>4.4554</td><td>true</td><td>32.5869</td></tr><tr><td>"20260320_221107_77ddda88"</td><td>"application_test.csv"</td><td>"SUCCESS"</td><td>92254</td><td>92254</td><td>171</td><td>131.85</td><td>39.0049</td><td>3.3803</td><td>true</td><td>7.7143</td></tr><tr><td>"20260320_221107_77ddda88"</td><td>"application_train.csv"</td><td>"SUCCESS"</td><td>215257</td><td>215257</td><td>172</td><td>308.0314</td><td>90.8214</td><td>3.3916</td><td>true</td><td>17.1665</td></tr><tr><td>"20260320_221107_77ddda88"</td><td>"bureau.csv"</td><td>"SUCCESS"</td><td>1716428</td><td>1716428</td><td>17</td><td>162.1406</td><td>24.9118</td><td>6.5086</td><td>true</td><td>15.8967</td></tr><tr><td>"20260320_221107_77ddda88"</td><td>"bureau_balance.csv"</td><td>"SUCCESS"</td><td>27299925</td><td>27299925</td><td>3</td><td>358.1933</td><td>11.3023</td><td>31.6921</td><td>true</td><td>37.7715</td></tr><tr><td>"20260320_221107_77ddda88"</td><td>"credit_card_balance.csv"</td><td>"SUCCESS"</td><td>3840312</td><td>3840312</td><td>23</td><td>404.9135</td><td>97.3264</td><td>4.1604</td><td>true</td><td>41.4394</td></tr><tr><td>"20260320_221107_77ddda88"</td><td>"installments_payments.csv"</td><td>"SUCCESS"</td><td>13605401</td><td>13605401</td><td>8</td><td>689.6194</td><td>237.7724</td><td>2.9003</td><td>true</td><td>66.7619</td></tr><tr><td>"20260320_221107_77ddda88"</td><td>"previous_application.csv"</td><td>"SUCCESS"</td><td>1670214</td><td>1670214</td><td>37</td><td>386.2126</td><td>52.579</td><td>7.3454</td><td>true</td><td>22.7277</td></tr></tbody></table></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 01.2 - Função Schema Registry (Lazy)</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Schema Registry (LAZY)
+
+def build_schema_registry(bronze_dir="../data/01-bronze", audit_dir="../data/99-audit"):
+    rows = []
+
+    for file in Path(bronze_dir).glob("*.parquet"):
+        schema = pl.scan_parquet(str(file)).collect_schema()
+
+        for i, (col, dtype) in enumerate(schema.items(), start=1):
+            rows.append({
+                "table": file.stem,
+                "column": col,
+                "dtype": str(dtype),
+                "order": i
+            })
+
+    df = pl.DataFrame(rows)
+
+    df.write_parquet(Path(audit_dir) / "schema_registry.parquet")
+    df.write_csv(Path(audit_dir) / "schema_registry.csv")
+
+    return df
+
+schema_df = build_schema_registry()
+display(schema_df.head(5))
+print(" ")
+display(schema_df.sample(5))</code></pre>
+</div>
+<div class="output table-output">
+<div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (5, 4)</small><table border="1" class="dataframe"><thead><tr><th>table</th><th>column</th><th>dtype</th><th>order</th></tr><tr><td>str</td><td>str</td><td>str</td><td>i64</td></tr></thead><tbody><tr><td>"application_test"</td><td>"SK_ID_CURR"</td><td>"Int64"</td><td>1</td></tr><tr><td>"application_test"</td><td>"NAME_CONTRACT_TYPE"</td><td>"String"</td><td>2</td></tr><tr><td>"application_test"</td><td>"CODE_GENDER"</td><td>"String"</td><td>3</td></tr><tr><td>"application_test"</td><td>"FLAG_OWN_CAR"</td><td>"String"</td><td>4</td></tr><tr><td>"application_test"</td><td>"FLAG_OWN_REALTY"</td><td>"String"</td><td>5</td></tr></tbody></table></div>
+</div>
+<div class="output output-stream">
+<pre> 
+</pre>
+</div>
+<div class="output table-output">
+<div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (5, 4)</small><table border="1" class="dataframe"><thead><tr><th>table</th><th>column</th><th>dtype</th><th>order</th></tr><tr><td>str</td><td>str</td><td>str</td><td>i64</td></tr></thead><tbody><tr><td>"application_test"</td><td>"EXT_SOURCE_2"</td><td>"Float64"</td><td>42</td></tr><tr><td>"application_test"</td><td>"var_33"</td><td>"Float64"</td><td>154</td></tr><tr><td>"credit_card_balance"</td><td>"AMT_CREDIT_LIMIT_ACTUAL"</td><td>"Int64"</td><td>5</td></tr><tr><td>"application_train"</td><td>"DAYS_ID_PUBLISH"</td><td>"Int64"</td><td>21</td></tr><tr><td>"application_test"</td><td>"ENTRANCES_AVG"</td><td>"Float64"</td><td>50</td></tr></tbody></table></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 01.3 - Função Profiling de Colunas</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Profiling de Colunas
+def profile_bronze(bronze_dir="../data/01-bronze", out_dir="../data/90-profiling"):
+    rows = []
+
+    for file in Path(bronze_dir).glob("*.parquet"):
+        df = pl.read_parquet(file)
+
+        for col in df.columns:
+            s = df[col]
+
+            rows.append({
+                "table": file.stem,
+                "column": col,
+                "dtype": str(s.dtype),
+                "rows": df.height,
+                "nulls": s.null_count(),
+                "null_pct": s.null_count() / df.height * 100 if df.height else 0,
+                "unique": s.n_unique(),
+            })
+
+    df = pl.DataFrame(rows)
+    ensure_dir(out_dir)
+
+    df.write_parquet(Path(out_dir) / "column_profile.parquet")
+    df.write_csv(Path(out_dir) / "column_profile.csv")
+
+    return df
+
+
+profile_df = profile_bronze()
+display(profile_df.head(5))
+print()
+display(profile_df.sample(5))</code></pre>
+</div>
+<div class="output table-output">
+<div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (5, 7)</small><table border="1" class="dataframe"><thead><tr><th>table</th><th>column</th><th>dtype</th><th>rows</th><th>nulls</th><th>null_pct</th><th>unique</th></tr><tr><td>str</td><td>str</td><td>str</td><td>i64</td><td>i64</td><td>f64</td><td>i64</td></tr></thead><tbody><tr><td>"application_test"</td><td>"SK_ID_CURR"</td><td>"Int64"</td><td>92254</td><td>0</td><td>0.0</td><td>92254</td></tr><tr><td>"application_test"</td><td>"NAME_CONTRACT_TYPE"</td><td>"String"</td><td>92254</td><td>0</td><td>0.0</td><td>2</td></tr><tr><td>"application_test"</td><td>"CODE_GENDER"</td><td>"String"</td><td>92254</td><td>0</td><td>0.0</td><td>3</td></tr><tr><td>"application_test"</td><td>"FLAG_OWN_CAR"</td><td>"String"</td><td>92254</td><td>0</td><td>0.0</td><td>2</td></tr><tr><td>"application_test"</td><td>"FLAG_OWN_REALTY"</td><td>"String"</td><td>92254</td><td>0</td><td>0.0</td><td>2</td></tr></tbody></table></div>
+</div>
+<div class="output output-stream">
+<pre>
+</pre>
+</div>
+<div class="output table-output">
+<div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (5, 7)</small><table border="1" class="dataframe"><thead><tr><th>table</th><th>column</th><th>dtype</th><th>rows</th><th>nulls</th><th>null_pct</th><th>unique</th></tr><tr><td>str</td><td>str</td><td>str</td><td>i64</td><td>i64</td><td>f64</td><td>i64</td></tr></thead><tbody><tr><td>"POS_CASH_balance"</td><td>"SK_ID_PREV"</td><td>"Int64"</td><td>10001358</td><td>0</td><td>0.0</td><td>936325</td></tr><tr><td>"credit_card_balance"</td><td>"SK_DPD_DEF"</td><td>"Int64"</td><td>3840312</td><td>0</td><td>0.0</td><td>378</td></tr><tr><td>"bureau"</td><td>"AMT_CREDIT_SUM_OVERDUE"</td><td>"Float64"</td><td>1716428</td><td>0</td><td>0.0</td><td>1616</td></tr><tr><td>"application_test"</td><td>"REGION_RATING_CLIENT_W_CITY"</td><td>"Int64"</td><td>92254</td><td>0</td><td>0.0</td><td>3</td></tr><tr><td>"application_test"</td><td>"FLAG_DOCUMENT_15"</td><td>"Int64"</td><td>92254</td><td>0</td><td>0.0</td><td>2</td></tr></tbody></table></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 2 - Null Analysis</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Null Analysis
+null_df = (profile_df.sort("null_pct", descending=True))
+null_df.head(10)</code></pre>
+</div>
+<div class="output table-output">
+<div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (20, 7)</small><table border="1" class="dataframe"><thead><tr><th>table</th><th>column</th><th>dtype</th><th>rows</th><th>nulls</th><th>null_pct</th><th>unique</th></tr><tr><td>str</td><td>str</td><td>str</td><td>i64</td><td>i64</td><td>f64</td><td>i64</td></tr></thead><tbody><tr><td>"previous_application"</td><td>"RATE_INTEREST_PRIMARY"</td><td>"Float64"</td><td>1670214</td><td>1664263</td><td>99.643698</td><td>149</td></tr><tr><td>"previous_application"</td><td>"RATE_INTEREST_PRIVILEGED"</td><td>"Float64"</td><td>1670214</td><td>1664263</td><td>99.643698</td><td>26</td></tr><tr><td>"bureau"</td><td>"AMT_ANNUITY"</td><td>"Float64"</td><td>1716428</td><td>1226791</td><td>71.47349</td><td>40322</td></tr><tr><td>"application_test"</td><td>"COMMONAREA_AVG"</td><td>"Float64"</td><td>92254</td><td>64488</td><td>69.90266</td><td>2372</td></tr><tr><td>"application_test"</td><td>"COMMONAREA_MODE"</td><td>"Float64"</td><td>92254</td><td>64488</td><td>69.90266</td><td>2340</td></tr><tr><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td></tr><tr><td>"application_test"</td><td>"LIVINGAPARTMENTS_AVG"</td><td>"Float64"</td><td>92254</td><td>63120</td><td>68.419798</td><td>1433</td></tr><tr><td>"application_test"</td><td>"LIVINGAPARTMENTS_MODE"</td><td>"Float64"</td><td>92254</td><td>63120</td><td>68.419798</td><td>655</td></tr><tr><td>"application_test"</td><td>"LIVINGAPARTMENTS_MEDI"</td><td>"Float64"</td><td>92254</td><td>63120</td><td>68.419798</td><td>944</td></tr><tr><td>"application_test"</td><td>"FONDKAPREMONT_MODE"</td><td>"String"</td><td>92254</td><td>63112</td><td>68.411126</td><td>5</td></tr><tr><td>"application_train"</td><td>"FONDKAPREMONT_MODE"</td><td>"String"</td><td>215257</td><td>147183</td><td>68.375477</td><td>5</td></tr></tbody></table></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 3 - Testes Globais</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Testes Globais
+
+assert audit_df.filter(pl.col("status") == "ERROR").height == 0
+assert profile_df.height &gt; 0
+assert schema_df.height &gt; 0
+
+print("✅ Pipeline RAW → BRONZE validado com sucesso")</code></pre>
+</div>
+<div class="output output-stream">
+<pre>✅ Pipeline RAW → BRONZE validado com sucesso
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ O que foi construido</strong></font></p>
+<font color="#66666" size="2">
+<ul>
+<li>NÃO fez só ingestão.</li>
+<li>Criou:<ul>
+<li>✔ Camada Bronze profissional<ul>
+<li>rápida (DuckDB)</li>
+<li>compacta (Parquet)</li>
+<li>auditável</li>
+</ul>
+</li>
+<li>✔ Observabilidade de dados<ul>
+<li>auditoria</li>
+<li>schema registry</li>
+<li>profiling</li>
+<li>null analysis</li>
+</ul>
+</li>
+<li>✔ Base perfeita para:<ul>
+<li>feature engineering</li>
+<li>grafos</li>
+<li>ML</li>
+<li>explicabilidade</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>🎯 Próximo passo (Grafo de Similaridade + Curvatura de Ricci)</strong></font></p>
+<font color="#66666" size="2">
+<p>Seguimos para:</p>
+<p>👉 Grafo de Similaridade + Curvatura de Ricci</p>
+<ul>
+<li>Onde vamos:<ul>
+<li>usar application_train</li>
+<li>construir KNN graph</li>
+<li>calcular curvatura</li>
+<li>gerar primeiras features geométricas</li>
+</ul>
+</li>
+</ul>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">%reload_ext watermark 
+%watermark -a "Roberto-SSoares-LfLngLrnng" -d -t -u --iversions -v -m -h</code></pre>
+</div>
+<div class="output output-stream">
+<pre>Author: Roberto-SSoares-LfLngLrnng
+
+Last updated: 2026-03-21 16:01:18
+
+Python implementation: CPython
+Python version       : 3.12.3
+IPython version      : 9.11.0
+
+Compiler    : GCC 13.3.0
+OS          : Linux
+Release     : 6.6.87.2-microsoft-standard-WSL2
+Machine     : x86_64
+Processor   : x86_64
+CPU cores   : 4
+Architecture: 64bit
+
+Hostname: PC-ROBERTO
+
+duckdb: 1.5.0
+polars: 1.39.3
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="5"><strong>FIM</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">#!uv pip install nbconvert -U -q
+!jupyter nbconvert 00_raw_to_bronze_duckdb_polars.ipynb --to html --template _my-template-html-v07.tpl</code></pre>
+</div>
+</div>
+<div class="footer">
+<p>RobertoSSoares-LfLngLrnng — <span id="datetime"></span></p>
+</div>
+<script>
+            document.getElementById("datetime").innerText = new Date().toLocaleString('pt-BR');
+        </script>
+</div>
+</body>
+</html>

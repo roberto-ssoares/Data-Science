@@ -1,0 +1,41 @@
+[project]
+name = "home-credit-geometric-risk"
+version = "0.1.0"
+description = "Análise de Risco de Crédito utilizando Geometria Diferencial (Ricci Curvature) e Grafos."
+readme = "README.md"
+authors = [
+    { name = "RobertoSSoares", email = "ssoares.roberto@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "duckdb>=0.10.0",
+    "polars>=0.19.19",
+    "pyarrow>=14.0.1",
+    "networkx>=3.1",
+    "GraphRicciCurvature>=0.5.3",
+    "scikit-learn>=1.3.2",
+    "lightgbm>=4.1.0",
+    "numpy>=1.26.2",
+    "pandas>=2.1.3",
+    "tqdm>=4.66.1",
+    "matplotlib>=3.8.2",
+    "seaborn>=0.13.0",
+    "plotly>=5.18.0",
+    "kaleido>=0.2.1",
+    "watermark",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+# NOVA SEÇÃO (Substitui a [tool.uv])
+[dependency-groups]
+dev = [
+    "pytest>=7.4.0",      # Boa prática para seus Sanity Checks
+    "ipykernel>=6.25.0",  # Para rodar notebooks no VS Code
+    "jupyter>=1.1.1",
+    "jupyterlab>=4.5.6",
+]
+
+
