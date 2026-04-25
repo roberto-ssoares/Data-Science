@@ -1,0 +1,13 @@
+# Business Language Model — Glossário Antifraude
+
+| termo                     | definicao                                                                                                | uso_no_projeto                                                                                       |
+|:--------------------------|:---------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------|
+| Fraude transacional       | Uso indevido de canais financeiros para realizar movimentações não autorizadas, simuladas ou maliciosas. | Conceito central do MVP.                                                                             |
+| Conta laranja             | Conta utilizada para intermediar ou receber valores de origem suspeita.                                  | Representada por contas com alta conexão, alto recebimento ou participação em comunidades suspeitas. |
+| Beneficiário concentrador | Beneficiário que recebe valores de muitas contas diferentes em curto período.                            | Usado em regras de concentração e análise de centralidade.                                           |
+| Dispositivo compartilhado | Dispositivo utilizado por múltiplas contas ou clientes distintos.                                        | Sinal forte para investigação de coordenação ou uso indevido.                                        |
+| Transação atípica         | Transação que foge do padrão esperado de valor, horário, frequência, canal ou relacionamento.            | Base para regras antifraude e score de risco.                                                        |
+| Comunidade suspeita       | Grupo de contas, beneficiários, dispositivos ou IPs conectados por padrões incomuns.                     | Detectada por algoritmos de comunidade em grafos.                                                    |
+| Conta ponte               | Conta que conecta diferentes grupos ou comunidades, podendo atuar como intermediária.                    | Identificada por métricas como betweenness centrality.                                               |
+| Alerta antifraude         | Sinal gerado por regra, score ou padrão analítico que indica necessidade de investigação.                | Saída operacional do motor de regras e do score.                                                     |
+| Score de risco            | Pontuação calculada para priorizar transações, contas ou comunidades suspeitas.                          | Combina regras, features de grafo e sinais transacionais.                                            |

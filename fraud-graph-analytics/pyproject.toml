@@ -21,7 +21,8 @@ dependencies = [
     "jupyterlab",
     "ipykernel",
     "streamlit",
-    "ruff"
+    "ruff",
+    "tabulate>=0.10.0",
 ]
 
 [tool.ruff]
