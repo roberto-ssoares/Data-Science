@@ -1,0 +1,2354 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>02_graph_building_networkx_preview</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/jupyterlab/3.6.3/themes/JupyterLab-light-theme.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@300;400;600&amp;family=Reddit+Sans:wght@300;400;600&amp;family=Courier+Prime:wght@400;700&amp;family=Montserrat:wght@300;400;600;700&amp;family=Source+Code+Pro:wght@400&amp;family=Red+Hat+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['\\(', '\\)'], ['$', '$']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+          ignoreHtmlClass: 'tex2jax_ignore',
+          processHtmlClass: 'mathjax_process'
+        }
+      };
+    </script>
+<script async="" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+        :root{
+            --bg:#f5f5f5;
+            --paper:#ffffff;
+            --text:#1f2937;
+            --muted:#6b7280;
+            --border:#d9dde3;
+            --shadow:0 4px 12px rgba(0,0,0,.08);
+            --shadow-soft:0 2px 8px rgba(15,23,42,.06);
+            --md-bg:#f3f2ee;
+            --md-accent:#ff9800;
+            --code-bg:#f7f7f7;
+            --code-accent:#4caf50;
+            --out-bg:#f3f9fa;
+            --out-accent:#2196f3;
+            --stream-bg:#eef8ff;
+            --table-head:#f8fafc;
+            --table-zebra:#f6f8fa;
+            --exec-bg:#f7fbff;
+            --exec-border:#2E86C1;
+            --insight-bg:#f8fffb;
+            --insight-border:#22a06b;
+            --warning-bg:#fffaf2;
+            --warning-border:#f59e0b;
+            --danger-bg:#fff6f6;
+            --danger-border:#ef4444;
+            --metric-bg:#ffffff;
+            --metric-border:#d6e7f7;
+        }
+
+        *{ box-sizing:border-box; }
+
+        body{
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            background:var(--bg);
+            padding:40px 0;
+            color:var(--text);
+            line-height:1.55;
+        }
+
+        .container{
+            max-width:1550px;
+            margin:auto;
+            background:var(--paper);
+            padding:20px 30px 28px;
+            border-radius:8px;
+            box-shadow:var(--shadow);
+        }
+
+        .cell{ margin-bottom:10px; }
+
+        h1.title-header{
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            font-weight:700;
+            color:#8eb4c4;
+            text-transform:uppercase;
+            text-align:center;
+            margin:0 0 24px;
+            letter-spacing:.04em;
+        }
+
+        .markdown{
+            background:var(--md-bg);
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            padding:10px 15px;
+            border-left:5px solid var(--md-accent);
+            border-radius:4px;
+            margin:4px 0 8px;
+            line-height:1.6;
+        }
+        .markdown h1,.markdown h2,.markdown h3,.markdown h4,.markdown h5,.markdown h6{
+            margin-top:0;
+            color:#d64545;
+        }
+        .markdown p:last-child,
+        .markdown ul:last-child,
+        .markdown ol:last-child{ margin-bottom:0; }
+
+        img, svg, figure img{
+            max-width:100%;
+            height:auto;
+            display:block;
+            margin-left:auto;
+            margin-right:auto;
+            border:1px solid #ddd;
+            border-radius:6px;
+            box-shadow:0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        figure{ margin:20px auto; text-align:center; }
+        figure figcaption{ font-size:13px; color:#555; margin-top:6px; }
+
+        .cell-toolbar{
+            display:flex;
+            justify-content:flex-end;
+            margin:0 0 4px;
+            gap:6px;
+            flex-wrap:wrap;
+        }
+        .cell-badge{
+            display:inline-block;
+            background:#eef2f7;
+            border:1px solid #d7dee8;
+            color:#516072;
+            border-radius:999px;
+            font-size:11px;
+            font-weight:600;
+            padding:2px 8px;
+            letter-spacing:.02em;
+        }
+
+        .code_cell{
+            background:var(--code-bg);
+            border-left:5px solid var(--code-accent);
+            padding:6px 8px;
+            margin:4px 0;
+            overflow-x:auto;
+            border-radius:4px;
+        }
+        .code_cell pre,
+        .code_cell .hljs{
+            margin:0;
+            background:transparent !important;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+            white-space:pre;
+        }
+
+        .output-text,
+        .output-stream,
+        .output-error,
+        .output-image,
+        .output-html{
+            margin:4px 0;
+            border-radius:4px;
+            overflow-x:auto;
+        }
+
+        .output-text{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:10px 10px 10px 8px;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+        }
+        .output-text pre{
+            margin:0;
+            white-space:pre-wrap;
+            word-break:break-word;
+            font-family:inherit;
+            font-size:inherit;
+            line-height:inherit;
+        }
+
+        .output-stream{
+            background:var(--stream-bg);
+            border-left:5px solid var(--out-accent);
+            padding:8px 10px;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+        }
+        .output-stream pre{ margin:0; white-space:pre-wrap; word-break:break-word; }
+
+        .output-image{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:10px;
+        }
+
+        .output-html{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:8px 10px;
+            color:var(--text);
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            line-height:1.55;
+            white-space:normal;
+        }
+        .output-html *{ white-space:normal; word-break:normal; max-width:100%; }
+        .output-html p{ margin:0 0 10px; }
+        .output-html p:last-child{ margin-bottom:0; }
+        .output-html h1,.output-html h2,.output-html h3,.output-html h4,.output-html h5,.output-html h6{
+            margin:0 0 10px;
+            color:var(--text);
+            line-height:1.3;
+        }
+        .output-html ul,
+        .output-html ol{ margin:0 0 10px 20px; padding-left:12px; }
+        .output-html li{ margin-bottom:4px; }
+        .output-html li:last-child{ margin-bottom:0; }
+        .output-html code{ font-family:'Red Hat Mono','Noto Sans Mono',monospace; font-size:.95em; }
+        .output-html pre{
+            white-space:pre-wrap;
+            word-break:break-word;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.5;
+            margin:0;
+        }
+
+        .table-output{ padding:8px 10px; }
+        .table-output table,
+        .table-output table.dataframe{
+            border-collapse:collapse;
+            border-spacing:0;
+            width:auto;
+            max-width:100%;
+            margin:0;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.45;
+            color:#263238;
+            background:#fff;
+        }
+        .table-output table th,
+        .table-output table td,
+        .table-output table.dataframe th,
+        .table-output table.dataframe td{
+            padding:8px 10px;
+            border:1px solid var(--border);
+            vertical-align:top;
+            text-align:left;
+        }
+        .table-output table thead,
+        .table-output table.dataframe thead{ background:var(--table-head); font-weight:600; }
+        .table-output table tbody tr:nth-child(even),
+        .table-output table.dataframe tbody tr:nth-child(even){ background:var(--table-zebra); }
+        .table-output .dataframe tbody tr:hover,
+        .table-output table tbody tr:hover{ background:#eef6ff; }
+
+        /* Premium HTML blocks */
+        .output-html .executive-card,
+        .output-html .insight-card,
+        .output-html .warning-card,
+        .output-html .danger-card,
+        .output-html .summary-card{
+            border-radius:10px;
+            padding:14px 16px;
+            box-shadow:var(--shadow-soft);
+            border:1px solid #dbe5ef;
+            margin:4px 0;
+        }
+        .output-html .executive-card{
+            background:var(--exec-bg);
+            border-left:6px solid var(--exec-border);
+        }
+        .output-html .summary-card{
+            background:#f8fbff;
+            border-left:6px solid #64748b;
+        }
+        .output-html .insight-card{
+            background:var(--insight-bg);
+            border-left:6px solid var(--insight-border);
+        }
+        .output-html .warning-card{
+            background:var(--warning-bg);
+            border-left:6px solid var(--warning-border);
+        }
+        .output-html .danger-card{
+            background:var(--danger-bg);
+            border-left:6px solid var(--danger-border);
+        }
+        .output-html .card-title{
+            margin:0 0 10px;
+            font-size:20px;
+            font-weight:700;
+            color:#1f2937;
+            line-height:1.25;
+        }
+        .output-html .card-subtitle{
+            margin:0 0 12px;
+            font-size:13px;
+            font-weight:600;
+            color:#64748b;
+            text-transform:uppercase;
+            letter-spacing:.03em;
+        }
+        .output-html .card-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+            gap:10px;
+            margin:10px 0 12px;
+        }
+        .output-html .metric-card{
+            background:var(--metric-bg);
+            border:1px solid var(--metric-border);
+            border-radius:10px;
+            padding:10px 12px;
+            min-height:82px;
+            box-shadow:0 1px 3px rgba(15,23,42,.05);
+        }
+        .output-html .metric-label{
+            display:block;
+            margin:0 0 6px;
+            font-size:12px;
+            font-weight:700;
+            color:#64748b;
+            text-transform:uppercase;
+            letter-spacing:.03em;
+        }
+        .output-html .metric-value{
+            display:block;
+            font-size:24px;
+            font-weight:700;
+            line-height:1.15;
+            color:#0f172a;
+        }
+        .output-html .metric-note{
+            display:block;
+            margin-top:4px;
+            font-size:12px;
+            color:#6b7280;
+        }
+        .output-html .chip-row{
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px;
+            margin:8px 0 10px;
+        }
+        .output-html .chip{
+            display:inline-flex;
+            align-items:center;
+            background:#edf4ff;
+            border:1px solid #d8e6ff;
+            color:#2457a6;
+            border-radius:999px;
+            padding:4px 10px;
+            font-size:12px;
+            font-weight:600;
+        }
+        .output-html .callout-compact p{ margin-bottom:8px; }
+        .output-html .callout-compact ul,
+        .output-html .callout-compact ol{ margin-bottom:8px; }
+
+        .output-error{
+            background:#fff5f5;
+            border-left:5px solid #ef4444;
+            padding:10px 12px;
+            color:#7f1d1d;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.5;
+        }
+        .output-error pre{ margin:8px 0 0; white-space:pre-wrap; word-break:break-word; }
+
+        .hidden-note{
+            margin:4px 0;
+            padding:6px 10px;
+            border-radius:6px;
+            background:#f8fafc;
+            border:1px dashed #cbd5e1;
+            color:#64748b;
+            font-size:12px;
+            font-weight:600;
+        }
+
+        .footer{
+            text-align:right;
+            margin-top:30px;
+            padding:12px;
+            background:#e9ecef;
+            border-radius:4px;
+            font-size:14px;
+            color:#555;
+        }
+
+        @media (max-width: 768px) {
+            body{ padding:16px 0; }
+            .container{ max-width:100%; padding:14px 16px 20px; border-radius:0; }
+            .output-html,
+            .output-text,
+            .output-stream,
+            .output-image,
+            .output-error,
+            .markdown,
+            .code_cell{ padding-left:10px; padding-right:10px; }
+            .output-html .card-title{ font-size:18px; }
+            .output-html .metric-value{ font-size:20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<h1 class="title-header">02_graph_building_networkx_preview</h1>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#F3F2EE">
+<br/><br/>
+<p style="text-align: center;">
+<font color="#0A1781" size="6">
+<strong>
+                    Databricks Certification Learning Knowledge Graph
+                </strong>
+</font>
+</p>
+<p style="text-align: center;">
+<font color="#C58A1E" size="6">
+<strong>
+                    Graph Building: NetworkX Preview
+                </strong>
+</font>
+</p>
+<p style="text-align: center;">
+<font color="#C58A1E" size="5">
+<strong>
+                    Iniciar a construção visual e analítica do Knowledge Graph a partir dos CSVs gerados no Notebook 01.
+                </strong>
+</font>
+</p>
+<br/>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#F3F2EE">
+<p style="text-align: right;">
+<font color="#444444" size="4">
+            Roberto SSoares - LfLngLrnng
+      </font>
+</p>
+<p style="text-align: right;"><font color="#444444" size="2">
+<a href="https://www.linkedin.com/in/roberto-dos-santos-soares/">in/roberto-dos-santos-soares</a><br/><a href="https://roberto-ssoares.github.io/meu-portfolio/">Portifólio: roberto-ssoares</a>
+</font></p>
+<p style="text-align: right;">
+<font color="#444444" size="4">
+            " [+] Faturamento [-] Custo [+] Qualidade de vida "
+        </font>
+<br/>
+<font color="#918e8e" size="2">"Mestre Bruno Jardim"
+        </font>
+</p>
+<p style="text-align: right;">
+<font color="#918e8e" size="2">
+</font>
+</p>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 Objetivo</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li><strong>Ações realizadas</strong><ul>
+<li>Carregamento dos arquivos <code>nodes_all.csv</code> e <code>edges_all.csv</code>.</li>
+<li>Construção do grafo com NetworkX.</li>
+<li>Cálculo de métricas estruturais.</li>
+<li>Geração de visualização interativa com PyVis.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>Após materializar a ontologia como dados tabulares, o próximo passo é construir uma representação em grafo para validar conectividade, centralidade, dependências e navegabilidade do modelo.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultados esperados</strong><ul>
+<li>Ao final deste notebook, teremos uma primeira visualização navegável do Knowledge Graph e métricas estruturais básicas para análise.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">#!uv pip install watermark -q -U
+#!uv pip install tabulate -q -U
+#!uv pip install networkx pyvis matplotlib -q -U</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">from pathlib import Path
+
+import pandas as pd
+import networkx as nx
+
+from pyvis.network import Network
+from IPython.display import IFrame, display</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Versões dos pacotes usados neste jupyter notebook
+%reload_ext watermark
+%watermark -a "RobertoSSoares-LfLngLrnng"</code></pre>
+</div>
+<div class="output-stream">
+<pre>Author: RobertoSSoares-LfLngLrnng
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">pd.set_option("display.max_columns", 100)
+pd.set_option("display.max_colwidth", 120)</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">PROJECT_NAME = "Databricks Certification Learning Knowledge Graph"
+
+BASE_DIR = Path.cwd().parent if Path.cwd().name == "notebooks" else Path.cwd()
+
+DATA_DIR = BASE_DIR / "data"
+PROCESSED_DIR = DATA_DIR / "processed"
+EXPORTS_DIR = DATA_DIR / "exports"
+ASSETS_DIR = BASE_DIR / "assets"
+DOCS_DIR = BASE_DIR / "docs"
+
+for directory in [PROCESSED_DIR, EXPORTS_DIR, ASSETS_DIR, DOCS_DIR]:
+    directory.mkdir(parents=True, exist_ok=True)
+
+BASE_DIR</code></pre>
+</div>
+<div class="output-text">
+<pre>WindowsPath('D:/_DS-Projects/Data-Science/databricks-learning-kg')</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 1. Carregamento dos dados do grafo</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Nesta etapa, vamos carregar os arquivos consolidados criados no Notebook 01:<ul>
+<li><code>nodes_all.csv</code></li>
+<li><code>edges_all.csv</code></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Esses arquivos representam, respectivamente, os nós e os relacionamentos do Knowledge Graph.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">nodes_path = PROCESSED_DIR / "nodes_all.csv"
+edges_path = PROCESSED_DIR / "edges_all.csv"
+
+nodes_all = pd.read_csv(nodes_path)
+edges_all = pd.read_csv(edges_path)
+
+display(nodes_all.head())
+display(edges_all.head())</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>node_id</th>
+<th>node_label</th>
+<th>name</th>
+<th>category</th>
+<th>description</th>
+<th>status</th>
+<th>priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>CERT_DEA_001</td>
+<td>Certification</td>
+<td>Databricks Certified Data Engineer Associate</td>
+<td>Associate</td>
+<td>Certificação alvo para consolidar fundamentos de Engenharia de Dados na plataforma Databricks.</td>
+<td>planned</td>
+<td>NaN</td>
+</tr>
+<tr>
+<th>1</th>
+<td>D01</td>
+<td>ExamDomain</td>
+<td>Databricks Intelligence Platform</td>
+<td>medium</td>
+<td>Fundamentos da plataforma, workspace, compute e arquitetura Lakehouse.</td>
+<td>NaN</td>
+<td>medium</td>
+</tr>
+<tr>
+<th>2</th>
+<td>D02</td>
+<td>ExamDomain</td>
+<td>Development and Ingestion</td>
+<td>high</td>
+<td>Desenvolvimento, ingestão de dados e uso de SQL/PySpark.</td>
+<td>NaN</td>
+<td>high</td>
+</tr>
+<tr>
+<th>3</th>
+<td>D03</td>
+<td>ExamDomain</td>
+<td>Data Processing &amp; Transformations</td>
+<td>high</td>
+<td>Transformações, Delta Lake, tabelas, joins, agregações e arquitetura medalhão.</td>
+<td>NaN</td>
+<td>high</td>
+</tr>
+<tr>
+<th>4</th>
+<td>D04</td>
+<td>ExamDomain</td>
+<td>Productionizing Data Pipelines</td>
+<td>high</td>
+<td>Jobs, Workflows, tarefas, agendamento, monitoramento e operação.</td>
+<td>NaN</td>
+<td>high</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>edge_id</th>
+<th>source_id</th>
+<th>source_label</th>
+<th>relationship</th>
+<th>target_id</th>
+<th>target_label</th>
+<th>weight</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>E0001</td>
+<td>CERT_DEA_001</td>
+<td>Certification</td>
+<td>HAS_DOMAIN</td>
+<td>D01</td>
+<td>ExamDomain</td>
+<td>0.10</td>
+<td>A certificação cobre o domínio Databricks Intelligence Platform.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>E0002</td>
+<td>CERT_DEA_001</td>
+<td>Certification</td>
+<td>HAS_DOMAIN</td>
+<td>D02</td>
+<td>ExamDomain</td>
+<td>0.30</td>
+<td>A certificação cobre o domínio Development and Ingestion.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>E0003</td>
+<td>CERT_DEA_001</td>
+<td>Certification</td>
+<td>HAS_DOMAIN</td>
+<td>D03</td>
+<td>ExamDomain</td>
+<td>0.31</td>
+<td>A certificação cobre o domínio Data Processing &amp; Transformations.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>E0004</td>
+<td>CERT_DEA_001</td>
+<td>Certification</td>
+<td>HAS_DOMAIN</td>
+<td>D04</td>
+<td>ExamDomain</td>
+<td>0.18</td>
+<td>A certificação cobre o domínio Productionizing Data Pipelines.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>E0005</td>
+<td>CERT_DEA_001</td>
+<td>Certification</td>
+<td>HAS_DOMAIN</td>
+<td>D05</td>
+<td>ExamDomain</td>
+<td>0.11</td>
+<td>A certificação cobre o domínio Data Governance &amp; Quality.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">print(f"Total de nós: {len(nodes_all)}")
+print(f"Total de relacionamentos: {len(edges_all)}")
+
+display(nodes_all["node_label"].value_counts().rename_axis("node_label").reset_index(name="total_nodes"))
+display(edges_all["relationship"].value_counts().rename_axis("relationship").reset_index(name="total_edges"))</code></pre>
+</div>
+<div class="output-stream">
+<pre>Total de nós: 93
+Total de relacionamentos: 172
+</pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>node_label</th>
+<th>total_nodes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>Topic</td>
+<td>46</td>
+</tr>
+<tr>
+<th>1</th>
+<td>Subtopic</td>
+<td>20</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Skill</td>
+<td>6</td>
+</tr>
+<tr>
+<th>3</th>
+<td>ExamDomain</td>
+<td>5</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Notebook</td>
+<td>5</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Resource</td>
+<td>4</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Lab</td>
+<td>4</td>
+</tr>
+<tr>
+<th>7</th>
+<td>Certification</td>
+<td>1</td>
+</tr>
+<tr>
+<th>8</th>
+<td>StudySession</td>
+<td>1</td>
+</tr>
+<tr>
+<th>9</th>
+<td>Snapshot</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>relationship</th>
+<th>total_edges</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>COVERS</td>
+<td>46</td>
+</tr>
+<tr>
+<th>1</th>
+<td>CAPTURES_STATUS_OF</td>
+<td>46</td>
+</tr>
+<tr>
+<th>2</th>
+<td>HAS_SUBTOPIC</td>
+<td>20</td>
+</tr>
+<tr>
+<th>3</th>
+<td>PREREQUISITE_FOR</td>
+<td>15</td>
+</tr>
+<tr>
+<th>4</th>
+<td>SUPPORTED_BY</td>
+<td>11</td>
+</tr>
+<tr>
+<th>5</th>
+<td>TEACHES</td>
+<td>10</td>
+</tr>
+<tr>
+<th>6</th>
+<td>PRACTICES</td>
+<td>8</td>
+</tr>
+<tr>
+<th>7</th>
+<td>IMPLEMENTS</td>
+<td>7</td>
+</tr>
+<tr>
+<th>8</th>
+<td>HAS_DOMAIN</td>
+<td>5</td>
+</tr>
+<tr>
+<th>9</th>
+<td>STUDIED</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 2. Validação antes da construção do grafo</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Antes de criar o grafo, vamos validar:<ul>
+<li>se todos os nós possuem identificador;</li>
+<li>se todos os relacionamentos possuem origem e destino;</li>
+<li>se não existem relacionamentos apontando para nós inexistentes.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">required_node_columns = ["node_id", "node_label", "name"]
+required_edge_columns = ["source_id", "relationship", "target_id"]
+
+missing_node_columns = [col for col in required_node_columns if col not in nodes_all.columns]
+missing_edge_columns = [col for col in required_edge_columns if col not in edges_all.columns]
+
+assert not missing_node_columns, f"Colunas ausentes em nodes_all: {missing_node_columns}"
+assert not missing_edge_columns, f"Colunas ausentes em edges_all: {missing_edge_columns}"
+
+assert nodes_all["node_id"].notna().all(), "Existem node_id nulos."
+assert edges_all["source_id"].notna().all(), "Existem source_id nulos."
+assert edges_all["target_id"].notna().all(), "Existem target_id nulos."
+
+node_ids = set(nodes_all["node_id"].astype(str))
+
+orphan_sources = sorted(set(edges_all["source_id"].astype(str)) - node_ids)
+orphan_targets = sorted(set(edges_all["target_id"].astype(str)) - node_ids)
+
+assert not orphan_sources, f"Existem source_ids órfãos: {orphan_sources}"
+assert not orphan_targets, f"Existem target_ids órfãos: {orphan_targets}"
+
+print("Validação concluída com sucesso.")</code></pre>
+</div>
+<div class="output-stream">
+<pre>Validação concluída com sucesso.
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 3. Construção do Knowledge Graph com NetworkX</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Vamos construir duas representações:<ol>
+<li><code>kg_multi</code>: grafo completo do tipo <code>MultiDiGraph</code>, preservando múltiplos relacionamentos entre os mesmos nós.</li>
+<li><code>kg_simple</code>: projeção simplificada do grafo, usada para métricas de centralidade e conectividade.</li>
+</ol>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">def clean_attr(value):
+    """
+    Converte valores nulos em string vazia para evitar problemas na visualização.
+    """
+    if pd.isna(value):
+        return ""
+    return value
+
+
+kg_multi = nx.MultiDiGraph(name=PROJECT_NAME)
+
+for _, row in nodes_all.iterrows():
+    node_id = str(row["node_id"])
+    
+    attrs = {
+        col: clean_attr(row[col])
+        for col in nodes_all.columns
+        if col != "node_id"
+    }
+    
+    kg_multi.add_node(node_id, **attrs)
+
+for _, row in edges_all.iterrows():
+    source_id = str(row["source_id"])
+    target_id = str(row["target_id"])
+    
+    attrs = {
+        col: clean_attr(row[col])
+        for col in edges_all.columns
+        if col not in ["source_id", "target_id"]
+    }
+    
+    kg_multi.add_edge(
+        source_id,
+        target_id,
+        key=str(row.get("edge_id", "")),
+        **attrs,
+    )
+
+print(kg_multi)</code></pre>
+</div>
+<div class="output-stream">
+<pre>MultiDiGraph named 'Databricks Certification Learning Knowledge Graph' with 93 nodes and 172 edges
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">kg_simple = nx.DiGraph(name=f"{PROJECT_NAME} - Simple Projection")
+
+for node_id, attrs in kg_multi.nodes(data=True):
+    kg_simple.add_node(node_id, **attrs)
+
+for source_id, target_id, attrs in kg_multi.edges(data=True):
+    relationship = attrs.get("relationship", "")
+    
+    if kg_simple.has_edge(source_id, target_id):
+        existing_relationships = kg_simple[source_id][target_id].get("relationships", [])
+        existing_relationships.append(relationship)
+        kg_simple[source_id][target_id]["relationships"] = sorted(set(existing_relationships))
+        kg_simple[source_id][target_id]["weight"] += 1
+    else:
+        kg_simple.add_edge(
+            source_id,
+            target_id,
+            relationships=[relationship],
+            weight=1,
+        )
+
+print(kg_simple)</code></pre>
+</div>
+<div class="output-stream">
+<pre>DiGraph named 'Databricks Certification Learning Knowledge Graph - Simple Projection' with 93 nodes and 172 edges
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 4. Métricas estruturais do grafo</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Agora vamos calcular métricas iniciais:<ul>
+<li><em>quantidade de nós;</em></li>
+<li><em>quantidade de relacionamentos;</em></li>
+<li><em>densidade;</em></li>
+<li><em>componentes fracamente conectados;</em></li>
+<li><em>grau de entrada;</em></li>
+<li><em>grau de saída;</em></li>
+<li><em>grau total;</em></li>
+<li><em>centralidade de grau.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essas métricas ajudam a entender quais entidades estão mais conectadas dentro do Knowledge Graph.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">graph_summary = {
+    "project": PROJECT_NAME,
+    "nodes": kg_multi.number_of_nodes(),
+    "edges_multi": kg_multi.number_of_edges(),
+    "edges_simple": kg_simple.number_of_edges(),
+    "density_simple": round(nx.density(kg_simple), 6),
+    "weakly_connected_components": nx.number_weakly_connected_components(kg_simple),
+    "is_weakly_connected": nx.is_weakly_connected(kg_simple),
+}
+
+pd.DataFrame([graph_summary])</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>project</th>
+<th>nodes</th>
+<th>edges_multi</th>
+<th>edges_simple</th>
+<th>density_simple</th>
+<th>weakly_connected_components</th>
+<th>is_weakly_connected</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>Databricks Certification Learning Knowledge Graph</td>
+<td>93</td>
+<td>172</td>
+<td>172</td>
+<td>0.020103</td>
+<td>2</td>
+<td>False</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">degree_centrality = nx.degree_centrality(kg_simple)
+in_degree = dict(kg_simple.in_degree())
+out_degree = dict(kg_simple.out_degree())
+total_degree = dict(kg_simple.degree())
+
+graph_metrics = pd.DataFrame(
+    [
+        {
+            "node_id": node_id,
+            "name": kg_simple.nodes[node_id].get("name", ""),
+            "node_label": kg_simple.nodes[node_id].get("node_label", ""),
+            "in_degree": in_degree.get(node_id, 0),
+            "out_degree": out_degree.get(node_id, 0),
+            "total_degree": total_degree.get(node_id, 0),
+            "degree_centrality": round(degree_centrality.get(node_id, 0), 6),
+        }
+        for node_id in kg_simple.nodes()
+    ]
+).sort_values(
+    by=["total_degree", "degree_centrality"],
+    ascending=False,
+)
+
+graph_metrics.head(15)</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>node_id</th>
+<th>name</th>
+<th>node_label</th>
+<th>in_degree</th>
+<th>out_degree</th>
+<th>total_degree</th>
+<th>degree_centrality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>92</th>
+<td>SNAP_W00</td>
+<td>2026-04-27</td>
+<td>Snapshot</td>
+<td>0</td>
+<td>46</td>
+<td>46</td>
+<td>0.500000</td>
+</tr>
+<tr>
+<th>3</th>
+<td>D03</td>
+<td>Data Processing &amp; Transformations</td>
+<td>ExamDomain</td>
+<td>1</td>
+<td>13</td>
+<td>14</td>
+<td>0.152174</td>
+</tr>
+<tr>
+<th>6</th>
+<td>T001</td>
+<td>Lakehouse Architecture</td>
+<td>Topic</td>
+<td>11</td>
+<td>3</td>
+<td>14</td>
+<td>0.152174</td>
+</tr>
+<tr>
+<th>25</th>
+<td>T020</td>
+<td>Medallion Architecture</td>
+<td>Topic</td>
+<td>8</td>
+<td>3</td>
+<td>11</td>
+<td>0.119565</td>
+</tr>
+<tr>
+<th>43</th>
+<td>T038</td>
+<td>Unity Catalog</td>
+<td>Topic</td>
+<td>8</td>
+<td>3</td>
+<td>11</td>
+<td>0.119565</td>
+</tr>
+<tr>
+<th>2</th>
+<td>D02</td>
+<td>Development and Ingestion</td>
+<td>ExamDomain</td>
+<td>1</td>
+<td>9</td>
+<td>10</td>
+<td>0.108696</td>
+</tr>
+<tr>
+<th>4</th>
+<td>D04</td>
+<td>Productionizing Data Pipelines</td>
+<td>ExamDomain</td>
+<td>1</td>
+<td>9</td>
+<td>10</td>
+<td>0.108696</td>
+</tr>
+<tr>
+<th>5</th>
+<td>D05</td>
+<td>Data Governance &amp; Quality</td>
+<td>ExamDomain</td>
+<td>1</td>
+<td>9</td>
+<td>10</td>
+<td>0.108696</td>
+</tr>
+<tr>
+<th>21</th>
+<td>T016</td>
+<td>Delta Lake</td>
+<td>Topic</td>
+<td>6</td>
+<td>4</td>
+<td>10</td>
+<td>0.108696</td>
+</tr>
+<tr>
+<th>26</th>
+<td>T021</td>
+<td>MERGE INTO</td>
+<td>Topic</td>
+<td>6</td>
+<td>2</td>
+<td>8</td>
+<td>0.086957</td>
+</tr>
+<tr>
+<th>1</th>
+<td>D01</td>
+<td>Databricks Intelligence Platform</td>
+<td>ExamDomain</td>
+<td>1</td>
+<td>6</td>
+<td>7</td>
+<td>0.076087</td>
+</tr>
+<tr>
+<th>12</th>
+<td>T007</td>
+<td>Data Ingestion</td>
+<td>Topic</td>
+<td>4</td>
+<td>3</td>
+<td>7</td>
+<td>0.076087</td>
+</tr>
+<tr>
+<th>34</th>
+<td>T029</td>
+<td>Databricks Workflows</td>
+<td>Topic</td>
+<td>5</td>
+<td>2</td>
+<td>7</td>
+<td>0.076087</td>
+</tr>
+<tr>
+<th>35</th>
+<td>T030</td>
+<td>Jobs</td>
+<td>Topic</td>
+<td>5</td>
+<td>2</td>
+<td>7</td>
+<td>0.076087</td>
+</tr>
+<tr>
+<th>50</th>
+<td>T045</td>
+<td>Data Quality</td>
+<td>Topic</td>
+<td>5</td>
+<td>2</td>
+<td>7</td>
+<td>0.076087</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">top_connected_nodes = graph_metrics.head(20)
+
+display(top_connected_nodes)</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>node_id</th>
+<th>name</th>
+<th>node_label</th>
+<th>in_degree</th>
+<th>out_degree</th>
+<th>total_degree</th>
+<th>degree_centrality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>92</th>
+<td>SNAP_W00</td>
+<td>2026-04-27</td>
+<td>Snapshot</td>
+<td>0</td>
+<td>46</td>
+<td>46</td>
+<td>0.500000</td>
+</tr>
+<tr>
+<th>3</th>
+<td>D03</td>
+<td>Data Processing &amp; Transformations</td>
+<td>ExamDomain</td>
+<td>1</td>
+<td>13</td>
+<td>14</td>
+<td>0.152174</td>
+</tr>
+<tr>
+<th>6</th>
+<td>T001</td>
+<td>Lakehouse Architecture</td>
+<td>Topic</td>
+<td>11</td>
+<td>3</td>
+<td>14</td>
+<td>0.152174</td>
+</tr>
+<tr>
+<th>25</th>
+<td>T020</td>
+<td>Medallion Architecture</td>
+<td>Topic</td>
+<td>8</td>
+<td>3</td>
+<td>11</td>
+<td>0.119565</td>
+</tr>
+<tr>
+<th>43</th>
+<td>T038</td>
+<td>Unity Catalog</td>
+<td>Topic</td>
+<td>8</td>
+<td>3</td>
+<td>11</td>
+<td>0.119565</td>
+</tr>
+<tr>
+<th>2</th>
+<td>D02</td>
+<td>Development and Ingestion</td>
+<td>ExamDomain</td>
+<td>1</td>
+<td>9</td>
+<td>10</td>
+<td>0.108696</td>
+</tr>
+<tr>
+<th>4</th>
+<td>D04</td>
+<td>Productionizing Data Pipelines</td>
+<td>ExamDomain</td>
+<td>1</td>
+<td>9</td>
+<td>10</td>
+<td>0.108696</td>
+</tr>
+<tr>
+<th>5</th>
+<td>D05</td>
+<td>Data Governance &amp; Quality</td>
+<td>ExamDomain</td>
+<td>1</td>
+<td>9</td>
+<td>10</td>
+<td>0.108696</td>
+</tr>
+<tr>
+<th>21</th>
+<td>T016</td>
+<td>Delta Lake</td>
+<td>Topic</td>
+<td>6</td>
+<td>4</td>
+<td>10</td>
+<td>0.108696</td>
+</tr>
+<tr>
+<th>26</th>
+<td>T021</td>
+<td>MERGE INTO</td>
+<td>Topic</td>
+<td>6</td>
+<td>2</td>
+<td>8</td>
+<td>0.086957</td>
+</tr>
+<tr>
+<th>1</th>
+<td>D01</td>
+<td>Databricks Intelligence Platform</td>
+<td>ExamDomain</td>
+<td>1</td>
+<td>6</td>
+<td>7</td>
+<td>0.076087</td>
+</tr>
+<tr>
+<th>12</th>
+<td>T007</td>
+<td>Data Ingestion</td>
+<td>Topic</td>
+<td>4</td>
+<td>3</td>
+<td>7</td>
+<td>0.076087</td>
+</tr>
+<tr>
+<th>34</th>
+<td>T029</td>
+<td>Databricks Workflows</td>
+<td>Topic</td>
+<td>5</td>
+<td>2</td>
+<td>7</td>
+<td>0.076087</td>
+</tr>
+<tr>
+<th>35</th>
+<td>T030</td>
+<td>Jobs</td>
+<td>Topic</td>
+<td>5</td>
+<td>2</td>
+<td>7</td>
+<td>0.076087</td>
+</tr>
+<tr>
+<th>50</th>
+<td>T045</td>
+<td>Data Quality</td>
+<td>Topic</td>
+<td>5</td>
+<td>2</td>
+<td>7</td>
+<td>0.076087</td>
+</tr>
+<tr>
+<th>36</th>
+<td>T031</td>
+<td>Tasks</td>
+<td>Topic</td>
+<td>4</td>
+<td>2</td>
+<td>6</td>
+<td>0.065217</td>
+</tr>
+<tr>
+<th>0</th>
+<td>CERT_DEA_001</td>
+<td>Databricks Certified Data Engineer Associate</td>
+<td>Certification</td>
+<td>0</td>
+<td>5</td>
+<td>5</td>
+<td>0.054348</td>
+</tr>
+<tr>
+<th>13</th>
+<td>T008</td>
+<td>read_files</td>
+<td>Topic</td>
+<td>4</td>
+<td>0</td>
+<td>4</td>
+<td>0.043478</td>
+</tr>
+<tr>
+<th>19</th>
+<td>T014</td>
+<td>Spark SQL</td>
+<td>Topic</td>
+<td>3</td>
+<td>1</td>
+<td>4</td>
+<td>0.043478</td>
+</tr>
+<tr>
+<th>22</th>
+<td>T017</td>
+<td>Delta Table</td>
+<td>Topic</td>
+<td>3</td>
+<td>1</td>
+<td>4</td>
+<td>0.043478</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 5. Leitura analítica inicial</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Nesta etapa, analisamos os nós mais conectados do KG.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Em um Knowledge Graph de aprendizagem, nós com maior conectividade tendem a representar:<ul>
+<li>tópicos centrais;</li>
+<li>domínios relevantes;</li>
+<li>artefatos que conectam várias áreas;</li>
+<li>conceitos estruturantes da jornada.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">label_summary = (
+    graph_metrics
+    .groupby("node_label", as_index=False)
+    .agg(
+        total_nodes=("node_id", "count"),
+        avg_total_degree=("total_degree", "mean"),
+        max_total_degree=("total_degree", "max"),
+        avg_centrality=("degree_centrality", "mean"),
+    )
+    .sort_values("avg_total_degree", ascending=False)
+)
+
+label_summary</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>node_label</th>
+<th>total_nodes</th>
+<th>avg_total_degree</th>
+<th>max_total_degree</th>
+<th>avg_centrality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>6</th>
+<td>Snapshot</td>
+<td>1</td>
+<td>46.000000</td>
+<td>46</td>
+<td>0.500000</td>
+</tr>
+<tr>
+<th>1</th>
+<td>ExamDomain</td>
+<td>5</td>
+<td>10.200000</td>
+<td>14</td>
+<td>0.110870</td>
+</tr>
+<tr>
+<th>0</th>
+<td>Certification</td>
+<td>1</td>
+<td>5.000000</td>
+<td>5</td>
+<td>0.054348</td>
+</tr>
+<tr>
+<th>7</th>
+<td>StudySession</td>
+<td>1</td>
+<td>4.000000</td>
+<td>4</td>
+<td>0.043478</td>
+</tr>
+<tr>
+<th>9</th>
+<td>Topic</td>
+<td>46</td>
+<td>3.956522</td>
+<td>14</td>
+<td>0.043006</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Resource</td>
+<td>4</td>
+<td>2.500000</td>
+<td>4</td>
+<td>0.027174</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Skill</td>
+<td>6</td>
+<td>1.833333</td>
+<td>2</td>
+<td>0.019928</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Lab</td>
+<td>4</td>
+<td>1.750000</td>
+<td>3</td>
+<td>0.019022</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Notebook</td>
+<td>5</td>
+<td>1.600000</td>
+<td>3</td>
+<td>0.017392</td>
+</tr>
+<tr>
+<th>8</th>
+<td>Subtopic</td>
+<td>20</td>
+<td>1.000000</td>
+<td>1</td>
+<td>0.010870</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 6. Análise dos tópicos mais conectados</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Agora vamos filtrar apenas os nós do tipo <code>Topic</code>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Isso nos ajuda a enxergar quais temas aparecem como mais centrais na ontologia inicial.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">topic_metrics = (
+    graph_metrics
+    .query("node_label == 'Topic'")
+    .sort_values(["total_degree", "degree_centrality"], ascending=False)
+)
+
+topic_metrics.head(15)</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>node_id</th>
+<th>name</th>
+<th>node_label</th>
+<th>in_degree</th>
+<th>out_degree</th>
+<th>total_degree</th>
+<th>degree_centrality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>6</th>
+<td>T001</td>
+<td>Lakehouse Architecture</td>
+<td>Topic</td>
+<td>11</td>
+<td>3</td>
+<td>14</td>
+<td>0.152174</td>
+</tr>
+<tr>
+<th>25</th>
+<td>T020</td>
+<td>Medallion Architecture</td>
+<td>Topic</td>
+<td>8</td>
+<td>3</td>
+<td>11</td>
+<td>0.119565</td>
+</tr>
+<tr>
+<th>43</th>
+<td>T038</td>
+<td>Unity Catalog</td>
+<td>Topic</td>
+<td>8</td>
+<td>3</td>
+<td>11</td>
+<td>0.119565</td>
+</tr>
+<tr>
+<th>21</th>
+<td>T016</td>
+<td>Delta Lake</td>
+<td>Topic</td>
+<td>6</td>
+<td>4</td>
+<td>10</td>
+<td>0.108696</td>
+</tr>
+<tr>
+<th>26</th>
+<td>T021</td>
+<td>MERGE INTO</td>
+<td>Topic</td>
+<td>6</td>
+<td>2</td>
+<td>8</td>
+<td>0.086957</td>
+</tr>
+<tr>
+<th>12</th>
+<td>T007</td>
+<td>Data Ingestion</td>
+<td>Topic</td>
+<td>4</td>
+<td>3</td>
+<td>7</td>
+<td>0.076087</td>
+</tr>
+<tr>
+<th>34</th>
+<td>T029</td>
+<td>Databricks Workflows</td>
+<td>Topic</td>
+<td>5</td>
+<td>2</td>
+<td>7</td>
+<td>0.076087</td>
+</tr>
+<tr>
+<th>35</th>
+<td>T030</td>
+<td>Jobs</td>
+<td>Topic</td>
+<td>5</td>
+<td>2</td>
+<td>7</td>
+<td>0.076087</td>
+</tr>
+<tr>
+<th>50</th>
+<td>T045</td>
+<td>Data Quality</td>
+<td>Topic</td>
+<td>5</td>
+<td>2</td>
+<td>7</td>
+<td>0.076087</td>
+</tr>
+<tr>
+<th>36</th>
+<td>T031</td>
+<td>Tasks</td>
+<td>Topic</td>
+<td>4</td>
+<td>2</td>
+<td>6</td>
+<td>0.065217</td>
+</tr>
+<tr>
+<th>13</th>
+<td>T008</td>
+<td>read_files</td>
+<td>Topic</td>
+<td>4</td>
+<td>0</td>
+<td>4</td>
+<td>0.043478</td>
+</tr>
+<tr>
+<th>19</th>
+<td>T014</td>
+<td>Spark SQL</td>
+<td>Topic</td>
+<td>3</td>
+<td>1</td>
+<td>4</td>
+<td>0.043478</td>
+</tr>
+<tr>
+<th>22</th>
+<td>T017</td>
+<td>Delta Table</td>
+<td>Topic</td>
+<td>3</td>
+<td>1</td>
+<td>4</td>
+<td>0.043478</td>
+</tr>
+<tr>
+<th>37</th>
+<td>T032</td>
+<td>Task Dependencies</td>
+<td>Topic</td>
+<td>3</td>
+<td>1</td>
+<td>4</td>
+<td>0.043478</td>
+</tr>
+<tr>
+<th>44</th>
+<td>T039</td>
+<td>Catalog</td>
+<td>Topic</td>
+<td>3</td>
+<td>1</td>
+<td>4</td>
+<td>0.043478</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">topic_metrics_path = EXPORTS_DIR / "topic_graph_metrics.csv"
+graph_metrics_path = EXPORTS_DIR / "graph_metrics.csv"
+label_summary_path = EXPORTS_DIR / "label_summary.csv"
+
+topic_metrics.to_csv(topic_metrics_path, index=False, encoding="utf-8")
+graph_metrics.to_csv(graph_metrics_path, index=False, encoding="utf-8")
+label_summary.to_csv(label_summary_path, index=False, encoding="utf-8")
+
+topic_metrics_path, graph_metrics_path, label_summary_path</code></pre>
+</div>
+<div class="output-text">
+<pre>(WindowsPath('D:/_DS-Projects/Data-Science/databricks-learning-kg/data/exports/topic_graph_metrics.csv'),
+ WindowsPath('D:/_DS-Projects/Data-Science/databricks-learning-kg/data/exports/graph_metrics.csv'),
+ WindowsPath('D:/_DS-Projects/Data-Science/databricks-learning-kg/data/exports/label_summary.csv'))</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 7. Visualização interativa com PyVis</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Nesta etapa, vamos gerar uma visualização HTML navegável do Knowledge Graph.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A visualização será salva em:<ul>
+<li><code>assets/databricks_learning_kg_initial_graph.html</code></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essa versão servirá como primeira inspeção visual do grafo.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">LABEL_COLORS = {
+    "Certification": "#1f77b4",
+    "ExamDomain": "#ff7f0e",
+    "Topic": "#2ca02c",
+    "Subtopic": "#98df8a",
+    "Resource": "#9467bd",
+    "Notebook": "#8c564b",
+    "Lab": "#e377c2",
+    "Skill": "#7f7f7f",
+    "StudySession": "#bcbd22",
+    "Snapshot": "#17becf",
+}
+
+
+def node_size(node_id: str) -&gt; int:
+    """
+    Define o tamanho visual do nó com base no grau total.
+    """
+    degree = total_degree.get(node_id, 0)
+    return 12 + min(degree * 3, 35)
+
+
+net = Network(
+    height="750px",
+    width="100%",
+    directed=True,
+    notebook=False,
+    cdn_resources="in_line",
+)
+
+net.barnes_hut(
+    gravity=-4500,
+    central_gravity=0.25,
+    spring_length=160,
+    spring_strength=0.03,
+    damping=0.85,
+)
+
+for node_id, attrs in kg_simple.nodes(data=True):
+    label = attrs.get("node_label", "")
+    name = attrs.get("name", node_id)
+    category = attrs.get("category", "")
+    status = attrs.get("status", "")
+    priority = attrs.get("priority", "")
+    
+    title = f"""
+    &lt;b&gt;{name}&lt;/b&gt;&lt;br&gt;
+    ID: {node_id}&lt;br&gt;
+    Label: {label}&lt;br&gt;
+    Category: {category}&lt;br&gt;
+    Status: {status}&lt;br&gt;
+    Priority: {priority}&lt;br&gt;
+    Degree: {total_degree.get(node_id, 0)}
+    """
+    
+    net.add_node(
+        node_id,
+        label=name,
+        title=title,
+        color=LABEL_COLORS.get(label, "#cccccc"),
+        size=node_size(node_id),
+        group=label,
+    )
+
+for source_id, target_id, attrs in kg_simple.edges(data=True):
+    relationships = attrs.get("relationships", [])
+    relationship_label = ", ".join(relationships)
+    
+    net.add_edge(
+        source_id,
+        target_id,
+        title=relationship_label,
+        label=relationship_label if len(relationship_label) &lt;= 22 else "",
+        arrows="to",
+    )
+
+net.show_buttons(filter_=["physics"])
+
+graph_html_path = ASSETS_DIR / "databricks_learning_kg_initial_graph.html"
+
+# Correção para Windows:
+# Em vez de usar net.write_html(), geramos o HTML e salvamos explicitamente em UTF-8.
+html_content = net.generate_html(notebook=False)
+
+graph_html_path.write_text(html_content, encoding="utf-8")
+
+graph_html_path</code></pre>
+</div>
+<div class="output-text">
+<pre>WindowsPath('D:/_DS-Projects/Data-Science/databricks-learning-kg/assets/databricks_learning_kg_initial_graph.html')</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">#display(IFrame(src=str(graph_html_path), width="100%", height="800px"))</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 8. Exportação de resumo executivo</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Vamos gerar um pequeno relatório Markdown com a leitura inicial do grafo.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Esse arquivo será salvo em:<ul>
+<li><code>docs/graph_summary_v01.md</code></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">top_topics_md = topic_metrics.head(10)[
+    ["node_id", "name", "total_degree", "degree_centrality"]
+].to_markdown(index=False)
+
+top_nodes_md = graph_metrics.head(10)[
+    ["node_id", "name", "node_label", "total_degree", "degree_centrality"]
+].to_markdown(index=False)
+
+label_summary_md = label_summary.to_markdown(index=False)
+
+graph_summary_doc = f"""# Graph Summary v0.1 — Databricks Learning Knowledge Graph
+
+## Projeto
+
+{PROJECT_NAME}
+
+## Visão geral estrutural
+
+| Métrica | Valor |
+|---|---:|
+| Total de nós | {graph_summary["nodes"]} |
+| Total de relacionamentos MultiDiGraph | {graph_summary["edges_multi"]} |
+| Total de relacionamentos projeção simples | {graph_summary["edges_simple"]} |
+| Densidade da projeção simples | {graph_summary["density_simple"]} |
+| Componentes fracamente conectados | {graph_summary["weakly_connected_components"]} |
+| Grafo fracamente conectado | {graph_summary["is_weakly_connected"]} |
+
+## Nós mais conectados
+
+{top_nodes_md}
+
+## Tópicos mais conectados
+
+{top_topics_md}
+
+## Resumo por tipo de nó
+
+{label_summary_md}
+
+## Interpretação inicial
+
+A primeira versão do Knowledge Graph já permite identificar conceitos estruturantes da jornada de certificação Databricks.
+
+Os nós mais conectados tendem a representar tópicos, domínios ou artefatos com maior papel de integração dentro do plano de estudos.
+
+Nas próximas etapas, o grafo será enriquecido com novas sessões de estudo, novos snapshots temporais, dúvidas, erros, insights e evidências práticas.
+"""
+
+graph_summary_path = DOCS_DIR / "graph_summary_v01.md"
+graph_summary_path.write_text(graph_summary_doc, encoding="utf-8")
+
+graph_summary_path</code></pre>
+</div>
+<div class="output-text">
+<pre>WindowsPath('D:/_DS-Projects/Data-Science/databricks-learning-kg/docs/graph_summary_v01.md')</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 9. Perguntas analíticas respondidas nesta versão</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Com esta primeira versão do grafo, já conseguimos responder:<ol>
+<li>Quantos nós e relacionamentos existem?</li>
+<li>Quais tipos de nós predominam?</li>
+<li>Quais relacionamentos predominam?</li>
+<li>Quais tópicos são mais centrais?</li>
+<li>Quais entidades conectam mais partes da jornada?</li>
+<li>O grafo está conectado?</li>
+<li>A ontologia inicial está navegável visualmente?</li>
+</ol>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essas respostas ajudam a validar a coerência estrutural do Knowledge Graph antes da carga em Neo4j.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 10. Conclusão executiva</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Este notebook construiu a primeira representação em grafo do projeto Databricks Certification Learning Knowledge Graph.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Foram realizadas as seguintes entregas:<ul>
+<li>carregamento dos CSVs de nós e relacionamentos;</li>
+<li>validação de integridade dos dados;</li>
+<li>construção de um <code>MultiDiGraph</code> com NetworkX;</li>
+<li>criação de uma projeção simples para métricas;</li>
+<li>cálculo de centralidade, grau de entrada e grau de saída;</li>
+<li>identificação dos tópicos mais conectados;</li>
+<li>geração de visualização HTML interativa com PyVis;</li>
+<li>exportação de métricas estruturais;</li>
+<li>criação de relatório Markdown com resumo executivo.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Próximo passo</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>O próximo notebook recomendado será:<ul>
+<li><code>Notebook 03 — Neo4j Load and Cypher Queries</code></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Nele vamos preparar:<ul>
+<li>constraints;</li>
+<li>comandos Cypher;</li>
+<li>carga dos nós;</li>
+<li>carga dos relacionamentos;</li>
+<li>primeiras consultas exploratórias no Neo4j.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">%reload_ext watermark 
+%watermark -a "Roberto-SSoares-LfLngLrnng" -d -t -u --iversions -v -m -h</code></pre>
+</div>
+<div class="output-stream">
+<pre>Author: Roberto-SSoares-LfLngLrnng
+
+Last updated: 2026-04-27 17:25:12
+
+Python implementation: CPython
+Python version       : 3.12.12
+IPython version      : 9.13.0
+
+Compiler    : MSC v.1944 64 bit (AMD64)
+OS          : Windows
+Release     : 11
+Machine     : AMD64
+Processor   : Intel64 Family 6 Model 158 Stepping 9, GenuineIntel
+CPU cores   : 4
+Architecture: 64bit
+
+Hostname: PC-ROBERTO
+
+IPython : 9.13.0
+networkx: 3.6.1
+pandas  : 3.0.2
+pyvis   : 0.3.2
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="6"><strong>Fim</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">#!uv pip install nbconvert -U -q
+!jupyter nbconvert --to html --template-file my-template-html-v10.tpl 02_graph_building_networkx_preview.ipynb</code></pre>
+</div>
+</div>
+<div class="footer">
+<p>RobertoSSoares-LfLngLrnng — <span id="datetime"></span></p>
+</div>
+<script>
+            document.getElementById("datetime").innerText = new Date().toLocaleString('pt-BR');
+        </script>
+</div>
+</body>
+</html>

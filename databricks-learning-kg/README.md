@@ -1,7 +1,5 @@
 # Databricks Certification Learning Knowledge Graph
 
-
-
 databricks-learning-kg/
 │
 ├── notebooks/
@@ -27,7 +25,3 @@ databricks-learning-kg/
 ├── assets/
 │
 └── README.md
-
-
-
-
