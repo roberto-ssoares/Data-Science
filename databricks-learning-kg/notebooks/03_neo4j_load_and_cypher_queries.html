@@ -592,7 +592,7 @@ NEO4J_DATABASE = os.getenv("NEO4J_DATABASE", "DigitalTwins-KG")
 }</code></pre>
 </div>
 <div class="output-text">
-<pre>{'NEO4J_URI': 'bolt://localhost:7687',
+<pre>{'NEO4J_URI': 'neo4j://localhost:7687',
  'NEO4J_USER': 'neo4j',
  'NEO4J_DATABASE': 'digitaltwinskg',
  'password_loaded': True}</pre>
@@ -1174,17 +1174,17 @@ nodes_by_label_neo4j</code></pre>
 </tr>
 <tr>
 <th>7</th>
-<td>Certification</td>
-<td>1</td>
-</tr>
-<tr>
-<th>8</th>
 <td>StudySession</td>
 <td>1</td>
 </tr>
 <tr>
-<th>9</th>
+<th>8</th>
 <td>Snapshot</td>
+<td>1</td>
+</tr>
+<tr>
+<th>9</th>
+<td>Certification</td>
 <td>1</td>
 </tr>
 </tbody>
@@ -2424,7 +2424,7 @@ print("Conexão com Neo4j encerrada.")</code></pre>
 <div class="output-stream">
 <pre>Author: Roberto-SSoares-LfLngLrnng
 
-Last updated: 2026-04-27 18:45:16
+Last updated: 2026-04-27 19:19:03
 
 Python implementation: CPython
 Python version       : 3.12.12

@@ -1,0 +1,2902 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>04_learning_progress_snapshots</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/jupyterlab/3.6.3/themes/JupyterLab-light-theme.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@300;400;600&amp;family=Reddit+Sans:wght@300;400;600&amp;family=Courier+Prime:wght@400;700&amp;family=Montserrat:wght@300;400;600;700&amp;family=Source+Code+Pro:wght@400&amp;family=Red+Hat+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['\\(', '\\)'], ['$', '$']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+          ignoreHtmlClass: 'tex2jax_ignore',
+          processHtmlClass: 'mathjax_process'
+        }
+      };
+    </script>
+<script async="" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+        :root{
+            --bg:#f5f5f5;
+            --paper:#ffffff;
+            --text:#1f2937;
+            --muted:#6b7280;
+            --border:#d9dde3;
+            --shadow:0 4px 12px rgba(0,0,0,.08);
+            --shadow-soft:0 2px 8px rgba(15,23,42,.06);
+            --md-bg:#f3f2ee;
+            --md-accent:#ff9800;
+            --code-bg:#f7f7f7;
+            --code-accent:#4caf50;
+            --out-bg:#f3f9fa;
+            --out-accent:#2196f3;
+            --stream-bg:#eef8ff;
+            --table-head:#f8fafc;
+            --table-zebra:#f6f8fa;
+            --exec-bg:#f7fbff;
+            --exec-border:#2E86C1;
+            --insight-bg:#f8fffb;
+            --insight-border:#22a06b;
+            --warning-bg:#fffaf2;
+            --warning-border:#f59e0b;
+            --danger-bg:#fff6f6;
+            --danger-border:#ef4444;
+            --metric-bg:#ffffff;
+            --metric-border:#d6e7f7;
+        }
+
+        *{ box-sizing:border-box; }
+
+        body{
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            background:var(--bg);
+            padding:40px 0;
+            color:var(--text);
+            line-height:1.55;
+        }
+
+        .container{
+            max-width:1550px;
+            margin:auto;
+            background:var(--paper);
+            padding:20px 30px 28px;
+            border-radius:8px;
+            box-shadow:var(--shadow);
+        }
+
+        .cell{ margin-bottom:10px; }
+
+        h1.title-header{
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            font-weight:700;
+            color:#8eb4c4;
+            text-transform:uppercase;
+            text-align:center;
+            margin:0 0 24px;
+            letter-spacing:.04em;
+        }
+
+        .markdown{
+            background:var(--md-bg);
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            padding:10px 15px;
+            border-left:5px solid var(--md-accent);
+            border-radius:4px;
+            margin:4px 0 8px;
+            line-height:1.6;
+        }
+        .markdown h1,.markdown h2,.markdown h3,.markdown h4,.markdown h5,.markdown h6{
+            margin-top:0;
+            color:#d64545;
+        }
+        .markdown p:last-child,
+        .markdown ul:last-child,
+        .markdown ol:last-child{ margin-bottom:0; }
+
+        img, svg, figure img{
+            max-width:100%;
+            height:auto;
+            display:block;
+            margin-left:auto;
+            margin-right:auto;
+            border:1px solid #ddd;
+            border-radius:6px;
+            box-shadow:0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        figure{ margin:20px auto; text-align:center; }
+        figure figcaption{ font-size:13px; color:#555; margin-top:6px; }
+
+        .cell-toolbar{
+            display:flex;
+            justify-content:flex-end;
+            margin:0 0 4px;
+            gap:6px;
+            flex-wrap:wrap;
+        }
+        .cell-badge{
+            display:inline-block;
+            background:#eef2f7;
+            border:1px solid #d7dee8;
+            color:#516072;
+            border-radius:999px;
+            font-size:11px;
+            font-weight:600;
+            padding:2px 8px;
+            letter-spacing:.02em;
+        }
+
+        .code_cell{
+            background:var(--code-bg);
+            border-left:5px solid var(--code-accent);
+            padding:6px 8px;
+            margin:4px 0;
+            overflow-x:auto;
+            border-radius:4px;
+        }
+        .code_cell pre,
+        .code_cell .hljs{
+            margin:0;
+            background:transparent !important;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+            white-space:pre;
+        }
+
+        .output-text,
+        .output-stream,
+        .output-error,
+        .output-image,
+        .output-html{
+            margin:4px 0;
+            border-radius:4px;
+            overflow-x:auto;
+        }
+
+        .output-text{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:10px 10px 10px 8px;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+        }
+        .output-text pre{
+            margin:0;
+            white-space:pre-wrap;
+            word-break:break-word;
+            font-family:inherit;
+            font-size:inherit;
+            line-height:inherit;
+        }
+
+        .output-stream{
+            background:var(--stream-bg);
+            border-left:5px solid var(--out-accent);
+            padding:8px 10px;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+        }
+        .output-stream pre{ margin:0; white-space:pre-wrap; word-break:break-word; }
+
+        .output-image{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:10px;
+        }
+
+        .output-html{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:8px 10px;
+            color:var(--text);
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            line-height:1.55;
+            white-space:normal;
+        }
+        .output-html *{ white-space:normal; word-break:normal; max-width:100%; }
+        .output-html p{ margin:0 0 10px; }
+        .output-html p:last-child{ margin-bottom:0; }
+        .output-html h1,.output-html h2,.output-html h3,.output-html h4,.output-html h5,.output-html h6{
+            margin:0 0 10px;
+            color:var(--text);
+            line-height:1.3;
+        }
+        .output-html ul,
+        .output-html ol{ margin:0 0 10px 20px; padding-left:12px; }
+        .output-html li{ margin-bottom:4px; }
+        .output-html li:last-child{ margin-bottom:0; }
+        .output-html code{ font-family:'Red Hat Mono','Noto Sans Mono',monospace; font-size:.95em; }
+        .output-html pre{
+            white-space:pre-wrap;
+            word-break:break-word;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.5;
+            margin:0;
+        }
+
+        .table-output{ padding:8px 10px; }
+        .table-output table,
+        .table-output table.dataframe{
+            border-collapse:collapse;
+            border-spacing:0;
+            width:auto;
+            max-width:100%;
+            margin:0;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.45;
+            color:#263238;
+            background:#fff;
+        }
+        .table-output table th,
+        .table-output table td,
+        .table-output table.dataframe th,
+        .table-output table.dataframe td{
+            padding:8px 10px;
+            border:1px solid var(--border);
+            vertical-align:top;
+            text-align:left;
+        }
+        .table-output table thead,
+        .table-output table.dataframe thead{ background:var(--table-head); font-weight:600; }
+        .table-output table tbody tr:nth-child(even),
+        .table-output table.dataframe tbody tr:nth-child(even){ background:var(--table-zebra); }
+        .table-output .dataframe tbody tr:hover,
+        .table-output table tbody tr:hover{ background:#eef6ff; }
+
+        /* Premium HTML blocks */
+        .output-html .executive-card,
+        .output-html .insight-card,
+        .output-html .warning-card,
+        .output-html .danger-card,
+        .output-html .summary-card{
+            border-radius:10px;
+            padding:14px 16px;
+            box-shadow:var(--shadow-soft);
+            border:1px solid #dbe5ef;
+            margin:4px 0;
+        }
+        .output-html .executive-card{
+            background:var(--exec-bg);
+            border-left:6px solid var(--exec-border);
+        }
+        .output-html .summary-card{
+            background:#f8fbff;
+            border-left:6px solid #64748b;
+        }
+        .output-html .insight-card{
+            background:var(--insight-bg);
+            border-left:6px solid var(--insight-border);
+        }
+        .output-html .warning-card{
+            background:var(--warning-bg);
+            border-left:6px solid var(--warning-border);
+        }
+        .output-html .danger-card{
+            background:var(--danger-bg);
+            border-left:6px solid var(--danger-border);
+        }
+        .output-html .card-title{
+            margin:0 0 10px;
+            font-size:20px;
+            font-weight:700;
+            color:#1f2937;
+            line-height:1.25;
+        }
+        .output-html .card-subtitle{
+            margin:0 0 12px;
+            font-size:13px;
+            font-weight:600;
+            color:#64748b;
+            text-transform:uppercase;
+            letter-spacing:.03em;
+        }
+        .output-html .card-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+            gap:10px;
+            margin:10px 0 12px;
+        }
+        .output-html .metric-card{
+            background:var(--metric-bg);
+            border:1px solid var(--metric-border);
+            border-radius:10px;
+            padding:10px 12px;
+            min-height:82px;
+            box-shadow:0 1px 3px rgba(15,23,42,.05);
+        }
+        .output-html .metric-label{
+            display:block;
+            margin:0 0 6px;
+            font-size:12px;
+            font-weight:700;
+            color:#64748b;
+            text-transform:uppercase;
+            letter-spacing:.03em;
+        }
+        .output-html .metric-value{
+            display:block;
+            font-size:24px;
+            font-weight:700;
+            line-height:1.15;
+            color:#0f172a;
+        }
+        .output-html .metric-note{
+            display:block;
+            margin-top:4px;
+            font-size:12px;
+            color:#6b7280;
+        }
+        .output-html .chip-row{
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px;
+            margin:8px 0 10px;
+        }
+        .output-html .chip{
+            display:inline-flex;
+            align-items:center;
+            background:#edf4ff;
+            border:1px solid #d8e6ff;
+            color:#2457a6;
+            border-radius:999px;
+            padding:4px 10px;
+            font-size:12px;
+            font-weight:600;
+        }
+        .output-html .callout-compact p{ margin-bottom:8px; }
+        .output-html .callout-compact ul,
+        .output-html .callout-compact ol{ margin-bottom:8px; }
+
+        .output-error{
+            background:#fff5f5;
+            border-left:5px solid #ef4444;
+            padding:10px 12px;
+            color:#7f1d1d;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.5;
+        }
+        .output-error pre{ margin:8px 0 0; white-space:pre-wrap; word-break:break-word; }
+
+        .hidden-note{
+            margin:4px 0;
+            padding:6px 10px;
+            border-radius:6px;
+            background:#f8fafc;
+            border:1px dashed #cbd5e1;
+            color:#64748b;
+            font-size:12px;
+            font-weight:600;
+        }
+
+        .footer{
+            text-align:right;
+            margin-top:30px;
+            padding:12px;
+            background:#e9ecef;
+            border-radius:4px;
+            font-size:14px;
+            color:#555;
+        }
+
+        @media (max-width: 768px) {
+            body{ padding:16px 0; }
+            .container{ max-width:100%; padding:14px 16px 20px; border-radius:0; }
+            .output-html,
+            .output-text,
+            .output-stream,
+            .output-image,
+            .output-error,
+            .markdown,
+            .code_cell{ padding-left:10px; padding-right:10px; }
+            .output-html .card-title{ font-size:18px; }
+            .output-html .metric-value{ font-size:20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<h1 class="title-header">04_learning_progress_snapshots</h1>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#F3F2EE">
+<br/><br/>
+<p style="text-align: center;">
+<font color="#0A1781" size="6">
+<strong>
+                    Databricks Certification Learning Knowledge Graph
+                </strong>
+</font>
+</p>
+<p style="text-align: center;">
+<font color="#C58A1E" size="6">
+<strong>
+                    Learning Progress Snapshots
+                </strong>
+</font>
+</p>
+<p style="text-align: center;">
+<font color="#C58A1E" size="5">
+<strong>
+                    Criar o primeiro mecanismo de evolução temporal do Knowledge Graph,<br/>registrando snapshots de progresso por tópico.
+                </strong>
+</font>
+</p>
+<br/>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#F3F2EE">
+<p style="text-align: right;">
+<font color="#444444" size="4">
+            Roberto SSoares - LfLngLrnng
+      </font>
+</p>
+<p style="text-align: right;"><font color="#444444" size="2">
+<a href="https://www.linkedin.com/in/roberto-dos-santos-soares/">in/roberto-dos-santos-soares</a><br/><a href="https://roberto-ssoares.github.io/meu-portfolio/">Portifólio: roberto-ssoares</a>
+</font></p>
+<p style="text-align: right;">
+<font color="#444444" size="4">
+            " [+] Faturamento [-] Custo [+] Qualidade de vida "
+        </font>
+<br/>
+<font color="#918e8e" size="2">"Mestre Bruno Jardim"
+        </font>
+</p>
+<p style="text-align: right;">
+<font color="#918e8e" size="2">
+</font>
+</p>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 Objetivo</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li><strong>Ações realizadas</strong><ul>
+<li><em>Leitura dos tópicos e snapshots iniciais.</em></li>
+<li><em>Criação de eventos de aprendizagem.</em></li>
+<li><em>Atualização dos scores de confiança e domínio.</em></li>
+<li><em>Geração de novo snapshot semanal.</em></li>
+<li><em>Exportação de arquivos para evolução do KG.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>Um Knowledge Graph de aprendizagem não deve representar apenas conceitos estáticos.</li>
+<li>Ele precisa capturar a evolução do conhecimento ao longo do tempo, registrando progresso, lacunas, evidências práticas e maturidade por tópico.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultados esperados</strong><ul>
+<li>Ao final deste notebook, teremos um snapshot evolutivo da jornada, comparando o estado inicial com o progresso obtido após os Notebooks 00, 01, 02 e 03.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">#!uv pip install watermark -q -U
+#!uv pip install tabulate -q -U
+#!uv pip install networkx pyvis matplotlib -q -U
+#!uv pip install dotenv
+#!uv pip install neo4j -q</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">from datetime import date
+from pathlib import Path
+
+import pandas as pd</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Versões dos pacotes usados neste jupyter notebook
+%reload_ext watermark
+%watermark -a "RobertoSSoares-LfLngLrnng"</code></pre>
+</div>
+<div class="output-stream">
+<pre>Author: RobertoSSoares-LfLngLrnng
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">pd.set_option("display.max_columns", 100)
+pd.set_option("display.max_colwidth", 120)</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">PROJECT_NAME = "Databricks Certification Learning Knowledge Graph"
+
+BASE_DIR = Path.cwd().parent if Path.cwd().name == "notebooks" else Path.cwd()
+
+DATA_DIR = BASE_DIR / "data"
+PROCESSED_DIR = DATA_DIR / "processed"
+EXPORTS_DIR = DATA_DIR / "exports"
+DOCS_DIR = BASE_DIR / "docs"
+
+for directory in [PROCESSED_DIR, EXPORTS_DIR, DOCS_DIR]:
+    directory.mkdir(parents=True, exist_ok=True)
+
+BASE_DIR</code></pre>
+</div>
+<div class="output-text">
+<pre>WindowsPath('D:/_DS-Projects/Data-Science/databricks-learning-kg')</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">topics = pd.read_csv(PROCESSED_DIR / "topics.csv").fillna("")
+exam_domains = pd.read_csv(PROCESSED_DIR / "exam_domains.csv").fillna("")
+snapshots = pd.read_csv(PROCESSED_DIR / "snapshots.csv").fillna("")
+
+display(topics.head())
+display(snapshots.head())</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>topic_id</th>
+<th>domain_id</th>
+<th>name</th>
+<th>category</th>
+<th>difficulty</th>
+<th>priority</th>
+<th>confidence_score</th>
+<th>mastery_score</th>
+<th>status</th>
+<th>exam_relevance</th>
+<th>portfolio_relevance</th>
+<th>last_review_date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>T001</td>
+<td>D01</td>
+<td>Lakehouse Architecture</td>
+<td>Platform</td>
+<td>medium</td>
+<td>high</td>
+<td>0.25</td>
+<td>0.10</td>
+<td>initial_mapping</td>
+<td>high</td>
+<td>high</td>
+<td></td>
+</tr>
+<tr>
+<th>1</th>
+<td>T002</td>
+<td>D01</td>
+<td>Databricks Workspace</td>
+<td>Platform</td>
+<td>easy</td>
+<td>medium</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>not_started</td>
+<td>medium</td>
+<td>medium</td>
+<td></td>
+</tr>
+<tr>
+<th>2</th>
+<td>T003</td>
+<td>D01</td>
+<td>Compute</td>
+<td>Platform</td>
+<td>medium</td>
+<td>medium</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>not_started</td>
+<td>medium</td>
+<td>medium</td>
+<td></td>
+</tr>
+<tr>
+<th>3</th>
+<td>T004</td>
+<td>D01</td>
+<td>SQL Warehouse</td>
+<td>Platform</td>
+<td>medium</td>
+<td>medium</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>not_started</td>
+<td>medium</td>
+<td>medium</td>
+<td></td>
+</tr>
+<tr>
+<th>4</th>
+<td>T005</td>
+<td>D01</td>
+<td>Notebooks</td>
+<td>Platform</td>
+<td>easy</td>
+<td>high</td>
+<td>0.50</td>
+<td>0.25</td>
+<td>initial_mapping</td>
+<td>high</td>
+<td>high</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>snapshot_id</th>
+<th>snapshot_date</th>
+<th>week_number</th>
+<th>overall_progress</th>
+<th>coverage_pct</th>
+<th>avg_confidence</th>
+<th>avg_mastery</th>
+<th>main_gap</th>
+<th>main_achievement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>SNAP_W00</td>
+<td>2026-04-27</td>
+<td>0</td>
+<td>0.05</td>
+<td>0.1</td>
+<td>0.213</td>
+<td>0.088</td>
+<td>Workflows, Unity Catalog e recursos específicos de Databricks ainda não praticados.</td>
+<td>Ontologia inicial definida e convertida para dados estruturados.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 1. Eventos de aprendizagem</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Nesta etapa, registramos os eventos reais da jornada até aqui.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Cada evento representa uma evidência de aprendizagem, como:<ul>
+<li>criação de notebook;</li>
+<li>modelagem de ontologia;</li>
+<li>geração de CSVs;</li>
+<li>visualização do grafo;</li>
+<li>carga no Neo4j;</li>
+<li>execução de consultas Cypher.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Esses eventos serão usados para atualizar os scores de progresso dos tópicos.</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">learning_events = pd.DataFrame(
+    [
+        {
+            "event_id": "EVT001",
+            "event_date": date.today().isoformat(),
+            "artifact": "Notebook 00",
+            "event_type": "conceptual_modeling",
+            "topic_id": "T001",
+            "topic": "Lakehouse Architecture",
+            "confidence_delta": 0.20,
+            "mastery_delta": 0.10,
+            "evidence": "Domain Understanding e contextualização CRISP-DM+.",
+        },
+        {
+            "event_id": "EVT002",
+            "event_date": date.today().isoformat(),
+            "artifact": "Notebook 00",
+            "event_type": "conceptual_modeling",
+            "topic_id": "T020",
+            "topic": "Medallion Architecture",
+            "confidence_delta": 0.15,
+            "mastery_delta": 0.10,
+            "evidence": "Mapeamento conceitual Bronze, Silver e Gold.",
+        },
+        {
+            "event_id": "EVT003",
+            "event_date": date.today().isoformat(),
+            "artifact": "Notebook 01",
+            "event_type": "ontology_as_data",
+            "topic_id": "T045",
+            "topic": "Data Quality",
+            "confidence_delta": 0.10,
+            "mastery_delta": 0.10,
+            "evidence": "Validação de nós, relacionamentos e integridade dos CSVs.",
+        },
+        {
+            "event_id": "EVT004",
+            "event_date": date.today().isoformat(),
+            "artifact": "Notebook 02",
+            "event_type": "graph_preview",
+            "topic_id": "T001",
+            "topic": "Lakehouse Architecture",
+            "confidence_delta": 0.10,
+            "mastery_delta": 0.15,
+            "evidence": "Visualização interativa do grafo com NetworkX e PyVis.",
+        },
+        {
+            "event_id": "EVT005",
+            "event_date": date.today().isoformat(),
+            "artifact": "Notebook 02",
+            "event_type": "graph_preview",
+            "topic_id": "T020",
+            "topic": "Medallion Architecture",
+            "confidence_delta": 0.10,
+            "mastery_delta": 0.15,
+            "evidence": "Relacionamento visual entre arquitetura medalhão e camadas Bronze/Silver/Gold.",
+        },
+        {
+            "event_id": "EVT006",
+            "event_date": date.today().isoformat(),
+            "artifact": "Notebook 03",
+            "event_type": "neo4j_load",
+            "topic_id": "T038",
+            "topic": "Unity Catalog",
+            "confidence_delta": 0.05,
+            "mastery_delta": 0.05,
+            "evidence": "Preparação de estrutura de governança semântica no Neo4j.",
+        },
+        {
+            "event_id": "EVT007",
+            "event_date": date.today().isoformat(),
+            "artifact": "Notebook 03",
+            "event_type": "neo4j_load",
+            "topic_id": "T029",
+            "topic": "Databricks Workflows",
+            "confidence_delta": 0.05,
+            "mastery_delta": 0.00,
+            "evidence": "Workflows identificados como área futura de prática.",
+        },
+        {
+            "event_id": "EVT008",
+            "event_date": date.today().isoformat(),
+            "artifact": "Notebook 03",
+            "event_type": "cypher_queries",
+            "topic_id": "T037",
+            "topic": "Pipeline Idempotency",
+            "confidence_delta": 0.10,
+            "mastery_delta": 0.10,
+            "evidence": "Carga reexecutável no Neo4j usando MERGE e limpeza controlada por label KGNode.",
+        },
+    ]
+)
+
+learning_events</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>event_id</th>
+<th>event_date</th>
+<th>artifact</th>
+<th>event_type</th>
+<th>topic_id</th>
+<th>topic</th>
+<th>confidence_delta</th>
+<th>mastery_delta</th>
+<th>evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>EVT001</td>
+<td>2026-04-27</td>
+<td>Notebook 00</td>
+<td>conceptual_modeling</td>
+<td>T001</td>
+<td>Lakehouse Architecture</td>
+<td>0.20</td>
+<td>0.10</td>
+<td>Domain Understanding e contextualização CRISP-DM+.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>EVT002</td>
+<td>2026-04-27</td>
+<td>Notebook 00</td>
+<td>conceptual_modeling</td>
+<td>T020</td>
+<td>Medallion Architecture</td>
+<td>0.15</td>
+<td>0.10</td>
+<td>Mapeamento conceitual Bronze, Silver e Gold.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>EVT003</td>
+<td>2026-04-27</td>
+<td>Notebook 01</td>
+<td>ontology_as_data</td>
+<td>T045</td>
+<td>Data Quality</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>Validação de nós, relacionamentos e integridade dos CSVs.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>EVT004</td>
+<td>2026-04-27</td>
+<td>Notebook 02</td>
+<td>graph_preview</td>
+<td>T001</td>
+<td>Lakehouse Architecture</td>
+<td>0.10</td>
+<td>0.15</td>
+<td>Visualização interativa do grafo com NetworkX e PyVis.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>EVT005</td>
+<td>2026-04-27</td>
+<td>Notebook 02</td>
+<td>graph_preview</td>
+<td>T020</td>
+<td>Medallion Architecture</td>
+<td>0.10</td>
+<td>0.15</td>
+<td>Relacionamento visual entre arquitetura medalhão e camadas Bronze/Silver/Gold.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>EVT006</td>
+<td>2026-04-27</td>
+<td>Notebook 03</td>
+<td>neo4j_load</td>
+<td>T038</td>
+<td>Unity Catalog</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>Preparação de estrutura de governança semântica no Neo4j.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>EVT007</td>
+<td>2026-04-27</td>
+<td>Notebook 03</td>
+<td>neo4j_load</td>
+<td>T029</td>
+<td>Databricks Workflows</td>
+<td>0.05</td>
+<td>0.00</td>
+<td>Workflows identificados como área futura de prática.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>EVT008</td>
+<td>2026-04-27</td>
+<td>Notebook 03</td>
+<td>cypher_queries</td>
+<td>T037</td>
+<td>Pipeline Idempotency</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>Carga reexecutável no Neo4j usando MERGE e limpeza controlada por label KGNode.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 2. Atualização dos scores</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Agora aplicamos os eventos de aprendizagem aos tópicos existentes.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Os scores são limitados a 1.0 para manter uma escala interpretável:<ul>
+<li><code>confidence_score</code>: percepção de domínio conceitual;</li>
+<li><code>mastery_score</code>: evidência prática acumulada.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 2.1. Atualização tópicos</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">progress_deltas = (
+    learning_events
+    .groupby("topic_id", as_index=False)
+    .agg(
+        confidence_delta=("confidence_delta", "sum"),
+        mastery_delta=("mastery_delta", "sum"),
+        evidence_count=("event_id", "count"),
+    )
+)
+
+topics_progress = topics.merge(
+    progress_deltas,
+    on="topic_id",
+    how="left",
+)
+
+topics_progress[["confidence_delta", "mastery_delta", "evidence_count"]] = (
+    topics_progress[["confidence_delta", "mastery_delta", "evidence_count"]]
+    .fillna(0)
+)
+
+topics_progress["previous_confidence_score"] = topics_progress["confidence_score"]
+topics_progress["previous_mastery_score"] = topics_progress["mastery_score"]
+
+topics_progress["confidence_score"] = (
+    topics_progress["confidence_score"] + topics_progress["confidence_delta"]
+).clip(upper=1.0)
+
+topics_progress["mastery_score"] = (
+    topics_progress["mastery_score"] + topics_progress["mastery_delta"]
+).clip(upper=1.0)
+
+topics_progress["last_review_date"] = date.today().isoformat()
+
+topics_progress["status"] = topics_progress["mastery_score"].apply(
+    lambda score: (
+        "not_started" if score == 0
+        else "mapped" if score &lt; 0.25
+        else "practicing" if score &lt; 0.50
+        else "consolidating" if score &lt; 0.75
+        else "strong"
+    )
+)
+
+topics_progress.head()</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>topic_id</th>
+<th>domain_id</th>
+<th>name</th>
+<th>category</th>
+<th>difficulty</th>
+<th>priority</th>
+<th>confidence_score</th>
+<th>mastery_score</th>
+<th>status</th>
+<th>exam_relevance</th>
+<th>portfolio_relevance</th>
+<th>last_review_date</th>
+<th>confidence_delta</th>
+<th>mastery_delta</th>
+<th>evidence_count</th>
+<th>previous_confidence_score</th>
+<th>previous_mastery_score</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>T001</td>
+<td>D01</td>
+<td>Lakehouse Architecture</td>
+<td>Platform</td>
+<td>medium</td>
+<td>high</td>
+<td>0.55</td>
+<td>0.35</td>
+<td>practicing</td>
+<td>high</td>
+<td>high</td>
+<td>2026-04-27</td>
+<td>0.3</td>
+<td>0.25</td>
+<td>2.0</td>
+<td>0.25</td>
+<td>0.10</td>
+</tr>
+<tr>
+<th>1</th>
+<td>T002</td>
+<td>D01</td>
+<td>Databricks Workspace</td>
+<td>Platform</td>
+<td>easy</td>
+<td>medium</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>not_started</td>
+<td>medium</td>
+<td>medium</td>
+<td>2026-04-27</td>
+<td>0.0</td>
+<td>0.00</td>
+<td>0.0</td>
+<td>0.10</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>2</th>
+<td>T003</td>
+<td>D01</td>
+<td>Compute</td>
+<td>Platform</td>
+<td>medium</td>
+<td>medium</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>not_started</td>
+<td>medium</td>
+<td>medium</td>
+<td>2026-04-27</td>
+<td>0.0</td>
+<td>0.00</td>
+<td>0.0</td>
+<td>0.10</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>3</th>
+<td>T004</td>
+<td>D01</td>
+<td>SQL Warehouse</td>
+<td>Platform</td>
+<td>medium</td>
+<td>medium</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>not_started</td>
+<td>medium</td>
+<td>medium</td>
+<td>2026-04-27</td>
+<td>0.0</td>
+<td>0.00</td>
+<td>0.0</td>
+<td>0.10</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>4</th>
+<td>T005</td>
+<td>D01</td>
+<td>Notebooks</td>
+<td>Platform</td>
+<td>easy</td>
+<td>high</td>
+<td>0.50</td>
+<td>0.25</td>
+<td>practicing</td>
+<td>high</td>
+<td>high</td>
+<td>2026-04-27</td>
+<td>0.0</td>
+<td>0.00</td>
+<td>0.0</td>
+<td>0.50</td>
+<td>0.25</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 2.2. Ver progresso aplicado</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">progress_view = topics_progress[
+    [
+        "topic_id",
+        "name",
+        "category",
+        "priority",
+        "previous_confidence_score",
+        "confidence_score",
+        "previous_mastery_score",
+        "mastery_score",
+        "evidence_count",
+        "status",
+    ]
+].sort_values(
+    by=["evidence_count", "mastery_score"],
+    ascending=False,
+)
+
+progress_view.head(20)</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>topic_id</th>
+<th>name</th>
+<th>category</th>
+<th>priority</th>
+<th>previous_confidence_score</th>
+<th>confidence_score</th>
+<th>previous_mastery_score</th>
+<th>mastery_score</th>
+<th>evidence_count</th>
+<th>status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>19</th>
+<td>T020</td>
+<td>Medallion Architecture</td>
+<td>Transformation</td>
+<td>high</td>
+<td>0.50</td>
+<td>0.75</td>
+<td>0.25</td>
+<td>0.50</td>
+<td>2.0</td>
+<td>consolidating</td>
+</tr>
+<tr>
+<th>0</th>
+<td>T001</td>
+<td>Lakehouse Architecture</td>
+<td>Platform</td>
+<td>high</td>
+<td>0.25</td>
+<td>0.55</td>
+<td>0.10</td>
+<td>0.35</td>
+<td>2.0</td>
+<td>practicing</td>
+</tr>
+<tr>
+<th>44</th>
+<td>T045</td>
+<td>Data Quality</td>
+<td>Governance</td>
+<td>high</td>
+<td>0.40</td>
+<td>0.50</td>
+<td>0.20</td>
+<td>0.30</td>
+<td>1.0</td>
+<td>practicing</td>
+</tr>
+<tr>
+<th>36</th>
+<td>T037</td>
+<td>Pipeline Idempotency</td>
+<td>Production</td>
+<td>high</td>
+<td>0.25</td>
+<td>0.35</td>
+<td>0.10</td>
+<td>0.20</td>
+<td>1.0</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>37</th>
+<td>T038</td>
+<td>Unity Catalog</td>
+<td>Governance</td>
+<td>high</td>
+<td>0.10</td>
+<td>0.15</td>
+<td>0.00</td>
+<td>0.05</td>
+<td>1.0</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>28</th>
+<td>T029</td>
+<td>Databricks Workflows</td>
+<td>Production</td>
+<td>high</td>
+<td>0.00</td>
+<td>0.05</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>1.0</td>
+<td>not_started</td>
+</tr>
+<tr>
+<th>22</th>
+<td>T023</td>
+<td>Joins</td>
+<td>Transformation</td>
+<td>high</td>
+<td>0.60</td>
+<td>0.60</td>
+<td>0.30</td>
+<td>0.30</td>
+<td>0.0</td>
+<td>practicing</td>
+</tr>
+<tr>
+<th>23</th>
+<td>T024</td>
+<td>Aggregations</td>
+<td>Transformation</td>
+<td>high</td>
+<td>0.60</td>
+<td>0.60</td>
+<td>0.30</td>
+<td>0.30</td>
+<td>0.0</td>
+<td>practicing</td>
+</tr>
+<tr>
+<th>24</th>
+<td>T025</td>
+<td>Data Cleaning</td>
+<td>Transformation</td>
+<td>high</td>
+<td>0.60</td>
+<td>0.60</td>
+<td>0.30</td>
+<td>0.30</td>
+<td>0.0</td>
+<td>practicing</td>
+</tr>
+<tr>
+<th>45</th>
+<td>T046</td>
+<td>Naming Conventions</td>
+<td>Governance</td>
+<td>medium</td>
+<td>0.60</td>
+<td>0.60</td>
+<td>0.30</td>
+<td>0.30</td>
+<td>0.0</td>
+<td>practicing</td>
+</tr>
+<tr>
+<th>4</th>
+<td>T005</td>
+<td>Notebooks</td>
+<td>Platform</td>
+<td>high</td>
+<td>0.50</td>
+<td>0.50</td>
+<td>0.25</td>
+<td>0.25</td>
+<td>0.0</td>
+<td>practicing</td>
+</tr>
+<tr>
+<th>10</th>
+<td>T011</td>
+<td>File Formats</td>
+<td>Ingestion</td>
+<td>high</td>
+<td>0.50</td>
+<td>0.50</td>
+<td>0.25</td>
+<td>0.25</td>
+<td>0.0</td>
+<td>practicing</td>
+</tr>
+<tr>
+<th>13</th>
+<td>T014</td>
+<td>Spark SQL</td>
+<td>Development</td>
+<td>high</td>
+<td>0.50</td>
+<td>0.50</td>
+<td>0.25</td>
+<td>0.25</td>
+<td>0.0</td>
+<td>practicing</td>
+</tr>
+<tr>
+<th>14</th>
+<td>T015</td>
+<td>PySpark DataFrame API</td>
+<td>Development</td>
+<td>high</td>
+<td>0.50</td>
+<td>0.50</td>
+<td>0.25</td>
+<td>0.25</td>
+<td>0.0</td>
+<td>practicing</td>
+</tr>
+<tr>
+<th>21</th>
+<td>T022</td>
+<td>Window Functions</td>
+<td>Transformation</td>
+<td>high</td>
+<td>0.40</td>
+<td>0.40</td>
+<td>0.20</td>
+<td>0.20</td>
+<td>0.0</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>25</th>
+<td>T026</td>
+<td>Deduplication</td>
+<td>Transformation</td>
+<td>high</td>
+<td>0.40</td>
+<td>0.40</td>
+<td>0.20</td>
+<td>0.20</td>
+<td>0.0</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>5</th>
+<td>T006</td>
+<td>Repos</td>
+<td>Platform</td>
+<td>medium</td>
+<td>0.25</td>
+<td>0.25</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.0</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>6</th>
+<td>T007</td>
+<td>Data Ingestion</td>
+<td>Ingestion</td>
+<td>high</td>
+<td>0.25</td>
+<td>0.25</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.0</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>11</th>
+<td>T012</td>
+<td>Schema Inference</td>
+<td>Ingestion</td>
+<td>high</td>
+<td>0.25</td>
+<td>0.25</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.0</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>12</th>
+<td>T013</td>
+<td>Schema Definition</td>
+<td>Ingestion</td>
+<td>high</td>
+<td>0.25</td>
+<td>0.25</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.0</td>
+<td>mapped</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 3. Snapshot da Semana 01</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Agora criamos o primeiro snapshot evolutivo após os primeiros notebooks.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Esse snapshot representa o estado da jornada depois de:<ul>
+<li>Notebook 00;</li>
+<li>Notebook 01;</li>
+<li>Notebook 02;</li>
+<li>Notebook 03.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 4. Criar snapshot semanal</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">week_number = 1
+snapshot_id = "SNAP_W01"
+
+snapshot_w01 = pd.DataFrame(
+    [
+        {
+            "snapshot_id": snapshot_id,
+            "snapshot_date": date.today().isoformat(),
+            "week_number": week_number,
+            "overall_progress": round(topics_progress["mastery_score"].mean(), 4),
+            "coverage_pct": round((topics_progress["mastery_score"] &gt; 0).mean(), 4),
+            "avg_confidence": round(topics_progress["confidence_score"].mean(), 4),
+            "avg_mastery": round(topics_progress["mastery_score"].mean(), 4),
+            "main_gap": "Prática real em Databricks Workflows, Delta Lake, Auto Loader e Unity Catalog ainda precisa ser aprofundada.",
+            "main_achievement": "Primeira versão operacional do Knowledge Graph criada, visualizada e carregada no Neo4j.",
+        }
+    ]
+)
+
+snapshot_w01</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>snapshot_id</th>
+<th>snapshot_date</th>
+<th>week_number</th>
+<th>overall_progress</th>
+<th>coverage_pct</th>
+<th>avg_confidence</th>
+<th>avg_mastery</th>
+<th>main_gap</th>
+<th>main_achievement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>SNAP_W01</td>
+<td>2026-04-27</td>
+<td>1</td>
+<td>0.1043</td>
+<td>0.5</td>
+<td>0.2315</td>
+<td>0.1043</td>
+<td>Prática real em Databricks Workflows, Delta Lake, Auto Loader e Unity Catalog ainda precisa ser aprofundada.</td>
+<td>Primeira versão operacional do Knowledge Graph criada, visualizada e carregada no Neo4j.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 5. Snapshot por tópico</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">topic_progress_snapshot_w01 = topics_progress[
+    [
+        "topic_id",
+        "name",
+        "domain_id",
+        "category",
+        "priority",
+        "confidence_score",
+        "mastery_score",
+        "status",
+        "last_review_date",
+    ]
+].copy()
+
+topic_progress_snapshot_w01.insert(0, "snapshot_id", snapshot_id)
+topic_progress_snapshot_w01.insert(1, "snapshot_date", date.today().isoformat())
+topic_progress_snapshot_w01.insert(2, "week_number", week_number)
+
+topic_progress_snapshot_w01.head()</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>snapshot_id</th>
+<th>snapshot_date</th>
+<th>week_number</th>
+<th>topic_id</th>
+<th>name</th>
+<th>domain_id</th>
+<th>category</th>
+<th>priority</th>
+<th>confidence_score</th>
+<th>mastery_score</th>
+<th>status</th>
+<th>last_review_date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>SNAP_W01</td>
+<td>2026-04-27</td>
+<td>1</td>
+<td>T001</td>
+<td>Lakehouse Architecture</td>
+<td>D01</td>
+<td>Platform</td>
+<td>high</td>
+<td>0.55</td>
+<td>0.35</td>
+<td>practicing</td>
+<td>2026-04-27</td>
+</tr>
+<tr>
+<th>1</th>
+<td>SNAP_W01</td>
+<td>2026-04-27</td>
+<td>1</td>
+<td>T002</td>
+<td>Databricks Workspace</td>
+<td>D01</td>
+<td>Platform</td>
+<td>medium</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>not_started</td>
+<td>2026-04-27</td>
+</tr>
+<tr>
+<th>2</th>
+<td>SNAP_W01</td>
+<td>2026-04-27</td>
+<td>1</td>
+<td>T003</td>
+<td>Compute</td>
+<td>D01</td>
+<td>Platform</td>
+<td>medium</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>not_started</td>
+<td>2026-04-27</td>
+</tr>
+<tr>
+<th>3</th>
+<td>SNAP_W01</td>
+<td>2026-04-27</td>
+<td>1</td>
+<td>T004</td>
+<td>SQL Warehouse</td>
+<td>D01</td>
+<td>Platform</td>
+<td>medium</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>not_started</td>
+<td>2026-04-27</td>
+</tr>
+<tr>
+<th>4</th>
+<td>SNAP_W01</td>
+<td>2026-04-27</td>
+<td>1</td>
+<td>T005</td>
+<td>Notebooks</td>
+<td>D01</td>
+<td>Platform</td>
+<td>high</td>
+<td>0.50</td>
+<td>0.25</td>
+<td>practicing</td>
+<td>2026-04-27</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 6. Comparativo inicial</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">comparison = topics.merge(
+    topics_progress[
+        [
+            "topic_id",
+            "confidence_score",
+            "mastery_score",
+            "status",
+        ]
+    ],
+    on="topic_id",
+    suffixes=("_w00", "_w01"),
+)
+
+comparison["confidence_gain"] = (
+    comparison["confidence_score_w01"] - comparison["confidence_score_w00"]
+).round(4)
+
+comparison["mastery_gain"] = (
+    comparison["mastery_score_w01"] - comparison["mastery_score_w00"]
+).round(4)
+
+comparison_view = comparison[
+    [
+        "topic_id",
+        "name",
+        "category",
+        "priority",
+        "confidence_score_w00",
+        "confidence_score_w01",
+        "confidence_gain",
+        "mastery_score_w00",
+        "mastery_score_w01",
+        "mastery_gain",
+        "status_w01",
+    ]
+].sort_values(
+    by=["mastery_gain", "confidence_gain"],
+    ascending=False,
+)
+
+comparison_view.head(20)</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>topic_id</th>
+<th>name</th>
+<th>category</th>
+<th>priority</th>
+<th>confidence_score_w00</th>
+<th>confidence_score_w01</th>
+<th>confidence_gain</th>
+<th>mastery_score_w00</th>
+<th>mastery_score_w01</th>
+<th>mastery_gain</th>
+<th>status_w01</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>T001</td>
+<td>Lakehouse Architecture</td>
+<td>Platform</td>
+<td>high</td>
+<td>0.25</td>
+<td>0.55</td>
+<td>0.30</td>
+<td>0.10</td>
+<td>0.35</td>
+<td>0.25</td>
+<td>practicing</td>
+</tr>
+<tr>
+<th>19</th>
+<td>T020</td>
+<td>Medallion Architecture</td>
+<td>Transformation</td>
+<td>high</td>
+<td>0.50</td>
+<td>0.75</td>
+<td>0.25</td>
+<td>0.25</td>
+<td>0.50</td>
+<td>0.25</td>
+<td>consolidating</td>
+</tr>
+<tr>
+<th>36</th>
+<td>T037</td>
+<td>Pipeline Idempotency</td>
+<td>Production</td>
+<td>high</td>
+<td>0.25</td>
+<td>0.35</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.20</td>
+<td>0.10</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>44</th>
+<td>T045</td>
+<td>Data Quality</td>
+<td>Governance</td>
+<td>high</td>
+<td>0.40</td>
+<td>0.50</td>
+<td>0.10</td>
+<td>0.20</td>
+<td>0.30</td>
+<td>0.10</td>
+<td>practicing</td>
+</tr>
+<tr>
+<th>37</th>
+<td>T038</td>
+<td>Unity Catalog</td>
+<td>Governance</td>
+<td>high</td>
+<td>0.10</td>
+<td>0.15</td>
+<td>0.05</td>
+<td>0.00</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>28</th>
+<td>T029</td>
+<td>Databricks Workflows</td>
+<td>Production</td>
+<td>high</td>
+<td>0.00</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>not_started</td>
+</tr>
+<tr>
+<th>1</th>
+<td>T002</td>
+<td>Databricks Workspace</td>
+<td>Platform</td>
+<td>medium</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>not_started</td>
+</tr>
+<tr>
+<th>2</th>
+<td>T003</td>
+<td>Compute</td>
+<td>Platform</td>
+<td>medium</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>not_started</td>
+</tr>
+<tr>
+<th>3</th>
+<td>T004</td>
+<td>SQL Warehouse</td>
+<td>Platform</td>
+<td>medium</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>not_started</td>
+</tr>
+<tr>
+<th>4</th>
+<td>T005</td>
+<td>Notebooks</td>
+<td>Platform</td>
+<td>high</td>
+<td>0.50</td>
+<td>0.50</td>
+<td>0.00</td>
+<td>0.25</td>
+<td>0.25</td>
+<td>0.00</td>
+<td>practicing</td>
+</tr>
+<tr>
+<th>5</th>
+<td>T006</td>
+<td>Repos</td>
+<td>Platform</td>
+<td>medium</td>
+<td>0.25</td>
+<td>0.25</td>
+<td>0.00</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>6</th>
+<td>T007</td>
+<td>Data Ingestion</td>
+<td>Ingestion</td>
+<td>high</td>
+<td>0.25</td>
+<td>0.25</td>
+<td>0.00</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>7</th>
+<td>T008</td>
+<td>read_files</td>
+<td>Ingestion</td>
+<td>high</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>not_started</td>
+</tr>
+<tr>
+<th>8</th>
+<td>T009</td>
+<td>COPY INTO</td>
+<td>Ingestion</td>
+<td>medium</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>not_started</td>
+</tr>
+<tr>
+<th>9</th>
+<td>T010</td>
+<td>Auto Loader</td>
+<td>Ingestion</td>
+<td>medium</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>not_started</td>
+</tr>
+<tr>
+<th>10</th>
+<td>T011</td>
+<td>File Formats</td>
+<td>Ingestion</td>
+<td>high</td>
+<td>0.50</td>
+<td>0.50</td>
+<td>0.00</td>
+<td>0.25</td>
+<td>0.25</td>
+<td>0.00</td>
+<td>practicing</td>
+</tr>
+<tr>
+<th>11</th>
+<td>T012</td>
+<td>Schema Inference</td>
+<td>Ingestion</td>
+<td>high</td>
+<td>0.25</td>
+<td>0.25</td>
+<td>0.00</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>12</th>
+<td>T013</td>
+<td>Schema Definition</td>
+<td>Ingestion</td>
+<td>high</td>
+<td>0.25</td>
+<td>0.25</td>
+<td>0.00</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>13</th>
+<td>T014</td>
+<td>Spark SQL</td>
+<td>Development</td>
+<td>high</td>
+<td>0.50</td>
+<td>0.50</td>
+<td>0.00</td>
+<td>0.25</td>
+<td>0.25</td>
+<td>0.00</td>
+<td>practicing</td>
+</tr>
+<tr>
+<th>14</th>
+<td>T015</td>
+<td>PySpark DataFrame API</td>
+<td>Development</td>
+<td>high</td>
+<td>0.50</td>
+<td>0.50</td>
+<td>0.00</td>
+<td>0.25</td>
+<td>0.25</td>
+<td>0.00</td>
+<td>practicing</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 7. Leitura analítica do progresso</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Agora vamos identificar:<ul>
+<li>tópicos com maior evolução;</li>
+<li>tópicos ainda sem evidência prática;</li>
+<li>tópicos prioritários ainda frágeis;</li>
+<li>média de progresso por domínio.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 7.1. Tópico com maior ganho</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">top_progress_topics = comparison_view[
+    (comparison_view["confidence_gain"] &gt; 0) | (comparison_view["mastery_gain"] &gt; 0)
+].head(15)
+
+top_progress_topics</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>topic_id</th>
+<th>name</th>
+<th>category</th>
+<th>priority</th>
+<th>confidence_score_w00</th>
+<th>confidence_score_w01</th>
+<th>confidence_gain</th>
+<th>mastery_score_w00</th>
+<th>mastery_score_w01</th>
+<th>mastery_gain</th>
+<th>status_w01</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>T001</td>
+<td>Lakehouse Architecture</td>
+<td>Platform</td>
+<td>high</td>
+<td>0.25</td>
+<td>0.55</td>
+<td>0.30</td>
+<td>0.10</td>
+<td>0.35</td>
+<td>0.25</td>
+<td>practicing</td>
+</tr>
+<tr>
+<th>19</th>
+<td>T020</td>
+<td>Medallion Architecture</td>
+<td>Transformation</td>
+<td>high</td>
+<td>0.50</td>
+<td>0.75</td>
+<td>0.25</td>
+<td>0.25</td>
+<td>0.50</td>
+<td>0.25</td>
+<td>consolidating</td>
+</tr>
+<tr>
+<th>36</th>
+<td>T037</td>
+<td>Pipeline Idempotency</td>
+<td>Production</td>
+<td>high</td>
+<td>0.25</td>
+<td>0.35</td>
+<td>0.10</td>
+<td>0.10</td>
+<td>0.20</td>
+<td>0.10</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>44</th>
+<td>T045</td>
+<td>Data Quality</td>
+<td>Governance</td>
+<td>high</td>
+<td>0.40</td>
+<td>0.50</td>
+<td>0.10</td>
+<td>0.20</td>
+<td>0.30</td>
+<td>0.10</td>
+<td>practicing</td>
+</tr>
+<tr>
+<th>37</th>
+<td>T038</td>
+<td>Unity Catalog</td>
+<td>Governance</td>
+<td>high</td>
+<td>0.10</td>
+<td>0.15</td>
+<td>0.05</td>
+<td>0.00</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>28</th>
+<td>T029</td>
+<td>Databricks Workflows</td>
+<td>Production</td>
+<td>high</td>
+<td>0.00</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>not_started</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 7.2. Tópico prioritários ainda frágeis</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">weak_high_priority_topics = topics_progress[
+    (topics_progress["priority"] == "high") &amp;
+    (topics_progress["mastery_score"] &lt; 0.30)
+][
+    [
+        "topic_id",
+        "name",
+        "category",
+        "priority",
+        "confidence_score",
+        "mastery_score",
+        "status",
+    ]
+].sort_values(
+    by=["mastery_score", "confidence_score"],
+    ascending=True,
+)
+
+weak_high_priority_topics.head(20)</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>topic_id</th>
+<th>name</th>
+<th>category</th>
+<th>priority</th>
+<th>confidence_score</th>
+<th>mastery_score</th>
+<th>status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>7</th>
+<td>T008</td>
+<td>read_files</td>
+<td>Ingestion</td>
+<td>high</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>not_started</td>
+</tr>
+<tr>
+<th>29</th>
+<td>T030</td>
+<td>Jobs</td>
+<td>Production</td>
+<td>high</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>not_started</td>
+</tr>
+<tr>
+<th>30</th>
+<td>T031</td>
+<td>Tasks</td>
+<td>Production</td>
+<td>high</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>not_started</td>
+</tr>
+<tr>
+<th>31</th>
+<td>T032</td>
+<td>Task Dependencies</td>
+<td>Production</td>
+<td>high</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>not_started</td>
+</tr>
+<tr>
+<th>28</th>
+<td>T029</td>
+<td>Databricks Workflows</td>
+<td>Production</td>
+<td>high</td>
+<td>0.05</td>
+<td>0.00</td>
+<td>not_started</td>
+</tr>
+<tr>
+<th>20</th>
+<td>T021</td>
+<td>MERGE INTO</td>
+<td>Transformation</td>
+<td>high</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>not_started</td>
+</tr>
+<tr>
+<th>42</th>
+<td>T043</td>
+<td>Permissions</td>
+<td>Governance</td>
+<td>high</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>not_started</td>
+</tr>
+<tr>
+<th>37</th>
+<td>T038</td>
+<td>Unity Catalog</td>
+<td>Governance</td>
+<td>high</td>
+<td>0.15</td>
+<td>0.05</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>6</th>
+<td>T007</td>
+<td>Data Ingestion</td>
+<td>Ingestion</td>
+<td>high</td>
+<td>0.25</td>
+<td>0.10</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>11</th>
+<td>T012</td>
+<td>Schema Inference</td>
+<td>Ingestion</td>
+<td>high</td>
+<td>0.25</td>
+<td>0.10</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>12</th>
+<td>T013</td>
+<td>Schema Definition</td>
+<td>Ingestion</td>
+<td>high</td>
+<td>0.25</td>
+<td>0.10</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>15</th>
+<td>T016</td>
+<td>Delta Lake</td>
+<td>Transformation</td>
+<td>high</td>
+<td>0.25</td>
+<td>0.10</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>16</th>
+<td>T017</td>
+<td>Delta Table</td>
+<td>Transformation</td>
+<td>high</td>
+<td>0.25</td>
+<td>0.10</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>36</th>
+<td>T037</td>
+<td>Pipeline Idempotency</td>
+<td>Production</td>
+<td>high</td>
+<td>0.35</td>
+<td>0.20</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>21</th>
+<td>T022</td>
+<td>Window Functions</td>
+<td>Transformation</td>
+<td>high</td>
+<td>0.40</td>
+<td>0.20</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>25</th>
+<td>T026</td>
+<td>Deduplication</td>
+<td>Transformation</td>
+<td>high</td>
+<td>0.40</td>
+<td>0.20</td>
+<td>mapped</td>
+</tr>
+<tr>
+<th>4</th>
+<td>T005</td>
+<td>Notebooks</td>
+<td>Platform</td>
+<td>high</td>
+<td>0.50</td>
+<td>0.25</td>
+<td>practicing</td>
+</tr>
+<tr>
+<th>10</th>
+<td>T011</td>
+<td>File Formats</td>
+<td>Ingestion</td>
+<td>high</td>
+<td>0.50</td>
+<td>0.25</td>
+<td>practicing</td>
+</tr>
+<tr>
+<th>13</th>
+<td>T014</td>
+<td>Spark SQL</td>
+<td>Development</td>
+<td>high</td>
+<td>0.50</td>
+<td>0.25</td>
+<td>practicing</td>
+</tr>
+<tr>
+<th>14</th>
+<td>T015</td>
+<td>PySpark DataFrame API</td>
+<td>Development</td>
+<td>high</td>
+<td>0.50</td>
+<td>0.25</td>
+<td>practicing</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 7.3. Progresso por domínio</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">domain_progress = (
+    topics_progress
+    .merge(exam_domains[["domain_id", "name", "weight_pct"]], on="domain_id", how="left", suffixes=("_topic", "_domain"))
+    .groupby(["domain_id", "name_domain", "weight_pct"], as_index=False)
+    .agg(
+        total_topics=("topic_id", "count"),
+        avg_confidence=("confidence_score", "mean"),
+        avg_mastery=("mastery_score", "mean"),
+        topics_with_evidence=("mastery_score", lambda s: (s &gt; 0).sum()),
+    )
+)
+
+domain_progress["coverage_pct"] = (
+    domain_progress["topics_with_evidence"] / domain_progress["total_topics"]
+).round(4)
+
+domain_progress["avg_confidence"] = domain_progress["avg_confidence"].round(4)
+domain_progress["avg_mastery"] = domain_progress["avg_mastery"].round(4)
+
+domain_progress.sort_values("weight_pct", ascending=False)</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>domain_id</th>
+<th>name_domain</th>
+<th>weight_pct</th>
+<th>total_topics</th>
+<th>avg_confidence</th>
+<th>avg_mastery</th>
+<th>topics_with_evidence</th>
+<th>coverage_pct</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>2</th>
+<td>D03</td>
+<td>Data Processing &amp; Transformations</td>
+<td>31</td>
+<td>13</td>
+<td>0.3346</td>
+<td>0.1538</td>
+<td>8</td>
+<td>0.6154</td>
+</tr>
+<tr>
+<th>1</th>
+<td>D02</td>
+<td>Development and Ingestion</td>
+<td>30</td>
+<td>9</td>
+<td>0.2500</td>
+<td>0.1167</td>
+<td>6</td>
+<td>0.6667</td>
+</tr>
+<tr>
+<th>3</th>
+<td>D04</td>
+<td>Productionizing Data Pipelines</td>
+<td>18</td>
+<td>9</td>
+<td>0.0444</td>
+<td>0.0222</td>
+<td>1</td>
+<td>0.1111</td>
+</tr>
+<tr>
+<th>4</th>
+<td>D05</td>
+<td>Data Governance &amp; Quality</td>
+<td>11</td>
+<td>9</td>
+<td>0.2278</td>
+<td>0.0944</td>
+<td>5</td>
+<td>0.5556</td>
+</tr>
+<tr>
+<th>0</th>
+<td>D01</td>
+<td>Databricks Intelligence Platform</td>
+<td>10</td>
+<td>6</td>
+<td>0.2667</td>
+<td>0.1167</td>
+<td>3</td>
+<td>0.5000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 8. Exportação dos artefatos de progresso</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Vamos salvar os arquivos gerados para uso posterior no Neo4j, no dashboard e no README do projeto.</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">learning_events.to_csv(PROCESSED_DIR / "learning_events.csv", index=False, encoding="utf-8")
+topics_progress.to_csv(PROCESSED_DIR / "topics_progress_w01.csv", index=False, encoding="utf-8")
+snapshot_w01.to_csv(PROCESSED_DIR / "snapshot_w01.csv", index=False, encoding="utf-8")
+topic_progress_snapshot_w01.to_csv(PROCESSED_DIR / "topic_progress_snapshot_w01.csv", index=False, encoding="utf-8")
+
+comparison_view.to_csv(EXPORTS_DIR / "learning_progress_comparison_w00_w01.csv", index=False, encoding="utf-8")
+top_progress_topics.to_csv(EXPORTS_DIR / "top_progress_topics_w01.csv", index=False, encoding="utf-8")
+weak_high_priority_topics.to_csv(EXPORTS_DIR / "weak_high_priority_topics_w01.csv", index=False, encoding="utf-8")
+domain_progress.to_csv(EXPORTS_DIR / "domain_progress_w01.csv", index=False, encoding="utf-8")
+
+print("Arquivos de progresso exportados com sucesso.")</code></pre>
+</div>
+<div class="output-stream">
+<pre>Arquivos de progresso exportados com sucesso.
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 9. Relatório Markdown</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">report = f"""# Learning Progress Snapshot W01 — Databricks Learning KG
+
+## Projeto
+
+{PROJECT_NAME}
+
+## Snapshot
+
+| Métrica | Valor |
+|---|---:|
+| Semana | {week_number} |
+| Data do snapshot | {date.today().isoformat()} |
+| Progresso geral médio | {snapshot_w01["overall_progress"].iloc[0]} |
+| Cobertura de tópicos com evidência | {snapshot_w01["coverage_pct"].iloc[0]} |
+| Confiança média | {snapshot_w01["avg_confidence"].iloc[0]} |
+| Domínio médio | {snapshot_w01["avg_mastery"].iloc[0]} |
+
+## Principal conquista
+
+{snapshot_w01["main_achievement"].iloc[0]}
+
+## Principal lacuna
+
+{snapshot_w01["main_gap"].iloc[0]}
+
+## Tópicos com maior progresso
+
+{top_progress_topics[["topic_id", "name", "confidence_gain", "mastery_gain", "status_w01"]].to_markdown(index=False)}
+
+## Tópicos prioritários ainda frágeis
+
+{weak_high_priority_topics.head(15).to_markdown(index=False)}
+
+## Progresso por domínio
+
+{domain_progress.sort_values("weight_pct", ascending=False).to_markdown(index=False)}
+
+## Leitura executiva
+
+A primeira evolução temporal do Knowledge Graph mostra que a jornada já possui evidências fortes em modelagem conceitual, ontologia, visualização de grafo e carga no Neo4j.
+
+Os próximos focos técnicos devem ser direcionados para prática real em Delta Lake, ingestão, Workflows, Jobs, Tasks, Unity Catalog e qualidade de dados na plataforma Databricks.
+"""
+
+report_path = DOCS_DIR / "learning_progress_snapshot_w01.md"
+report_path.write_text(report, encoding="utf-8")
+
+report_path</code></pre>
+</div>
+<div class="output-text">
+<pre>WindowsPath('D:/_DS-Projects/Data-Science/databricks-learning-kg/docs/learning_progress_snapshot_w01.md')</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 10. Conclusão executiva</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Este notebook criou o primeiro mecanismo de evolução temporal do Databricks Learning Knowledge Graph.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Foram gerados:<ul>
+<li>eventos de aprendizagem;</li>
+<li>atualização de confidence_score;</li>
+<li>atualização de mastery_score;</li>
+<li>snapshot da Semana 01;</li>
+<li>comparação entre W00 e W01;</li>
+<li>ranking de tópicos com maior progresso;</li>
+<li>identificação de tópicos prioritários ainda frágeis;</li>
+<li>progresso médio por domínio;</li>
+<li>arquivos CSV para uso futuro;</li>
+<li>relatório Markdown executivo.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Próximo passo</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>O próximo notebook recomendado será:<ul>
+<li><code>Notebook 05 — Neo4j Progress Update</code></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Nele vamos carregar os eventos de aprendizagem e o snapshot W01 no Neo4j, conectando:<ul>
+<li>StudySession;</li>
+<li>LearningEvent;</li>
+<li>Snapshot;</li>
+<li>Topic;</li>
+<li>Evidence;</li>
+<li>Progress.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Com isso, o Knowledge Graph deixará de ser apenas estrutural e passará a representar evolução real da jornada.</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">%reload_ext watermark 
+%watermark -a "Roberto-SSoares-LfLngLrnng" -d -t -u --iversions -v -m -h</code></pre>
+</div>
+<div class="output-stream">
+<pre>Author: Roberto-SSoares-LfLngLrnng
+
+Last updated: 2026-04-27 20:09:00
+
+Python implementation: CPython
+Python version       : 3.12.12
+IPython version      : 9.13.0
+
+Compiler    : MSC v.1944 64 bit (AMD64)
+OS          : Windows
+Release     : 11
+Machine     : AMD64
+Processor   : Intel64 Family 6 Model 158 Stepping 9, GenuineIntel
+CPU cores   : 4
+Architecture: 64bit
+
+Hostname: PC-ROBERTO
+
+pandas: 3.0.2
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="6"><strong>Fim</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">#!uv pip install nbconvert -U -q
+!jupyter nbconvert --to html --template-file my-template-html-v10.tpl 04_learning_progress_snapshots.ipynb</code></pre>
+</div>
+</div>
+<div class="footer">
+<p>RobertoSSoares-LfLngLrnng — <span id="datetime"></span></p>
+</div>
+<script>
+            document.getElementById("datetime").innerText = new Date().toLocaleString('pt-BR');
+        </script>
+</div>
+</body>
+</html>

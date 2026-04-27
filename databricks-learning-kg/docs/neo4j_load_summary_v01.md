@@ -22,9 +22,9 @@ Databricks Certification Learning Knowledge Graph
 | Notebook      |       5 |
 | Resource      |       4 |
 | Lab           |       4 |
-| Certification |       1 |
 | StudySession  |       1 |
 | Snapshot      |       1 |
+| Certification |       1 |
 
 ## Relacionamentos por tipo
 
