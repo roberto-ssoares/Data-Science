@@ -1,0 +1,1739 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>00_domain_understanding_databricks_learning_kd</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/jupyterlab/3.6.3/themes/JupyterLab-light-theme.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@300;400;600&amp;family=Reddit+Sans:wght@300;400;600&amp;family=Courier+Prime:wght@400;700&amp;family=Montserrat:wght@300;400;600;700&amp;family=Source+Code+Pro:wght@400&amp;family=Red+Hat+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['\\(', '\\)'], ['$', '$']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+          ignoreHtmlClass: 'tex2jax_ignore',
+          processHtmlClass: 'mathjax_process'
+        }
+      };
+    </script>
+<script async="" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+        :root{
+            --bg:#f5f5f5;
+            --paper:#ffffff;
+            --text:#1f2937;
+            --muted:#6b7280;
+            --border:#d9dde3;
+            --shadow:0 4px 12px rgba(0,0,0,.08);
+            --shadow-soft:0 2px 8px rgba(15,23,42,.06);
+            --md-bg:#f3f2ee;
+            --md-accent:#ff9800;
+            --code-bg:#f7f7f7;
+            --code-accent:#4caf50;
+            --out-bg:#f3f9fa;
+            --out-accent:#2196f3;
+            --stream-bg:#eef8ff;
+            --table-head:#f8fafc;
+            --table-zebra:#f6f8fa;
+            --exec-bg:#f7fbff;
+            --exec-border:#2E86C1;
+            --insight-bg:#f8fffb;
+            --insight-border:#22a06b;
+            --warning-bg:#fffaf2;
+            --warning-border:#f59e0b;
+            --danger-bg:#fff6f6;
+            --danger-border:#ef4444;
+            --metric-bg:#ffffff;
+            --metric-border:#d6e7f7;
+        }
+
+        *{ box-sizing:border-box; }
+
+        body{
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            background:var(--bg);
+            padding:40px 0;
+            color:var(--text);
+            line-height:1.55;
+        }
+
+        .container{
+            max-width:1550px;
+            margin:auto;
+            background:var(--paper);
+            padding:20px 30px 28px;
+            border-radius:8px;
+            box-shadow:var(--shadow);
+        }
+
+        .cell{ margin-bottom:10px; }
+
+        h1.title-header{
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            font-weight:700;
+            color:#8eb4c4;
+            text-transform:uppercase;
+            text-align:center;
+            margin:0 0 24px;
+            letter-spacing:.04em;
+        }
+
+        .markdown{
+            background:var(--md-bg);
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            padding:10px 15px;
+            border-left:5px solid var(--md-accent);
+            border-radius:4px;
+            margin:4px 0 8px;
+            line-height:1.6;
+        }
+        .markdown h1,.markdown h2,.markdown h3,.markdown h4,.markdown h5,.markdown h6{
+            margin-top:0;
+            color:#d64545;
+        }
+        .markdown p:last-child,
+        .markdown ul:last-child,
+        .markdown ol:last-child{ margin-bottom:0; }
+
+        img, svg, figure img{
+            max-width:100%;
+            height:auto;
+            display:block;
+            margin-left:auto;
+            margin-right:auto;
+            border:1px solid #ddd;
+            border-radius:6px;
+            box-shadow:0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        figure{ margin:20px auto; text-align:center; }
+        figure figcaption{ font-size:13px; color:#555; margin-top:6px; }
+
+        .cell-toolbar{
+            display:flex;
+            justify-content:flex-end;
+            margin:0 0 4px;
+            gap:6px;
+            flex-wrap:wrap;
+        }
+        .cell-badge{
+            display:inline-block;
+            background:#eef2f7;
+            border:1px solid #d7dee8;
+            color:#516072;
+            border-radius:999px;
+            font-size:11px;
+            font-weight:600;
+            padding:2px 8px;
+            letter-spacing:.02em;
+        }
+
+        .code_cell{
+            background:var(--code-bg);
+            border-left:5px solid var(--code-accent);
+            padding:6px 8px;
+            margin:4px 0;
+            overflow-x:auto;
+            border-radius:4px;
+        }
+        .code_cell pre,
+        .code_cell .hljs{
+            margin:0;
+            background:transparent !important;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+            white-space:pre;
+        }
+
+        .output-text,
+        .output-stream,
+        .output-error,
+        .output-image,
+        .output-html{
+            margin:4px 0;
+            border-radius:4px;
+            overflow-x:auto;
+        }
+
+        .output-text{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:10px 10px 10px 8px;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+        }
+        .output-text pre{
+            margin:0;
+            white-space:pre-wrap;
+            word-break:break-word;
+            font-family:inherit;
+            font-size:inherit;
+            line-height:inherit;
+        }
+
+        .output-stream{
+            background:var(--stream-bg);
+            border-left:5px solid var(--out-accent);
+            padding:8px 10px;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+        }
+        .output-stream pre{ margin:0; white-space:pre-wrap; word-break:break-word; }
+
+        .output-image{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:10px;
+        }
+
+        .output-html{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:8px 10px;
+            color:var(--text);
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            line-height:1.55;
+            white-space:normal;
+        }
+        .output-html *{ white-space:normal; word-break:normal; max-width:100%; }
+        .output-html p{ margin:0 0 10px; }
+        .output-html p:last-child{ margin-bottom:0; }
+        .output-html h1,.output-html h2,.output-html h3,.output-html h4,.output-html h5,.output-html h6{
+            margin:0 0 10px;
+            color:var(--text);
+            line-height:1.3;
+        }
+        .output-html ul,
+        .output-html ol{ margin:0 0 10px 20px; padding-left:12px; }
+        .output-html li{ margin-bottom:4px; }
+        .output-html li:last-child{ margin-bottom:0; }
+        .output-html code{ font-family:'Red Hat Mono','Noto Sans Mono',monospace; font-size:.95em; }
+        .output-html pre{
+            white-space:pre-wrap;
+            word-break:break-word;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.5;
+            margin:0;
+        }
+
+        .table-output{ padding:8px 10px; }
+        .table-output table,
+        .table-output table.dataframe{
+            border-collapse:collapse;
+            border-spacing:0;
+            width:auto;
+            max-width:100%;
+            margin:0;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.45;
+            color:#263238;
+            background:#fff;
+        }
+        .table-output table th,
+        .table-output table td,
+        .table-output table.dataframe th,
+        .table-output table.dataframe td{
+            padding:8px 10px;
+            border:1px solid var(--border);
+            vertical-align:top;
+            text-align:left;
+        }
+        .table-output table thead,
+        .table-output table.dataframe thead{ background:var(--table-head); font-weight:600; }
+        .table-output table tbody tr:nth-child(even),
+        .table-output table.dataframe tbody tr:nth-child(even){ background:var(--table-zebra); }
+        .table-output .dataframe tbody tr:hover,
+        .table-output table tbody tr:hover{ background:#eef6ff; }
+
+        /* Premium HTML blocks */
+        .output-html .executive-card,
+        .output-html .insight-card,
+        .output-html .warning-card,
+        .output-html .danger-card,
+        .output-html .summary-card{
+            border-radius:10px;
+            padding:14px 16px;
+            box-shadow:var(--shadow-soft);
+            border:1px solid #dbe5ef;
+            margin:4px 0;
+        }
+        .output-html .executive-card{
+            background:var(--exec-bg);
+            border-left:6px solid var(--exec-border);
+        }
+        .output-html .summary-card{
+            background:#f8fbff;
+            border-left:6px solid #64748b;
+        }
+        .output-html .insight-card{
+            background:var(--insight-bg);
+            border-left:6px solid var(--insight-border);
+        }
+        .output-html .warning-card{
+            background:var(--warning-bg);
+            border-left:6px solid var(--warning-border);
+        }
+        .output-html .danger-card{
+            background:var(--danger-bg);
+            border-left:6px solid var(--danger-border);
+        }
+        .output-html .card-title{
+            margin:0 0 10px;
+            font-size:20px;
+            font-weight:700;
+            color:#1f2937;
+            line-height:1.25;
+        }
+        .output-html .card-subtitle{
+            margin:0 0 12px;
+            font-size:13px;
+            font-weight:600;
+            color:#64748b;
+            text-transform:uppercase;
+            letter-spacing:.03em;
+        }
+        .output-html .card-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+            gap:10px;
+            margin:10px 0 12px;
+        }
+        .output-html .metric-card{
+            background:var(--metric-bg);
+            border:1px solid var(--metric-border);
+            border-radius:10px;
+            padding:10px 12px;
+            min-height:82px;
+            box-shadow:0 1px 3px rgba(15,23,42,.05);
+        }
+        .output-html .metric-label{
+            display:block;
+            margin:0 0 6px;
+            font-size:12px;
+            font-weight:700;
+            color:#64748b;
+            text-transform:uppercase;
+            letter-spacing:.03em;
+        }
+        .output-html .metric-value{
+            display:block;
+            font-size:24px;
+            font-weight:700;
+            line-height:1.15;
+            color:#0f172a;
+        }
+        .output-html .metric-note{
+            display:block;
+            margin-top:4px;
+            font-size:12px;
+            color:#6b7280;
+        }
+        .output-html .chip-row{
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px;
+            margin:8px 0 10px;
+        }
+        .output-html .chip{
+            display:inline-flex;
+            align-items:center;
+            background:#edf4ff;
+            border:1px solid #d8e6ff;
+            color:#2457a6;
+            border-radius:999px;
+            padding:4px 10px;
+            font-size:12px;
+            font-weight:600;
+        }
+        .output-html .callout-compact p{ margin-bottom:8px; }
+        .output-html .callout-compact ul,
+        .output-html .callout-compact ol{ margin-bottom:8px; }
+
+        .output-error{
+            background:#fff5f5;
+            border-left:5px solid #ef4444;
+            padding:10px 12px;
+            color:#7f1d1d;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.5;
+        }
+        .output-error pre{ margin:8px 0 0; white-space:pre-wrap; word-break:break-word; }
+
+        .hidden-note{
+            margin:4px 0;
+            padding:6px 10px;
+            border-radius:6px;
+            background:#f8fafc;
+            border:1px dashed #cbd5e1;
+            color:#64748b;
+            font-size:12px;
+            font-weight:600;
+        }
+
+        .footer{
+            text-align:right;
+            margin-top:30px;
+            padding:12px;
+            background:#e9ecef;
+            border-radius:4px;
+            font-size:14px;
+            color:#555;
+        }
+
+        @media (max-width: 768px) {
+            body{ padding:16px 0; }
+            .container{ max-width:100%; padding:14px 16px 20px; border-radius:0; }
+            .output-html,
+            .output-text,
+            .output-stream,
+            .output-image,
+            .output-error,
+            .markdown,
+            .code_cell{ padding-left:10px; padding-right:10px; }
+            .output-html .card-title{ font-size:18px; }
+            .output-html .metric-value{ font-size:20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<h1 class="title-header">00_domain_understanding_databricks_learning_kd</h1>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#F3F2EE">
+<br/><br/>
+<p style="text-align: center;">
+<font color="#0A1781" size="6">
+<strong>
+                    Databricks Certification Learning Knowledge Graph
+                </strong>
+</font>
+</p>
+<p style="text-align: center;">
+<font color="#C58A1E" size="6">
+<strong>
+                    Domain Understanding: Databricks Learning Knowledge Graph 
+                </strong>
+</font>
+</p>
+<p style="text-align: center;">
+<font color="#C58A1E" size="5">
+<strong>
+                    Construir a base conceitual, ontológica e estratégica de um Knowledge Graph evolutivo para acompanhar<br/>a jornada de preparação para a certificação Databricks Certified Data Engineer Associate.
+                </strong>
+</font>
+</p>
+<br/>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#F3F2EE">
+<p style="text-align: right;">
+<font color="#444444" size="4">
+            Roberto SSoares - LfLngLrnng
+      </font>
+</p>
+<p style="text-align: right;"><font color="#444444" size="2">
+<a href="https://www.linkedin.com/in/roberto-dos-santos-soares/">in/roberto-dos-santos-soares</a><br/><a href="https://roberto-ssoares.github.io/meu-portfolio/">Portifólio: roberto-ssoares</a>
+</font></p>
+<p style="text-align: right;">
+<font color="#444444" size="4">
+            " [+] Faturamento [-] Custo [+] Qualidade de vida "
+        </font>
+<br/>
+<font color="#918e8e" size="2">"Mestre Bruno Jardim"
+        </font>
+</p>
+<p style="text-align: right;">
+<font color="#918e8e" size="2">
+</font>
+</p>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 Objetivo</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Apresentar o propósito do notebook e posicionar o projeto dentro da abordagem CRISP-DM+.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Ações realizadas</strong><ul>
+<li><em>Definição do escopo inicial do projeto.</em></li>
+<li><em>Introdução da ideia de Knowledge Graph evolutivo.</em></li>
+<li><em>Conexão entre certificação, aprendizagem e portfólio.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>Antes de construir qualquer pipeline, grafo ou dashboard, é necessário definir claramente o domínio de conhecimento, as entidades principais e a lógica de evolução do aprendizado.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultados esperados</strong><ul>
+<li><em>Ao final deste notebook, teremos a primeira versão da ontologia, da taxonomia e do modelo conceitual do Knowledge Graph.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 1. Contexto do Projeto</strong></font></p>
+<font color="#66666" size="2">
+<ul>
+<li><p>A preparação para uma certificação técnica normalmente é conduzida por listas de tópicos, vídeos, cursos e simulados.</p>
+<ul>
+<li>Neste projeto, <strong>a proposta é transformar essa jornada em um Knowledge Graph evolutivo</strong>.</li>
+</ul>
+</li>
+<li><p>O grafo será usado para mapear:</p>
+<ul>
+<li><em>domínios oficiais do exame;</em></li>
+<li><em>tópicos técnicos;</em></li>
+<li><em>relações de pré-requisito;</em></li>
+<li><em>recursos de estudo;</em></li>
+<li><em>notebooks práticos;</em></li>
+<li><em>sessões de estudo;</em></li>
+<li><em>lacunas de conhecimento;</em></li>
+<li><em>insights;</em></li>
+<li><em>progresso semanal.</em></li>
+</ul>
+</li>
+<li><p>Esse projeto <em><strong>combina preparação para certificação com modelagem semântica, engenharia de dados, visualização em grafos</strong></em> e narrativa de portfólio.</p>
+</li>
+</ul>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">#!uv pip install watermark -q -U</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">from datetime import date
+import pandas as pd</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Versões dos pacotes usados neste jupyter notebook
+%reload_ext watermark
+%watermark -a "RobertoSSoares-LfLngLrnng"</code></pre>
+</div>
+<div class="output-stream">
+<pre>Author: RobertoSSoares-LfLngLrnng
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">pd.set_option("display.max_columns", 100)
+pd.set_option("display.max_colwidth", 120)</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">PROJECT_NAME = "Databricks Certification Learning Knowledge Graph"
+CERTIFICATION_NAME = "Databricks Certified Data Engineer Associate"
+START_DATE = date.today().isoformat()
+
+PROJECT_NAME, CERTIFICATION_NAME, START_DATE</code></pre>
+</div>
+<div class="output-text">
+<pre>('Databricks Certification Learning Knowledge Graph',
+ 'Databricks Certified Data Engineer Associate',
+ '2026-04-27')</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 2. Enquadramento CRISP-DM+</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Neste projeto, usamos uma extensão do CRISP-DM tradicional com uma etapa anterior chamada:<ul>
+<li><strong>Etapa 0 — Domain Understanding via Ontology + BLM + Semantic Clustering</strong></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essa etapa tem como objetivo compreender o domínio antes da modelagem dos dados.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>No contexto deste projeto:<ul>
+<li><strong>Ontologia</strong> define entidades e relacionamentos do conhecimento.</li>
+<li><strong>BLM — Business Language Model</strong> padroniza a linguagem usada para falar sobre certificação, estudo, prática e progresso.</li>
+<li><strong>Cluster Semântico</strong> agrupa tópicos tecnicamente próximos.</li>
+<li><strong>Taxonomia</strong> organiza o conhecimento em hierarquias compreensíveis.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">crisp_dm_plus_steps = pd.DataFrame(
+    [
+        {
+            "step": "0",
+            "name": "Domain Understanding",
+            "project_application": "Modelar a ontologia, taxonomia e linguagem de negócio da jornada Databricks.",
+        },
+        {
+            "step": "1",
+            "name": "Business Understanding",
+            "project_application": "Definir o objetivo profissional: certificação + portfólio + reposicionamento.",
+        },
+        {
+            "step": "2",
+            "name": "Data Understanding",
+            "project_application": "Compreender fontes: domínios do exame, recursos, sessões, notebooks e simulados.",
+        },
+        {
+            "step": "3",
+            "name": "Data Preparation",
+            "project_application": "Estruturar dados para carga no grafo: nós, relacionamentos e propriedades.",
+        },
+        {
+            "step": "4",
+            "name": "Modeling",
+            "project_application": "Construir o Knowledge Graph e métricas de evolução.",
+        },
+        {
+            "step": "5",
+            "name": "Evaluation",
+            "project_application": "Avaliar cobertura, lacunas, maturidade e prontidão para exame.",
+        },
+        {
+            "step": "6",
+            "name": "Deployment",
+            "project_application": "Publicar grafo, dashboard, README e página HTML no portfólio.",
+        },
+    ]
+)
+
+crisp_dm_plus_steps</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>step</th>
+<th>name</th>
+<th>project_application</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>0</td>
+<td>Domain Understanding</td>
+<td>Modelar a ontologia, taxonomia e linguagem de negócio da jornada Databricks.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>1</td>
+<td>Business Understanding</td>
+<td>Definir o objetivo profissional: certificação + portfólio + reposicionamento.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>2</td>
+<td>Data Understanding</td>
+<td>Compreender fontes: domínios do exame, recursos, sessões, notebooks e simulados.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>3</td>
+<td>Data Preparation</td>
+<td>Estruturar dados para carga no grafo: nós, relacionamentos e propriedades.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>4</td>
+<td>Modeling</td>
+<td>Construir o Knowledge Graph e métricas de evolução.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>5</td>
+<td>Evaluation</td>
+<td>Avaliar cobertura, lacunas, maturidade e prontidão para exame.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>6</td>
+<td>Deployment</td>
+<td>Publicar grafo, dashboard, README e página HTML no portfólio.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 3. Domínios oficiais do exame</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A certificação Databricks Certified Data Engineer Associate está organizada em domínios de conhecimento.<ul>
+<li>Esses domínios serão usados como o primeiro nível estrutural do Knowledge Graph.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Cada domínio será representado como um nó do tipo <code>ExamDomain</code>.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">exam_domains = pd.DataFrame(
+    [
+        {
+            "domain_id": "D01",
+            "name": "Databricks Intelligence Platform",
+            "weight_pct": 10,
+            "priority": "medium",
+        },
+        {
+            "domain_id": "D02",
+            "name": "Development and Ingestion",
+            "weight_pct": 30,
+            "priority": "high",
+        },
+        {
+            "domain_id": "D03",
+            "name": "Data Processing &amp; Transformations",
+            "weight_pct": 31,
+            "priority": "high",
+        },
+        {
+            "domain_id": "D04",
+            "name": "Productionizing Data Pipelines",
+            "weight_pct": 18,
+            "priority": "high",
+        },
+        {
+            "domain_id": "D05",
+            "name": "Data Governance &amp; Quality",
+            "weight_pct": 11,
+            "priority": "medium",
+        },
+    ]
+)
+
+exam_domains</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>domain_id</th>
+<th>name</th>
+<th>weight_pct</th>
+<th>priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>D01</td>
+<td>Databricks Intelligence Platform</td>
+<td>10</td>
+<td>medium</td>
+</tr>
+<tr>
+<th>1</th>
+<td>D02</td>
+<td>Development and Ingestion</td>
+<td>30</td>
+<td>high</td>
+</tr>
+<tr>
+<th>2</th>
+<td>D03</td>
+<td>Data Processing &amp; Transformations</td>
+<td>31</td>
+<td>high</td>
+</tr>
+<tr>
+<th>3</th>
+<td>D04</td>
+<td>Productionizing Data Pipelines</td>
+<td>18</td>
+<td>high</td>
+</tr>
+<tr>
+<th>4</th>
+<td>D05</td>
+<td>Data Governance &amp; Quality</td>
+<td>11</td>
+<td>medium</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 4. Ontologia inicial do Knowledge Graph</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A ontologia define os tipos de entidades que existirão no grafo.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Neste MVP, o KG terá os seguintes tipos principais de nós:<ul>
+<li><em>Certification</em></li>
+<li><em>ExamDomain</em></li>
+<li><em>Topic</em></li>
+<li><em>Subtopic</em></li>
+<li><em>Skill</em></li>
+<li><em>Resource</em></li>
+<li><em>Notebook</em></li>
+<li><em>Lab</em></li>
+<li><em>StudySession</em></li>
+<li><em>Mistake</em></li>
+<li><em>Insight</em></li>
+<li><em>Milestone</em></li>
+<li><em>Snapshot</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">node_classes = pd.DataFrame(
+    [
+        {"node_label": "Certification", "description": "Certificação alvo do projeto."},
+        {"node_label": "ExamDomain", "description": "Domínio oficial do exame."},
+        {"node_label": "Topic", "description": "Conceito técnico relevante para estudo."},
+        {"node_label": "Subtopic", "description": "Detalhamento de um tópico técnico."},
+        {"node_label": "Skill", "description": "Competência demonstrável no portfólio."},
+        {"node_label": "Resource", "description": "Material de estudo utilizado."},
+        {"node_label": "Notebook", "description": "Notebook prático produzido."},
+        {"node_label": "Lab", "description": "Exercício hands-on executado."},
+        {"node_label": "StudySession", "description": "Registro de uma sessão de estudo."},
+        {"node_label": "Mistake", "description": "Erro, dúvida ou lacuna identificada."},
+        {"node_label": "Insight", "description": "Aprendizado relevante gerado."},
+        {"node_label": "Milestone", "description": "Marco de evolução no plano."},
+        {"node_label": "Snapshot", "description": "Fotografia temporal do progresso."},
+    ]
+)
+
+node_classes</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>node_label</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>Certification</td>
+<td>Certificação alvo do projeto.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>ExamDomain</td>
+<td>Domínio oficial do exame.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Topic</td>
+<td>Conceito técnico relevante para estudo.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Subtopic</td>
+<td>Detalhamento de um tópico técnico.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Skill</td>
+<td>Competência demonstrável no portfólio.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Resource</td>
+<td>Material de estudo utilizado.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Notebook</td>
+<td>Notebook prático produzido.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>Lab</td>
+<td>Exercício hands-on executado.</td>
+</tr>
+<tr>
+<th>8</th>
+<td>StudySession</td>
+<td>Registro de uma sessão de estudo.</td>
+</tr>
+<tr>
+<th>9</th>
+<td>Mistake</td>
+<td>Erro, dúvida ou lacuna identificada.</td>
+</tr>
+<tr>
+<th>10</th>
+<td>Insight</td>
+<td>Aprendizado relevante gerado.</td>
+</tr>
+<tr>
+<th>11</th>
+<td>Milestone</td>
+<td>Marco de evolução no plano.</td>
+</tr>
+<tr>
+<th>12</th>
+<td>Snapshot</td>
+<td>Fotografia temporal do progresso.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 5. Relacionamentos iniciais</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Os relacionamentos definem a semântica do Knowledge Graph.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Eles devem responder perguntas como:<ul>
+<li><em>Quais tópicos pertencem a cada domínio?</em></li>
+<li><em>Quais tópicos são pré-requisitos de outros?</em></li>
+<li><em>Quais notebooks praticam cada tópico?</em></li>
+<li><em>Quais erros estão associados a quais assuntos?</em></li>
+<li><em>Como meu domínio evoluiu ao longo das semanas?</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">relationship_types = pd.DataFrame(
+    [
+        {"relationship": "HAS_DOMAIN", "source": "Certification", "target": "ExamDomain"},
+        {"relationship": "COVERS", "source": "ExamDomain", "target": "Topic"},
+        {"relationship": "HAS_SUBTOPIC", "source": "Topic", "target": "Subtopic"},
+        {"relationship": "PREREQUISITE_FOR", "source": "Topic", "target": "Topic"},
+        {"relationship": "STUDIED", "source": "StudySession", "target": "Topic"},
+        {"relationship": "USED_RESOURCE", "source": "StudySession", "target": "Resource"},
+        {"relationship": "PRACTICES", "source": "Notebook", "target": "Topic"},
+        {"relationship": "IMPLEMENTS", "source": "Lab", "target": "Topic"},
+        {"relationship": "REVEALED_GAP", "source": "StudySession", "target": "Mistake"},
+        {"relationship": "ABOUT", "source": "Mistake", "target": "Topic"},
+        {"relationship": "GENERATED_INSIGHT", "source": "StudySession", "target": "Insight"},
+        {"relationship": "CAPTURES_STATUS_OF", "source": "Snapshot", "target": "Topic"},
+        {"relationship": "SHOWCASES", "source": "Project", "target": "Skill"},
+        {"relationship": "SUPPORTED_BY", "source": "Skill", "target": "Topic"},
+    ]
+)
+
+relationship_types</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>relationship</th>
+<th>source</th>
+<th>target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>HAS_DOMAIN</td>
+<td>Certification</td>
+<td>ExamDomain</td>
+</tr>
+<tr>
+<th>1</th>
+<td>COVERS</td>
+<td>ExamDomain</td>
+<td>Topic</td>
+</tr>
+<tr>
+<th>2</th>
+<td>HAS_SUBTOPIC</td>
+<td>Topic</td>
+<td>Subtopic</td>
+</tr>
+<tr>
+<th>3</th>
+<td>PREREQUISITE_FOR</td>
+<td>Topic</td>
+<td>Topic</td>
+</tr>
+<tr>
+<th>4</th>
+<td>STUDIED</td>
+<td>StudySession</td>
+<td>Topic</td>
+</tr>
+<tr>
+<th>5</th>
+<td>USED_RESOURCE</td>
+<td>StudySession</td>
+<td>Resource</td>
+</tr>
+<tr>
+<th>6</th>
+<td>PRACTICES</td>
+<td>Notebook</td>
+<td>Topic</td>
+</tr>
+<tr>
+<th>7</th>
+<td>IMPLEMENTS</td>
+<td>Lab</td>
+<td>Topic</td>
+</tr>
+<tr>
+<th>8</th>
+<td>REVEALED_GAP</td>
+<td>StudySession</td>
+<td>Mistake</td>
+</tr>
+<tr>
+<th>9</th>
+<td>ABOUT</td>
+<td>Mistake</td>
+<td>Topic</td>
+</tr>
+<tr>
+<th>10</th>
+<td>GENERATED_INSIGHT</td>
+<td>StudySession</td>
+<td>Insight</td>
+</tr>
+<tr>
+<th>11</th>
+<td>CAPTURES_STATUS_OF</td>
+<td>Snapshot</td>
+<td>Topic</td>
+</tr>
+<tr>
+<th>12</th>
+<td>SHOWCASES</td>
+<td>Project</td>
+<td>Skill</td>
+</tr>
+<tr>
+<th>13</th>
+<td>SUPPORTED_BY</td>
+<td>Skill</td>
+<td>Topic</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 6. Taxonomia inicial de tópicos</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A taxonomia organiza os conceitos técnicos da certificação em grupos semânticos.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essa estrutura será evoluída ao longo do projeto, conforme novos materiais, labs e dúvidas forem incorporados.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">topics = pd.DataFrame(
+    [
+        {"topic_id": "T001", "domain_id": "D01", "name": "Lakehouse Architecture", "difficulty": "medium"},
+        {"topic_id": "T002", "domain_id": "D01", "name": "Databricks Workspace", "difficulty": "easy"},
+        {"topic_id": "T003", "domain_id": "D02", "name": "Data Ingestion", "difficulty": "medium"},
+        {"topic_id": "T004", "domain_id": "D02", "name": "Spark SQL", "difficulty": "medium"},
+        {"topic_id": "T005", "domain_id": "D02", "name": "PySpark DataFrame API", "difficulty": "medium"},
+        {"topic_id": "T006", "domain_id": "D03", "name": "Delta Lake", "difficulty": "medium"},
+        {"topic_id": "T007", "domain_id": "D03", "name": "Medallion Architecture", "difficulty": "medium"},
+        {"topic_id": "T008", "domain_id": "D03", "name": "MERGE INTO", "difficulty": "hard"},
+        {"topic_id": "T009", "domain_id": "D04", "name": "Databricks Workflows", "difficulty": "medium"},
+        {"topic_id": "T010", "domain_id": "D04", "name": "Jobs and Tasks", "difficulty": "medium"},
+        {"topic_id": "T011", "domain_id": "D05", "name": "Unity Catalog", "difficulty": "medium"},
+        {"topic_id": "T012", "domain_id": "D05", "name": "Data Quality", "difficulty": "medium"},
+    ]
+)
+
+topics</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>topic_id</th>
+<th>domain_id</th>
+<th>name</th>
+<th>difficulty</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>T001</td>
+<td>D01</td>
+<td>Lakehouse Architecture</td>
+<td>medium</td>
+</tr>
+<tr>
+<th>1</th>
+<td>T002</td>
+<td>D01</td>
+<td>Databricks Workspace</td>
+<td>easy</td>
+</tr>
+<tr>
+<th>2</th>
+<td>T003</td>
+<td>D02</td>
+<td>Data Ingestion</td>
+<td>medium</td>
+</tr>
+<tr>
+<th>3</th>
+<td>T004</td>
+<td>D02</td>
+<td>Spark SQL</td>
+<td>medium</td>
+</tr>
+<tr>
+<th>4</th>
+<td>T005</td>
+<td>D02</td>
+<td>PySpark DataFrame API</td>
+<td>medium</td>
+</tr>
+<tr>
+<th>5</th>
+<td>T006</td>
+<td>D03</td>
+<td>Delta Lake</td>
+<td>medium</td>
+</tr>
+<tr>
+<th>6</th>
+<td>T007</td>
+<td>D03</td>
+<td>Medallion Architecture</td>
+<td>medium</td>
+</tr>
+<tr>
+<th>7</th>
+<td>T008</td>
+<td>D03</td>
+<td>MERGE INTO</td>
+<td>hard</td>
+</tr>
+<tr>
+<th>8</th>
+<td>T009</td>
+<td>D04</td>
+<td>Databricks Workflows</td>
+<td>medium</td>
+</tr>
+<tr>
+<th>9</th>
+<td>T010</td>
+<td>D04</td>
+<td>Jobs and Tasks</td>
+<td>medium</td>
+</tr>
+<tr>
+<th>10</th>
+<td>T011</td>
+<td>D05</td>
+<td>Unity Catalog</td>
+<td>medium</td>
+</tr>
+<tr>
+<th>11</th>
+<td>T012</td>
+<td>D05</td>
+<td>Data Quality</td>
+<td>medium</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 7. Modelo inicial de progresso</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>O KG acompanhará dois tipos de evolução:</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Confidence Score</strong><ul>
+<li>Mede a percepção subjetiva de segurança sobre o tópico.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Mastery Score</strong><ul>
+<li>Mede evidência prática associada ao tópico.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essa separação é importante porque um tópico pode parecer conhecido, mas ainda não ter evidência prática suficiente.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">progress_scale = pd.DataFrame(
+    [
+        {"score": 0.00, "confidence_meaning": "Não conheço", "mastery_meaning": "Sem evidência prática"},
+        {"score": 0.25, "confidence_meaning": "Já li sobre", "mastery_meaning": "Resumo criado"},
+        {"score": 0.50, "confidence_meaning": "Entendo conceitualmente", "mastery_meaning": "Notebook executado"},
+        {"score": 0.75, "confidence_meaning": "Já pratiquei", "mastery_meaning": "Lab completo"},
+        {"score": 1.00, "confidence_meaning": "Consigo explicar e aplicar", "mastery_meaning": "Projeto publicado ou explicado"},
+    ]
+)
+
+progress_scale</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>score</th>
+<th>confidence_meaning</th>
+<th>mastery_meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>0.00</td>
+<td>Não conheço</td>
+<td>Sem evidência prática</td>
+</tr>
+<tr>
+<th>1</th>
+<td>0.25</td>
+<td>Já li sobre</td>
+<td>Resumo criado</td>
+</tr>
+<tr>
+<th>2</th>
+<td>0.50</td>
+<td>Entendo conceitualmente</td>
+<td>Notebook executado</td>
+</tr>
+<tr>
+<th>3</th>
+<td>0.75</td>
+<td>Já pratiquei</td>
+<td>Lab completo</td>
+</tr>
+<tr>
+<th>4</th>
+<td>1.00</td>
+<td>Consigo explicar e aplicar</td>
+<td>Projeto publicado ou explicado</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 8. Primeira leitura estratégica</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Neste momento, os tópicos com maior peso e maior impacto prático são:<ul>
+<li><em>Development and Ingestion</em></li>
+<li><em>Data Processing &amp; Transformations</em></li>
+<li><em>Productionizing Data Pipelines</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Esses domínios serão priorizados porque concentram a maior parte do exame e também geram evidências fortes para portfólio.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">priority_view = (
+    exam_domains
+    .sort_values(by="weight_pct", ascending=False)
+    .assign(
+        strategic_focus=lambda df: df["weight_pct"].apply(
+            lambda x: "primary" if x &gt;= 18 else "support"
+        )
+    )
+)
+
+priority_view</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>domain_id</th>
+<th>name</th>
+<th>weight_pct</th>
+<th>priority</th>
+<th>strategic_focus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>2</th>
+<td>D03</td>
+<td>Data Processing &amp; Transformations</td>
+<td>31</td>
+<td>high</td>
+<td>primary</td>
+</tr>
+<tr>
+<th>1</th>
+<td>D02</td>
+<td>Development and Ingestion</td>
+<td>30</td>
+<td>high</td>
+<td>primary</td>
+</tr>
+<tr>
+<th>3</th>
+<td>D04</td>
+<td>Productionizing Data Pipelines</td>
+<td>18</td>
+<td>high</td>
+<td>primary</td>
+</tr>
+<tr>
+<th>4</th>
+<td>D05</td>
+<td>Data Governance &amp; Quality</td>
+<td>11</td>
+<td>medium</td>
+<td>support</td>
+</tr>
+<tr>
+<th>0</th>
+<td>D01</td>
+<td>Databricks Intelligence Platform</td>
+<td>10</td>
+<td>medium</td>
+<td>support</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 9. Perguntas que o Knowledge Graph deverá responder</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>O KG deverá permitir consultas como:<ol>
+<li><em>Quais tópicos têm maior peso no exame?</em></li>
+<li><em>Quais tópicos ainda não possuem notebook prático?</em></li>
+<li><em>Quais conceitos são pré-requisitos de outros?</em></li>
+<li><em>Quais dúvidas aparecem com maior frequência?</em></li>
+<li><em>Quais tópicos evoluíram mais ao longo das semanas?</em></li>
+<li><em>Quais tópicos ainda estão abaixo do nível mínimo de domínio?</em></li>
+<li><em>Quais evidências de portfólio comprovam cada skill?</em></li>
+</ol>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">kg_questions = pd.DataFrame(
+    [
+        {"question_id": "Q01", "question": "Quais tópicos têm maior peso no exame?"},
+        {"question_id": "Q02", "question": "Quais tópicos ainda não possuem notebook prático?"},
+        {"question_id": "Q03", "question": "Quais conceitos são pré-requisitos de outros?"},
+        {"question_id": "Q04", "question": "Quais dúvidas aparecem com maior frequência?"},
+        {"question_id": "Q05", "question": "Quais tópicos evoluíram mais ao longo das semanas?"},
+        {"question_id": "Q06", "question": "Quais tópicos ainda estão abaixo do nível mínimo de domínio?"},
+        {"question_id": "Q07", "question": "Quais evidências de portfólio comprovam cada skill?"},
+    ]
+)
+
+kg_questions</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>question_id</th>
+<th>question</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>Q01</td>
+<td>Quais tópicos têm maior peso no exame?</td>
+</tr>
+<tr>
+<th>1</th>
+<td>Q02</td>
+<td>Quais tópicos ainda não possuem notebook prático?</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Q03</td>
+<td>Quais conceitos são pré-requisitos de outros?</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Q04</td>
+<td>Quais dúvidas aparecem com maior frequência?</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Q05</td>
+<td>Quais tópicos evoluíram mais ao longo das semanas?</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Q06</td>
+<td>Quais tópicos ainda estão abaixo do nível mínimo de domínio?</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Q07</td>
+<td>Quais evidências de portfólio comprovam cada skill?</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 10. Conclusão executiva do Notebook 00</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Este notebook definiu a base conceitual do projeto Databricks Certification Learning Knowledge Graph.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Foram definidos:<ul>
+<li><em>o objetivo estratégico do projeto;</em></li>
+<li><em>o enquadramento CRISP-DM+;</em></li>
+<li><em>os domínios iniciais da certificação;</em></li>
+<li><em>a ontologia inicial;</em></li>
+<li><em>os principais tipos de nós;</em></li>
+<li><em>os principais relacionamentos;</em></li>
+<li><em>a taxonomia inicial de tópicos;</em></li>
+<li><em>o modelo de evolução por confidence_score e mastery_score;</em></li>
+<li><em>as perguntas analíticas que o KG deverá responder.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>O próximo passo será construir o Notebook 01, responsável por materializar essa ontologia em arquivos estruturados para carga posterior no Neo4j.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">%reload_ext watermark 
+%watermark -a "Roberto-SSoares-LfLngLrnng" -d -t -u --iversions -v -m -h</code></pre>
+</div>
+<div class="output-stream">
+<pre>Author: Roberto-SSoares-LfLngLrnng
+
+Last updated: 2026-04-27 16:08:46
+
+Python implementation: CPython
+Python version       : 3.12.12
+IPython version      : 9.13.0
+
+Compiler    : MSC v.1944 64 bit (AMD64)
+OS          : Windows
+Release     : 11
+Machine     : AMD64
+Processor   : Intel64 Family 6 Model 158 Stepping 9, GenuineIntel
+CPU cores   : 4
+Architecture: 64bit
+
+Hostname: PC-ROBERTO
+
+pandas: 3.0.2
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="6"><strong>Fim</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">#!uv pip install nbconvert -U -q
+!jupyter nbconvert --to html --template-file my-template-html-v10.tpl 00_domain_understanding_databricks_learning_kd.ipynb</code></pre>
+</div>
+</div>
+<div class="footer">
+<p>RobertoSSoares-LfLngLrnng — <span id="datetime"></span></p>
+</div>
+<script>
+            document.getElementById("datetime").innerText = new Date().toLocaleString('pt-BR');
+        </script>
+</div>
+</body>
+</html>

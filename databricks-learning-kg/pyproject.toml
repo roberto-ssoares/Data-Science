@@ -1,0 +1,17 @@
+[project]
+name = "databricks-learning-kg"
+version = "0.1.0"
+description = "Knowledge Graph evolutivo para a jornada de certificação Databricks."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "pandas",
+    "jupyterlab",
+    "ipykernel",
+    "networkx",
+    "pyvis",
+    "matplotlib",
+]
+
+[tool.uv]
+package = false

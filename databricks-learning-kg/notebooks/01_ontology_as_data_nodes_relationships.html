@@ -1,0 +1,4337 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>01_ontology_as_data_nodes_relationships</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/jupyterlab/3.6.3/themes/JupyterLab-light-theme.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@300;400;600&amp;family=Reddit+Sans:wght@300;400;600&amp;family=Courier+Prime:wght@400;700&amp;family=Montserrat:wght@300;400;600;700&amp;family=Source+Code+Pro:wght@400&amp;family=Red+Hat+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['\\(', '\\)'], ['$', '$']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+          ignoreHtmlClass: 'tex2jax_ignore',
+          processHtmlClass: 'mathjax_process'
+        }
+      };
+    </script>
+<script async="" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+        :root{
+            --bg:#f5f5f5;
+            --paper:#ffffff;
+            --text:#1f2937;
+            --muted:#6b7280;
+            --border:#d9dde3;
+            --shadow:0 4px 12px rgba(0,0,0,.08);
+            --shadow-soft:0 2px 8px rgba(15,23,42,.06);
+            --md-bg:#f3f2ee;
+            --md-accent:#ff9800;
+            --code-bg:#f7f7f7;
+            --code-accent:#4caf50;
+            --out-bg:#f3f9fa;
+            --out-accent:#2196f3;
+            --stream-bg:#eef8ff;
+            --table-head:#f8fafc;
+            --table-zebra:#f6f8fa;
+            --exec-bg:#f7fbff;
+            --exec-border:#2E86C1;
+            --insight-bg:#f8fffb;
+            --insight-border:#22a06b;
+            --warning-bg:#fffaf2;
+            --warning-border:#f59e0b;
+            --danger-bg:#fff6f6;
+            --danger-border:#ef4444;
+            --metric-bg:#ffffff;
+            --metric-border:#d6e7f7;
+        }
+
+        *{ box-sizing:border-box; }
+
+        body{
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            background:var(--bg);
+            padding:40px 0;
+            color:var(--text);
+            line-height:1.55;
+        }
+
+        .container{
+            max-width:1550px;
+            margin:auto;
+            background:var(--paper);
+            padding:20px 30px 28px;
+            border-radius:8px;
+            box-shadow:var(--shadow);
+        }
+
+        .cell{ margin-bottom:10px; }
+
+        h1.title-header{
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            font-weight:700;
+            color:#8eb4c4;
+            text-transform:uppercase;
+            text-align:center;
+            margin:0 0 24px;
+            letter-spacing:.04em;
+        }
+
+        .markdown{
+            background:var(--md-bg);
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            padding:10px 15px;
+            border-left:5px solid var(--md-accent);
+            border-radius:4px;
+            margin:4px 0 8px;
+            line-height:1.6;
+        }
+        .markdown h1,.markdown h2,.markdown h3,.markdown h4,.markdown h5,.markdown h6{
+            margin-top:0;
+            color:#d64545;
+        }
+        .markdown p:last-child,
+        .markdown ul:last-child,
+        .markdown ol:last-child{ margin-bottom:0; }
+
+        img, svg, figure img{
+            max-width:100%;
+            height:auto;
+            display:block;
+            margin-left:auto;
+            margin-right:auto;
+            border:1px solid #ddd;
+            border-radius:6px;
+            box-shadow:0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        figure{ margin:20px auto; text-align:center; }
+        figure figcaption{ font-size:13px; color:#555; margin-top:6px; }
+
+        .cell-toolbar{
+            display:flex;
+            justify-content:flex-end;
+            margin:0 0 4px;
+            gap:6px;
+            flex-wrap:wrap;
+        }
+        .cell-badge{
+            display:inline-block;
+            background:#eef2f7;
+            border:1px solid #d7dee8;
+            color:#516072;
+            border-radius:999px;
+            font-size:11px;
+            font-weight:600;
+            padding:2px 8px;
+            letter-spacing:.02em;
+        }
+
+        .code_cell{
+            background:var(--code-bg);
+            border-left:5px solid var(--code-accent);
+            padding:6px 8px;
+            margin:4px 0;
+            overflow-x:auto;
+            border-radius:4px;
+        }
+        .code_cell pre,
+        .code_cell .hljs{
+            margin:0;
+            background:transparent !important;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+            white-space:pre;
+        }
+
+        .output-text,
+        .output-stream,
+        .output-error,
+        .output-image,
+        .output-html{
+            margin:4px 0;
+            border-radius:4px;
+            overflow-x:auto;
+        }
+
+        .output-text{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:10px 10px 10px 8px;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+        }
+        .output-text pre{
+            margin:0;
+            white-space:pre-wrap;
+            word-break:break-word;
+            font-family:inherit;
+            font-size:inherit;
+            line-height:inherit;
+        }
+
+        .output-stream{
+            background:var(--stream-bg);
+            border-left:5px solid var(--out-accent);
+            padding:8px 10px;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+        }
+        .output-stream pre{ margin:0; white-space:pre-wrap; word-break:break-word; }
+
+        .output-image{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:10px;
+        }
+
+        .output-html{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:8px 10px;
+            color:var(--text);
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            line-height:1.55;
+            white-space:normal;
+        }
+        .output-html *{ white-space:normal; word-break:normal; max-width:100%; }
+        .output-html p{ margin:0 0 10px; }
+        .output-html p:last-child{ margin-bottom:0; }
+        .output-html h1,.output-html h2,.output-html h3,.output-html h4,.output-html h5,.output-html h6{
+            margin:0 0 10px;
+            color:var(--text);
+            line-height:1.3;
+        }
+        .output-html ul,
+        .output-html ol{ margin:0 0 10px 20px; padding-left:12px; }
+        .output-html li{ margin-bottom:4px; }
+        .output-html li:last-child{ margin-bottom:0; }
+        .output-html code{ font-family:'Red Hat Mono','Noto Sans Mono',monospace; font-size:.95em; }
+        .output-html pre{
+            white-space:pre-wrap;
+            word-break:break-word;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.5;
+            margin:0;
+        }
+
+        .table-output{ padding:8px 10px; }
+        .table-output table,
+        .table-output table.dataframe{
+            border-collapse:collapse;
+            border-spacing:0;
+            width:auto;
+            max-width:100%;
+            margin:0;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.45;
+            color:#263238;
+            background:#fff;
+        }
+        .table-output table th,
+        .table-output table td,
+        .table-output table.dataframe th,
+        .table-output table.dataframe td{
+            padding:8px 10px;
+            border:1px solid var(--border);
+            vertical-align:top;
+            text-align:left;
+        }
+        .table-output table thead,
+        .table-output table.dataframe thead{ background:var(--table-head); font-weight:600; }
+        .table-output table tbody tr:nth-child(even),
+        .table-output table.dataframe tbody tr:nth-child(even){ background:var(--table-zebra); }
+        .table-output .dataframe tbody tr:hover,
+        .table-output table tbody tr:hover{ background:#eef6ff; }
+
+        /* Premium HTML blocks */
+        .output-html .executive-card,
+        .output-html .insight-card,
+        .output-html .warning-card,
+        .output-html .danger-card,
+        .output-html .summary-card{
+            border-radius:10px;
+            padding:14px 16px;
+            box-shadow:var(--shadow-soft);
+            border:1px solid #dbe5ef;
+            margin:4px 0;
+        }
+        .output-html .executive-card{
+            background:var(--exec-bg);
+            border-left:6px solid var(--exec-border);
+        }
+        .output-html .summary-card{
+            background:#f8fbff;
+            border-left:6px solid #64748b;
+        }
+        .output-html .insight-card{
+            background:var(--insight-bg);
+            border-left:6px solid var(--insight-border);
+        }
+        .output-html .warning-card{
+            background:var(--warning-bg);
+            border-left:6px solid var(--warning-border);
+        }
+        .output-html .danger-card{
+            background:var(--danger-bg);
+            border-left:6px solid var(--danger-border);
+        }
+        .output-html .card-title{
+            margin:0 0 10px;
+            font-size:20px;
+            font-weight:700;
+            color:#1f2937;
+            line-height:1.25;
+        }
+        .output-html .card-subtitle{
+            margin:0 0 12px;
+            font-size:13px;
+            font-weight:600;
+            color:#64748b;
+            text-transform:uppercase;
+            letter-spacing:.03em;
+        }
+        .output-html .card-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+            gap:10px;
+            margin:10px 0 12px;
+        }
+        .output-html .metric-card{
+            background:var(--metric-bg);
+            border:1px solid var(--metric-border);
+            border-radius:10px;
+            padding:10px 12px;
+            min-height:82px;
+            box-shadow:0 1px 3px rgba(15,23,42,.05);
+        }
+        .output-html .metric-label{
+            display:block;
+            margin:0 0 6px;
+            font-size:12px;
+            font-weight:700;
+            color:#64748b;
+            text-transform:uppercase;
+            letter-spacing:.03em;
+        }
+        .output-html .metric-value{
+            display:block;
+            font-size:24px;
+            font-weight:700;
+            line-height:1.15;
+            color:#0f172a;
+        }
+        .output-html .metric-note{
+            display:block;
+            margin-top:4px;
+            font-size:12px;
+            color:#6b7280;
+        }
+        .output-html .chip-row{
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px;
+            margin:8px 0 10px;
+        }
+        .output-html .chip{
+            display:inline-flex;
+            align-items:center;
+            background:#edf4ff;
+            border:1px solid #d8e6ff;
+            color:#2457a6;
+            border-radius:999px;
+            padding:4px 10px;
+            font-size:12px;
+            font-weight:600;
+        }
+        .output-html .callout-compact p{ margin-bottom:8px; }
+        .output-html .callout-compact ul,
+        .output-html .callout-compact ol{ margin-bottom:8px; }
+
+        .output-error{
+            background:#fff5f5;
+            border-left:5px solid #ef4444;
+            padding:10px 12px;
+            color:#7f1d1d;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.5;
+        }
+        .output-error pre{ margin:8px 0 0; white-space:pre-wrap; word-break:break-word; }
+
+        .hidden-note{
+            margin:4px 0;
+            padding:6px 10px;
+            border-radius:6px;
+            background:#f8fafc;
+            border:1px dashed #cbd5e1;
+            color:#64748b;
+            font-size:12px;
+            font-weight:600;
+        }
+
+        .footer{
+            text-align:right;
+            margin-top:30px;
+            padding:12px;
+            background:#e9ecef;
+            border-radius:4px;
+            font-size:14px;
+            color:#555;
+        }
+
+        @media (max-width: 768px) {
+            body{ padding:16px 0; }
+            .container{ max-width:100%; padding:14px 16px 20px; border-radius:0; }
+            .output-html,
+            .output-text,
+            .output-stream,
+            .output-image,
+            .output-error,
+            .markdown,
+            .code_cell{ padding-left:10px; padding-right:10px; }
+            .output-html .card-title{ font-size:18px; }
+            .output-html .metric-value{ font-size:20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<h1 class="title-header">01_ontology_as_data_nodes_relationships</h1>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#F3F2EE">
+<br/><br/>
+<p style="text-align: center;">
+<font color="#0A1781" size="6">
+<strong>
+                    Databricks Certification Learning Knowledge Graph
+                </strong>
+</font>
+</p>
+<p style="text-align: center;">
+<font color="#C58A1E" size="6">
+<strong>
+                    Ontology as Data: Nodes and Relationships
+                </strong>
+</font>
+</p>
+<p style="text-align: center;">
+<font color="#C58A1E" size="5">
+<strong>
+                    Iniciar a materialização da ontologia criada no Notebook 00 em estruturas tabulares reutilizáveis.
+                </strong>
+</font>
+</p>
+<br/>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#F3F2EE">
+<p style="text-align: right;">
+<font color="#444444" size="4">
+            Roberto SSoares - LfLngLrnng
+      </font>
+</p>
+<p style="text-align: right;"><font color="#444444" size="2">
+<a href="https://www.linkedin.com/in/roberto-dos-santos-soares/">in/roberto-dos-santos-soares</a><br/><a href="https://roberto-ssoares.github.io/meu-portfolio/">Portifólio: roberto-ssoares</a>
+</font></p>
+<p style="text-align: right;">
+<font color="#444444" size="4">
+            " [+] Faturamento [-] Custo [+] Qualidade de vida "
+        </font>
+<br/>
+<font color="#918e8e" size="2">"Mestre Bruno Jardim"
+        </font>
+</p>
+<p style="text-align: right;">
+<font color="#918e8e" size="2">
+</font>
+</p>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 Objetivo</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li><strong>Ações realizadas</strong><ul>
+<li>Definição do propósito do notebook.</li>
+<li>Preparação para criação dos CSVs de nós e relacionamentos.</li>
+<li>Organização da ontologia como dados.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>Um Knowledge Graph pode ser desenhado conceitualmente, mas precisa ser materializado em estruturas persistentes para carga, auditoria, versionamento e reuso.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultados esperados</strong><ul>
+<li>Ao final deste notebook, teremos arquivos CSV prontos para representar os nós e relacionamentos iniciais do Knowledge Graph.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">#!uv pip install watermark -q -U
+#!uv pip install tabulate -q -U</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">from datetime import date
+from pathlib import Path
+import tabulate
+
+import pandas as pd</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Versões dos pacotes usados neste jupyter notebook
+%reload_ext watermark
+%watermark -a "RobertoSSoares-LfLngLrnng"</code></pre>
+</div>
+<div class="output-stream">
+<pre>Author: RobertoSSoares-LfLngLrnng
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">pd.set_option("display.max_columns", 100)
+pd.set_option("display.max_colwidth", 120)</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">PROJECT_NAME = "Databricks Certification Learning Knowledge Graph"
+CERTIFICATION_NAME = "Databricks Certified Data Engineer Associate"
+
+BASE_DIR = Path.cwd().parent if Path.cwd().name == "notebooks" else Path.cwd()
+
+DATA_DIR = BASE_DIR / "data"
+RAW_DIR = DATA_DIR / "raw"
+PROCESSED_DIR = DATA_DIR / "processed"
+EXPORTS_DIR = DATA_DIR / "exports"
+DOCS_DIR = BASE_DIR / "docs"
+CYPHER_DIR = BASE_DIR / "cypher"
+
+for directory in [DATA_DIR, RAW_DIR, PROCESSED_DIR, EXPORTS_DIR, DOCS_DIR, CYPHER_DIR]:
+    directory.mkdir(parents=True, exist_ok=True)
+
+BASE_DIR</code></pre>
+</div>
+<div class="output-text">
+<pre>WindowsPath('D:/_DS-Projects/Data-Science/databricks-learning-kg')</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 1. Convenção de modelagem</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Neste notebook, cada entidade relevante será transformada em uma tabela de nós.<ul>
+<li>Cada relacionamento será transformado em uma tabela de arestas.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A convenção usada será:</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Nós</strong><ul>
+<li><em><code>node_id</code>: identificador único do nó.</em></li>
+<li><em><code>node_label</code>: tipo semântico do nó.</em></li>
+<li><em><code>name</code>: nome legível.</em></li>
+<li><em><code>category</code>: agrupamento analítico.</em></li>
+<li><em><code>description</code>: descrição executiva.</em></li>
+<li><em><code>status</code>: estado atual.</em></li>
+<li><em><code>priority</code>: prioridade.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Relacionamentos</strong><ul>
+<li><em><code>source_id</code>: nó de origem.</em></li>
+<li><em><code>source_label</code>: tipo do nó de origem.</em></li>
+<li><em><code>relationship</code>: tipo do relacionamento.</em></li>
+<li><em><code>target_id</code>: nó de destino.</em></li>
+<li><em><code>target_label</code>: tipo do nó de destino.</em></li>
+<li><em><code>weight</code>: peso opcional.</em></li>
+<li><em><code>description</code>: descrição semântica da relação.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">def save_table(df: pd.DataFrame, filename: str) -&gt; dict:
+    """
+    Salva um DataFrame como CSV na pasta data/processed.
+    Retorna metadados básicos para o manifesto de exportação.
+    """
+    path = PROCESSED_DIR / filename
+    df.to_csv(path, index=False, encoding="utf-8")
+    
+    return {
+        "filename": filename,
+        "path": str(path),
+        "rows": len(df),
+        "columns": len(df.columns),
+        "export_date": date.today().isoformat(),
+    }
+
+
+def build_node_frame(
+    df: pd.DataFrame,
+    id_col: str,
+    label: str,
+    name_col: str,
+    category_col: str | None = None,
+    description_col: str | None = None,
+    status_col: str | None = None,
+    priority_col: str | None = None,
+) -&gt; pd.DataFrame:
+    """
+    Padroniza diferentes tabelas de entidades em um formato único de nós.
+    """
+    out = pd.DataFrame()
+    out["node_id"] = df[id_col].astype(str)
+    out["node_label"] = label
+    out["name"] = df[name_col].astype(str)
+    
+    out["category"] = (
+        df[category_col].astype(str)
+        if category_col and category_col in df.columns
+        else ""
+    )
+    
+    out["description"] = (
+        df[description_col].astype(str)
+        if description_col and description_col in df.columns
+        else ""
+    )
+    
+    out["status"] = (
+        df[status_col].astype(str)
+        if status_col and status_col in df.columns
+        else ""
+    )
+    
+    out["priority"] = (
+        df[priority_col].astype(str)
+        if priority_col and priority_col in df.columns
+        else ""
+    )
+    
+    return out
+
+
+def make_edges(
+    pairs: list[dict],
+    source_label: str,
+    relationship: str,
+    target_label: str,
+    default_weight: float = 1.0,
+) -&gt; pd.DataFrame:
+    """
+    Cria uma tabela padronizada de relacionamentos.
+    """
+    rows = []
+    
+    for pair in pairs:
+        rows.append(
+            {
+                "source_id": pair["source_id"],
+                "source_label": source_label,
+                "relationship": relationship,
+                "target_id": pair["target_id"],
+                "target_label": target_label,
+                "weight": pair.get("weight", default_weight),
+                "description": pair.get("description", ""),
+            }
+        )
+    
+    return pd.DataFrame(rows)</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 2. Nós principais: certificação e domínios do exame</strong></font></p>
+<font color="#66666" size="2">
+<ul>
+<li><p>A certificação será o nó raiz do Knowledge Graph.</p>
+</li>
+<li><p>Os domínios do exame serão conectados à certificação por meio do relacionamento <code>HAS_DOMAIN</code>.</p>
+</li>
+</ul>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">certifications = pd.DataFrame(
+    [
+        {
+            "certification_id": "CERT_DEA_001",
+            "name": "Databricks Certified Data Engineer Associate",
+            "vendor": "Databricks",
+            "level": "Associate",
+            "target_role": "Data Engineer",
+            "status": "planned",
+            "start_date": date.today().isoformat(),
+            "target_exam_date": "",
+            "validity_years": 2,
+            "description": "Certificação alvo para consolidar fundamentos de Engenharia de Dados na plataforma Databricks.",
+        }
+    ]
+)
+
+exam_domains = pd.DataFrame(
+    [
+        {
+            "domain_id": "D01",
+            "name": "Databricks Intelligence Platform",
+            "weight_pct": 10,
+            "priority": "medium",
+            "description": "Fundamentos da plataforma, workspace, compute e arquitetura Lakehouse.",
+        },
+        {
+            "domain_id": "D02",
+            "name": "Development and Ingestion",
+            "weight_pct": 30,
+            "priority": "high",
+            "description": "Desenvolvimento, ingestão de dados e uso de SQL/PySpark.",
+        },
+        {
+            "domain_id": "D03",
+            "name": "Data Processing &amp; Transformations",
+            "weight_pct": 31,
+            "priority": "high",
+            "description": "Transformações, Delta Lake, tabelas, joins, agregações e arquitetura medalhão.",
+        },
+        {
+            "domain_id": "D04",
+            "name": "Productionizing Data Pipelines",
+            "weight_pct": 18,
+            "priority": "high",
+            "description": "Jobs, Workflows, tarefas, agendamento, monitoramento e operação.",
+        },
+        {
+            "domain_id": "D05",
+            "name": "Data Governance &amp; Quality",
+            "weight_pct": 11,
+            "priority": "medium",
+            "description": "Governança, Unity Catalog, qualidade, permissões e linhagem.",
+        },
+    ]
+)
+</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">display(certifications)
+display(exam_domains)</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>certification_id</th>
+<th>name</th>
+<th>vendor</th>
+<th>level</th>
+<th>target_role</th>
+<th>status</th>
+<th>start_date</th>
+<th>target_exam_date</th>
+<th>validity_years</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>CERT_DEA_001</td>
+<td>Databricks Certified Data Engineer Associate</td>
+<td>Databricks</td>
+<td>Associate</td>
+<td>Data Engineer</td>
+<td>planned</td>
+<td>2026-04-27</td>
+<td></td>
+<td>2</td>
+<td>Certificação alvo para consolidar fundamentos de Engenharia de Dados na plataforma Databricks.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>domain_id</th>
+<th>name</th>
+<th>weight_pct</th>
+<th>priority</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>D01</td>
+<td>Databricks Intelligence Platform</td>
+<td>10</td>
+<td>medium</td>
+<td>Fundamentos da plataforma, workspace, compute e arquitetura Lakehouse.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>D02</td>
+<td>Development and Ingestion</td>
+<td>30</td>
+<td>high</td>
+<td>Desenvolvimento, ingestão de dados e uso de SQL/PySpark.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>D03</td>
+<td>Data Processing &amp; Transformations</td>
+<td>31</td>
+<td>high</td>
+<td>Transformações, Delta Lake, tabelas, joins, agregações e arquitetura medalhão.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>D04</td>
+<td>Productionizing Data Pipelines</td>
+<td>18</td>
+<td>high</td>
+<td>Jobs, Workflows, tarefas, agendamento, monitoramento e operação.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>D05</td>
+<td>Data Governance &amp; Quality</td>
+<td>11</td>
+<td>medium</td>
+<td>Governança, Unity Catalog, qualidade, permissões e linhagem.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 3. Tópicos iniciais do KG</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Os tópicos representam os conceitos técnicos que precisam ser estudados, praticados e evidenciados.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Cada tópico será conectado a um domínio oficial do exame.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">topics_data = [
+    # D01
+    ("T001", "D01", "Lakehouse Architecture", "Platform", "medium", "high", 0.25, 0.10),
+    ("T002", "D01", "Databricks Workspace", "Platform", "easy", "medium", 0.10, 0.00),
+    ("T003", "D01", "Compute", "Platform", "medium", "medium", 0.10, 0.00),
+    ("T004", "D01", "SQL Warehouse", "Platform", "medium", "medium", 0.10, 0.00),
+    ("T005", "D01", "Notebooks", "Platform", "easy", "high", 0.50, 0.25),
+    ("T006", "D01", "Repos", "Platform", "medium", "medium", 0.25, 0.10),
+
+    # D02
+    ("T007", "D02", "Data Ingestion", "Ingestion", "medium", "high", 0.25, 0.10),
+    ("T008", "D02", "read_files", "Ingestion", "medium", "high", 0.00, 0.00),
+    ("T009", "D02", "COPY INTO", "Ingestion", "medium", "medium", 0.00, 0.00),
+    ("T010", "D02", "Auto Loader", "Ingestion", "hard", "medium", 0.00, 0.00),
+    ("T011", "D02", "File Formats", "Ingestion", "easy", "high", 0.50, 0.25),
+    ("T012", "D02", "Schema Inference", "Ingestion", "medium", "high", 0.25, 0.10),
+    ("T013", "D02", "Schema Definition", "Ingestion", "medium", "high", 0.25, 0.10),
+    ("T014", "D02", "Spark SQL", "Development", "medium", "high", 0.50, 0.25),
+    ("T015", "D02", "PySpark DataFrame API", "Development", "medium", "high", 0.50, 0.25),
+
+    # D03
+    ("T016", "D03", "Delta Lake", "Transformation", "medium", "high", 0.25, 0.10),
+    ("T017", "D03", "Delta Table", "Transformation", "medium", "high", 0.25, 0.10),
+    ("T018", "D03", "Managed Table", "Transformation", "medium", "medium", 0.10, 0.00),
+    ("T019", "D03", "External Table", "Transformation", "medium", "medium", 0.10, 0.00),
+    ("T020", "D03", "Medallion Architecture", "Transformation", "medium", "high", 0.50, 0.25),
+    ("T021", "D03", "MERGE INTO", "Transformation", "hard", "high", 0.10, 0.00),
+    ("T022", "D03", "Window Functions", "Transformation", "medium", "high", 0.40, 0.20),
+    ("T023", "D03", "Joins", "Transformation", "medium", "high", 0.60, 0.30),
+    ("T024", "D03", "Aggregations", "Transformation", "medium", "high", 0.60, 0.30),
+    ("T025", "D03", "Data Cleaning", "Transformation", "medium", "high", 0.60, 0.30),
+    ("T026", "D03", "Deduplication", "Transformation", "medium", "high", 0.40, 0.20),
+    ("T027", "D03", "Schema Evolution", "Transformation", "hard", "medium", 0.10, 0.00),
+    ("T028", "D03", "Time Travel", "Transformation", "medium", "medium", 0.10, 0.00),
+
+    # D04
+    ("T029", "D04", "Databricks Workflows", "Production", "medium", "high", 0.00, 0.00),
+    ("T030", "D04", "Jobs", "Production", "medium", "high", 0.00, 0.00),
+    ("T031", "D04", "Tasks", "Production", "medium", "high", 0.00, 0.00),
+    ("T032", "D04", "Task Dependencies", "Production", "medium", "high", 0.00, 0.00),
+    ("T033", "D04", "Scheduling", "Production", "medium", "medium", 0.00, 0.00),
+    ("T034", "D04", "Parameters", "Production", "medium", "medium", 0.00, 0.00),
+    ("T035", "D04", "Monitoring", "Production", "medium", "medium", 0.00, 0.00),
+    ("T036", "D04", "Retry", "Production", "medium", "medium", 0.00, 0.00),
+    ("T037", "D04", "Pipeline Idempotency", "Production", "hard", "high", 0.25, 0.10),
+
+    # D05
+    ("T038", "D05", "Unity Catalog", "Governance", "medium", "high", 0.10, 0.00),
+    ("T039", "D05", "Catalog", "Governance", "easy", "medium", 0.10, 0.00),
+    ("T040", "D05", "Schema", "Governance", "easy", "medium", 0.25, 0.10),
+    ("T041", "D05", "Table", "Governance", "easy", "medium", 0.25, 0.10),
+    ("T042", "D05", "Volume", "Governance", "medium", "medium", 0.00, 0.00),
+    ("T043", "D05", "Permissions", "Governance", "medium", "high", 0.10, 0.00),
+    ("T044", "D05", "Lineage", "Governance", "medium", "medium", 0.10, 0.00),
+    ("T045", "D05", "Data Quality", "Governance", "medium", "high", 0.40, 0.20),
+    ("T046", "D05", "Naming Conventions", "Governance", "easy", "medium", 0.60, 0.30),
+]
+
+topics = pd.DataFrame(
+    topics_data,
+    columns=[
+        "topic_id",
+        "domain_id",
+        "name",
+        "category",
+        "difficulty",
+        "priority",
+        "confidence_score",
+        "mastery_score",
+    ],
+)
+
+topics["status"] = topics["mastery_score"].apply(
+    lambda x: "not_started" if x == 0 else "initial_mapping"
+)
+
+topics["exam_relevance"] = topics["priority"]
+topics["portfolio_relevance"] = topics["priority"]
+topics["last_review_date"] = ""
+
+topics.head(10)</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>topic_id</th>
+<th>domain_id</th>
+<th>name</th>
+<th>category</th>
+<th>difficulty</th>
+<th>priority</th>
+<th>confidence_score</th>
+<th>mastery_score</th>
+<th>status</th>
+<th>exam_relevance</th>
+<th>portfolio_relevance</th>
+<th>last_review_date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>T001</td>
+<td>D01</td>
+<td>Lakehouse Architecture</td>
+<td>Platform</td>
+<td>medium</td>
+<td>high</td>
+<td>0.25</td>
+<td>0.10</td>
+<td>initial_mapping</td>
+<td>high</td>
+<td>high</td>
+<td></td>
+</tr>
+<tr>
+<th>1</th>
+<td>T002</td>
+<td>D01</td>
+<td>Databricks Workspace</td>
+<td>Platform</td>
+<td>easy</td>
+<td>medium</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>not_started</td>
+<td>medium</td>
+<td>medium</td>
+<td></td>
+</tr>
+<tr>
+<th>2</th>
+<td>T003</td>
+<td>D01</td>
+<td>Compute</td>
+<td>Platform</td>
+<td>medium</td>
+<td>medium</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>not_started</td>
+<td>medium</td>
+<td>medium</td>
+<td></td>
+</tr>
+<tr>
+<th>3</th>
+<td>T004</td>
+<td>D01</td>
+<td>SQL Warehouse</td>
+<td>Platform</td>
+<td>medium</td>
+<td>medium</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>not_started</td>
+<td>medium</td>
+<td>medium</td>
+<td></td>
+</tr>
+<tr>
+<th>4</th>
+<td>T005</td>
+<td>D01</td>
+<td>Notebooks</td>
+<td>Platform</td>
+<td>easy</td>
+<td>high</td>
+<td>0.50</td>
+<td>0.25</td>
+<td>initial_mapping</td>
+<td>high</td>
+<td>high</td>
+<td></td>
+</tr>
+<tr>
+<th>5</th>
+<td>T006</td>
+<td>D01</td>
+<td>Repos</td>
+<td>Platform</td>
+<td>medium</td>
+<td>medium</td>
+<td>0.25</td>
+<td>0.10</td>
+<td>initial_mapping</td>
+<td>medium</td>
+<td>medium</td>
+<td></td>
+</tr>
+<tr>
+<th>6</th>
+<td>T007</td>
+<td>D02</td>
+<td>Data Ingestion</td>
+<td>Ingestion</td>
+<td>medium</td>
+<td>high</td>
+<td>0.25</td>
+<td>0.10</td>
+<td>initial_mapping</td>
+<td>high</td>
+<td>high</td>
+<td></td>
+</tr>
+<tr>
+<th>7</th>
+<td>T008</td>
+<td>D02</td>
+<td>read_files</td>
+<td>Ingestion</td>
+<td>medium</td>
+<td>high</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>not_started</td>
+<td>high</td>
+<td>high</td>
+<td></td>
+</tr>
+<tr>
+<th>8</th>
+<td>T009</td>
+<td>D02</td>
+<td>COPY INTO</td>
+<td>Ingestion</td>
+<td>medium</td>
+<td>medium</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>not_started</td>
+<td>medium</td>
+<td>medium</td>
+<td></td>
+</tr>
+<tr>
+<th>9</th>
+<td>T010</td>
+<td>D02</td>
+<td>Auto Loader</td>
+<td>Ingestion</td>
+<td>hard</td>
+<td>medium</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>not_started</td>
+<td>medium</td>
+<td>medium</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 4. Subtópicos</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Os subtópicos detalham conceitos importantes dentro de tópicos maiores.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essa camada ajuda a refinar o estudo e permite que o KG identifique lacunas mais específicas.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">subtopics = pd.DataFrame(
+    [
+        {"subtopic_id": "ST001", "topic_id": "T001", "name": "Data Lake vs Data Warehouse vs Lakehouse"},
+        {"subtopic_id": "ST002", "topic_id": "T001", "name": "Lakehouse as unified architecture"},
+        {"subtopic_id": "ST003", "topic_id": "T016", "name": "ACID transactions"},
+        {"subtopic_id": "ST004", "topic_id": "T016", "name": "Delta transaction log"},
+        {"subtopic_id": "ST005", "topic_id": "T016", "name": "Versioning"},
+        {"subtopic_id": "ST006", "topic_id": "T020", "name": "Bronze Layer"},
+        {"subtopic_id": "ST007", "topic_id": "T020", "name": "Silver Layer"},
+        {"subtopic_id": "ST008", "topic_id": "T020", "name": "Gold Layer"},
+        {"subtopic_id": "ST009", "topic_id": "T021", "name": "Upsert pattern"},
+        {"subtopic_id": "ST010", "topic_id": "T021", "name": "Incremental load pattern"},
+        {"subtopic_id": "ST011", "topic_id": "T029", "name": "Workflow orchestration"},
+        {"subtopic_id": "ST012", "topic_id": "T030", "name": "Job configuration"},
+        {"subtopic_id": "ST013", "topic_id": "T031", "name": "Task execution"},
+        {"subtopic_id": "ST014", "topic_id": "T032", "name": "Task dependencies"},
+        {"subtopic_id": "ST015", "topic_id": "T038", "name": "Centralized governance"},
+        {"subtopic_id": "ST016", "topic_id": "T038", "name": "Object hierarchy"},
+        {"subtopic_id": "ST017", "topic_id": "T043", "name": "Access control"},
+        {"subtopic_id": "ST018", "topic_id": "T045", "name": "Quality checks"},
+        {"subtopic_id": "ST019", "topic_id": "T045", "name": "Validation rules"},
+        {"subtopic_id": "ST020", "topic_id": "T046", "name": "Enterprise naming standards"},
+    ]
+)
+
+subtopics["description"] = "Subtópico técnico associado à jornada de certificação Databricks."
+subtopics.head()</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>subtopic_id</th>
+<th>topic_id</th>
+<th>name</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>ST001</td>
+<td>T001</td>
+<td>Data Lake vs Data Warehouse vs Lakehouse</td>
+<td>Subtópico técnico associado à jornada de certificação Databricks.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>ST002</td>
+<td>T001</td>
+<td>Lakehouse as unified architecture</td>
+<td>Subtópico técnico associado à jornada de certificação Databricks.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>ST003</td>
+<td>T016</td>
+<td>ACID transactions</td>
+<td>Subtópico técnico associado à jornada de certificação Databricks.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>ST004</td>
+<td>T016</td>
+<td>Delta transaction log</td>
+<td>Subtópico técnico associado à jornada de certificação Databricks.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>ST005</td>
+<td>T016</td>
+<td>Versioning</td>
+<td>Subtópico técnico associado à jornada de certificação Databricks.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 5. Recursos, notebooks, labs e skills</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Agora criamos os nós que representarão artefatos da jornada:<ul>
+<li>recursos de estudo;</li>
+<li>notebooks;</li>
+<li>labs práticos;</li>
+<li>skills demonstráveis;</li>
+<li>sessões de estudo;</li>
+<li>snapshots de evolução.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">resources = pd.DataFrame(
+    [
+        {
+            "resource_id": "R001",
+            "name": "Databricks Academy",
+            "type": "course_platform",
+            "origin": "official",
+            "status": "planned",
+            "description": "Plataforma oficial de cursos e trilhas de aprendizagem Databricks.",
+        },
+        {
+            "resource_id": "R002",
+            "name": "Databricks Exam Guide",
+            "type": "exam_guide",
+            "origin": "official",
+            "status": "planned",
+            "description": "Guia oficial de tópicos e estrutura da certificação.",
+        },
+        {
+            "resource_id": "R003",
+            "name": "Databricks Documentation",
+            "type": "documentation",
+            "origin": "official",
+            "status": "planned",
+            "description": "Documentação técnica da plataforma Databricks.",
+        },
+        {
+            "resource_id": "R004",
+            "name": "Notebook 00 — Domain Understanding",
+            "type": "internal_notebook",
+            "origin": "project",
+            "status": "completed",
+            "description": "Notebook conceitual inicial do projeto Databricks Learning KG.",
+        },
+    ]
+)
+
+notebooks = pd.DataFrame(
+    [
+        {
+            "notebook_id": "NB00",
+            "name": "00_domain_understanding_databricks_learning_kg.ipynb",
+            "stage": "Domain Understanding",
+            "status": "completed",
+            "description": "Define a ontologia inicial e o enquadramento CRISP-DM+.",
+        },
+        {
+            "notebook_id": "NB01",
+            "name": "01_ontology_as_data_nodes_relationships.ipynb",
+            "stage": "Ontology as Data",
+            "status": "in_progress",
+            "description": "Materializa a ontologia em CSVs de nós e relacionamentos.",
+        },
+        {
+            "notebook_id": "NB02",
+            "name": "02_graph_building_networkx_preview.ipynb",
+            "stage": "Graph Building",
+            "status": "planned",
+            "description": "Constrói uma primeira visualização do grafo com Python.",
+        },
+        {
+            "notebook_id": "NB03",
+            "name": "03_neo4j_load_and_cypher_queries.ipynb",
+            "stage": "Neo4j Load",
+            "status": "planned",
+            "description": "Prepara carga no Neo4j e primeiras consultas Cypher.",
+        },
+        {
+            "notebook_id": "NB04",
+            "name": "04_learning_progress_snapshots.ipynb",
+            "stage": "Learning Analytics",
+            "status": "planned",
+            "description": "Analisa evolução temporal da jornada de aprendizagem.",
+        },
+    ]
+)
+
+labs = pd.DataFrame(
+    [
+        {
+            "lab_id": "LAB001",
+            "name": "Lakehouse Concept Map",
+            "status": "planned",
+            "description": "Mapa conceitual inicial da arquitetura Lakehouse.",
+        },
+        {
+            "lab_id": "LAB002",
+            "name": "Bronze Silver Gold Mini Pipeline",
+            "status": "planned",
+            "description": "Pipeline prático simulando arquitetura medalhão.",
+        },
+        {
+            "lab_id": "LAB003",
+            "name": "Delta Lake Transformation Lab",
+            "status": "planned",
+            "description": "Laboratório focado em tabelas Delta, MERGE e evolução de schema.",
+        },
+        {
+            "lab_id": "LAB004",
+            "name": "Databricks Workflow Lab",
+            "status": "planned",
+            "description": "Laboratório focado em jobs, tasks e orquestração.",
+        },
+    ]
+)
+
+skills = pd.DataFrame(
+    [
+        {
+            "skill_id": "S001",
+            "name": "Lakehouse Conceptual Modeling",
+            "category": "Architecture",
+            "priority": "high",
+            "description": "Capacidade de explicar e modelar uma arquitetura Lakehouse.",
+        },
+        {
+            "skill_id": "S002",
+            "name": "Data Ingestion Design",
+            "category": "Data Engineering",
+            "priority": "high",
+            "description": "Capacidade de desenhar processos de ingestão de dados.",
+        },
+        {
+            "skill_id": "S003",
+            "name": "Delta Lake Transformation",
+            "category": "Data Engineering",
+            "priority": "high",
+            "description": "Capacidade de aplicar transformações usando Delta Lake.",
+        },
+        {
+            "skill_id": "S004",
+            "name": "Workflow Orchestration",
+            "category": "Production",
+            "priority": "high",
+            "description": "Capacidade de estruturar pipelines produtivos com jobs e tasks.",
+        },
+        {
+            "skill_id": "S005",
+            "name": "Data Governance Awareness",
+            "category": "Governance",
+            "priority": "medium",
+            "description": "Capacidade de aplicar princípios de governança e qualidade.",
+        },
+        {
+            "skill_id": "S006",
+            "name": "Learning Knowledge Graph Modeling",
+            "category": "Knowledge Graph",
+            "priority": "high",
+            "description": "Capacidade de modelar uma jornada de aprendizagem como Knowledge Graph.",
+        },
+    ]
+)
+</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">display(resources)
+display(notebooks)
+display(labs)
+display(skills)</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>resource_id</th>
+<th>name</th>
+<th>type</th>
+<th>origin</th>
+<th>status</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>R001</td>
+<td>Databricks Academy</td>
+<td>course_platform</td>
+<td>official</td>
+<td>planned</td>
+<td>Plataforma oficial de cursos e trilhas de aprendizagem Databricks.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>R002</td>
+<td>Databricks Exam Guide</td>
+<td>exam_guide</td>
+<td>official</td>
+<td>planned</td>
+<td>Guia oficial de tópicos e estrutura da certificação.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>R003</td>
+<td>Databricks Documentation</td>
+<td>documentation</td>
+<td>official</td>
+<td>planned</td>
+<td>Documentação técnica da plataforma Databricks.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>R004</td>
+<td>Notebook 00 — Domain Understanding</td>
+<td>internal_notebook</td>
+<td>project</td>
+<td>completed</td>
+<td>Notebook conceitual inicial do projeto Databricks Learning KG.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>notebook_id</th>
+<th>name</th>
+<th>stage</th>
+<th>status</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>NB00</td>
+<td>00_domain_understanding_databricks_learning_kg.ipynb</td>
+<td>Domain Understanding</td>
+<td>completed</td>
+<td>Define a ontologia inicial e o enquadramento CRISP-DM+.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>NB01</td>
+<td>01_ontology_as_data_nodes_relationships.ipynb</td>
+<td>Ontology as Data</td>
+<td>in_progress</td>
+<td>Materializa a ontologia em CSVs de nós e relacionamentos.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>NB02</td>
+<td>02_graph_building_networkx_preview.ipynb</td>
+<td>Graph Building</td>
+<td>planned</td>
+<td>Constrói uma primeira visualização do grafo com Python.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>NB03</td>
+<td>03_neo4j_load_and_cypher_queries.ipynb</td>
+<td>Neo4j Load</td>
+<td>planned</td>
+<td>Prepara carga no Neo4j e primeiras consultas Cypher.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>NB04</td>
+<td>04_learning_progress_snapshots.ipynb</td>
+<td>Learning Analytics</td>
+<td>planned</td>
+<td>Analisa evolução temporal da jornada de aprendizagem.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>lab_id</th>
+<th>name</th>
+<th>status</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>LAB001</td>
+<td>Lakehouse Concept Map</td>
+<td>planned</td>
+<td>Mapa conceitual inicial da arquitetura Lakehouse.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>LAB002</td>
+<td>Bronze Silver Gold Mini Pipeline</td>
+<td>planned</td>
+<td>Pipeline prático simulando arquitetura medalhão.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>LAB003</td>
+<td>Delta Lake Transformation Lab</td>
+<td>planned</td>
+<td>Laboratório focado em tabelas Delta, MERGE e evolução de schema.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>LAB004</td>
+<td>Databricks Workflow Lab</td>
+<td>planned</td>
+<td>Laboratório focado em jobs, tasks e orquestração.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>skill_id</th>
+<th>name</th>
+<th>category</th>
+<th>priority</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>S001</td>
+<td>Lakehouse Conceptual Modeling</td>
+<td>Architecture</td>
+<td>high</td>
+<td>Capacidade de explicar e modelar uma arquitetura Lakehouse.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>S002</td>
+<td>Data Ingestion Design</td>
+<td>Data Engineering</td>
+<td>high</td>
+<td>Capacidade de desenhar processos de ingestão de dados.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>S003</td>
+<td>Delta Lake Transformation</td>
+<td>Data Engineering</td>
+<td>high</td>
+<td>Capacidade de aplicar transformações usando Delta Lake.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>S004</td>
+<td>Workflow Orchestration</td>
+<td>Production</td>
+<td>high</td>
+<td>Capacidade de estruturar pipelines produtivos com jobs e tasks.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>S005</td>
+<td>Data Governance Awareness</td>
+<td>Governance</td>
+<td>medium</td>
+<td>Capacidade de aplicar princípios de governança e qualidade.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>S006</td>
+<td>Learning Knowledge Graph Modeling</td>
+<td>Knowledge Graph</td>
+<td>high</td>
+<td>Capacidade de modelar uma jornada de aprendizagem como Knowledge Graph.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">study_sessions = pd.DataFrame(
+    [
+        {
+            "session_id": "SS001",
+            "session_date": date.today().isoformat(),
+            "duration_minutes": 60,
+            "focus_area": "Ontology and Knowledge Graph setup",
+            "energy_level": "high",
+            "productivity_level": "high",
+            "summary": "Início da materialização da ontologia do projeto Databricks Learning KG.",
+            "next_action": "Gerar CSVs de nós e relacionamentos.",
+        }
+    ]
+)
+
+snapshots = pd.DataFrame(
+    [
+        {
+            "snapshot_id": "SNAP_W00",
+            "snapshot_date": date.today().isoformat(),
+            "week_number": 0,
+            "overall_progress": 0.05,
+            "coverage_pct": 0.10,
+            "avg_confidence": round(topics["confidence_score"].mean(), 4),
+            "avg_mastery": round(topics["mastery_score"].mean(), 4),
+            "main_gap": "Workflows, Unity Catalog e recursos específicos de Databricks ainda não praticados.",
+            "main_achievement": "Ontologia inicial definida e convertida para dados estruturados.",
+        }
+    ]
+)
+</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">display(study_sessions)
+display(snapshots)</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>session_id</th>
+<th>session_date</th>
+<th>duration_minutes</th>
+<th>focus_area</th>
+<th>energy_level</th>
+<th>productivity_level</th>
+<th>summary</th>
+<th>next_action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>SS001</td>
+<td>2026-04-27</td>
+<td>60</td>
+<td>Ontology and Knowledge Graph setup</td>
+<td>high</td>
+<td>high</td>
+<td>Início da materialização da ontologia do projeto Databricks Learning KG.</td>
+<td>Gerar CSVs de nós e relacionamentos.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>snapshot_id</th>
+<th>snapshot_date</th>
+<th>week_number</th>
+<th>overall_progress</th>
+<th>coverage_pct</th>
+<th>avg_confidence</th>
+<th>avg_mastery</th>
+<th>main_gap</th>
+<th>main_achievement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>SNAP_W00</td>
+<td>2026-04-27</td>
+<td>0</td>
+<td>0.05</td>
+<td>0.1</td>
+<td>0.213</td>
+<td>0.088</td>
+<td>Workflows, Unity Catalog e recursos específicos de Databricks ainda não praticados.</td>
+<td>Ontologia inicial definida e convertida para dados estruturados.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 6. Relacionamentos estruturais</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Nesta etapa criamos os relacionamentos principais:<ul>
+<li>certificação possui domínios;</li>
+<li>domínios cobrem tópicos;</li>
+<li>tópicos possuem subtópicos;</li>
+<li>tópicos dependem de outros tópicos.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">certification_domain_edges = make_edges(
+    pairs=[
+        {
+            "source_id": "CERT_DEA_001",
+            "target_id": row["domain_id"],
+            "weight": row["weight_pct"] / 100,
+            "description": f"A certificação cobre o domínio {row['name']}.",
+        }
+        for _, row in exam_domains.iterrows()
+    ],
+    source_label="Certification",
+    relationship="HAS_DOMAIN",
+    target_label="ExamDomain",
+)
+
+domain_topic_edges = make_edges(
+    pairs=[
+        {
+            "source_id": row["domain_id"],
+            "target_id": row["topic_id"],
+            "weight": 1.0,
+            "description": f"O domínio {row['domain_id']} cobre o tópico {row['name']}.",
+        }
+        for _, row in topics.iterrows()
+    ],
+    source_label="ExamDomain",
+    relationship="COVERS",
+    target_label="Topic",
+)
+
+topic_subtopic_edges = make_edges(
+    pairs=[
+        {
+            "source_id": row["topic_id"],
+            "target_id": row["subtopic_id"],
+            "weight": 1.0,
+            "description": f"O tópico {row['topic_id']} possui o subtópico {row['name']}.",
+        }
+        for _, row in subtopics.iterrows()
+    ],
+    source_label="Topic",
+    relationship="HAS_SUBTOPIC",
+    target_label="Subtopic",
+)
+</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">display(certification_domain_edges.head())
+display(domain_topic_edges.head())
+display(topic_subtopic_edges.head())</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>source_id</th>
+<th>source_label</th>
+<th>relationship</th>
+<th>target_id</th>
+<th>target_label</th>
+<th>weight</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>CERT_DEA_001</td>
+<td>Certification</td>
+<td>HAS_DOMAIN</td>
+<td>D01</td>
+<td>ExamDomain</td>
+<td>0.10</td>
+<td>A certificação cobre o domínio Databricks Intelligence Platform.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>CERT_DEA_001</td>
+<td>Certification</td>
+<td>HAS_DOMAIN</td>
+<td>D02</td>
+<td>ExamDomain</td>
+<td>0.30</td>
+<td>A certificação cobre o domínio Development and Ingestion.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>CERT_DEA_001</td>
+<td>Certification</td>
+<td>HAS_DOMAIN</td>
+<td>D03</td>
+<td>ExamDomain</td>
+<td>0.31</td>
+<td>A certificação cobre o domínio Data Processing &amp; Transformations.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>CERT_DEA_001</td>
+<td>Certification</td>
+<td>HAS_DOMAIN</td>
+<td>D04</td>
+<td>ExamDomain</td>
+<td>0.18</td>
+<td>A certificação cobre o domínio Productionizing Data Pipelines.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>CERT_DEA_001</td>
+<td>Certification</td>
+<td>HAS_DOMAIN</td>
+<td>D05</td>
+<td>ExamDomain</td>
+<td>0.11</td>
+<td>A certificação cobre o domínio Data Governance &amp; Quality.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>source_id</th>
+<th>source_label</th>
+<th>relationship</th>
+<th>target_id</th>
+<th>target_label</th>
+<th>weight</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>D01</td>
+<td>ExamDomain</td>
+<td>COVERS</td>
+<td>T001</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>O domínio D01 cobre o tópico Lakehouse Architecture.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>D01</td>
+<td>ExamDomain</td>
+<td>COVERS</td>
+<td>T002</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>O domínio D01 cobre o tópico Databricks Workspace.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>D01</td>
+<td>ExamDomain</td>
+<td>COVERS</td>
+<td>T003</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>O domínio D01 cobre o tópico Compute.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>D01</td>
+<td>ExamDomain</td>
+<td>COVERS</td>
+<td>T004</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>O domínio D01 cobre o tópico SQL Warehouse.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>D01</td>
+<td>ExamDomain</td>
+<td>COVERS</td>
+<td>T005</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>O domínio D01 cobre o tópico Notebooks.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>source_id</th>
+<th>source_label</th>
+<th>relationship</th>
+<th>target_id</th>
+<th>target_label</th>
+<th>weight</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>T001</td>
+<td>Topic</td>
+<td>HAS_SUBTOPIC</td>
+<td>ST001</td>
+<td>Subtopic</td>
+<td>1.0</td>
+<td>O tópico T001 possui o subtópico Data Lake vs Data Warehouse vs Lakehouse.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>T001</td>
+<td>Topic</td>
+<td>HAS_SUBTOPIC</td>
+<td>ST002</td>
+<td>Subtopic</td>
+<td>1.0</td>
+<td>O tópico T001 possui o subtópico Lakehouse as unified architecture.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>T016</td>
+<td>Topic</td>
+<td>HAS_SUBTOPIC</td>
+<td>ST003</td>
+<td>Subtopic</td>
+<td>1.0</td>
+<td>O tópico T016 possui o subtópico ACID transactions.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>T016</td>
+<td>Topic</td>
+<td>HAS_SUBTOPIC</td>
+<td>ST004</td>
+<td>Subtopic</td>
+<td>1.0</td>
+<td>O tópico T016 possui o subtópico Delta transaction log.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>T016</td>
+<td>Topic</td>
+<td>HAS_SUBTOPIC</td>
+<td>ST005</td>
+<td>Subtopic</td>
+<td>1.0</td>
+<td>O tópico T016 possui o subtópico Versioning.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">prerequisite_pairs = [
+    {"source_id": "T001", "target_id": "T020", "description": "Lakehouse Architecture ajuda a compreender Medallion Architecture."},
+    {"source_id": "T016", "target_id": "T017", "description": "Delta Lake é pré-requisito para compreender Delta Table."},
+    {"source_id": "T017", "target_id": "T021", "description": "Delta Table é pré-requisito para aplicar MERGE INTO."},
+    {"source_id": "T007", "target_id": "T008", "description": "Data Ingestion antecede o uso de read_files."},
+    {"source_id": "T007", "target_id": "T009", "description": "Data Ingestion antecede COPY INTO."},
+    {"source_id": "T007", "target_id": "T010", "description": "Data Ingestion antecede Auto Loader."},
+    {"source_id": "T012", "target_id": "T013", "description": "Inferência de schema ajuda a compreender definição explícita de schema."},
+    {"source_id": "T014", "target_id": "T022", "description": "Spark SQL apoia o uso de window functions."},
+    {"source_id": "T023", "target_id": "T024", "description": "Joins e agregações aparecem frequentemente em transformações analíticas."},
+    {"source_id": "T029", "target_id": "T030", "description": "Databricks Workflows contextualiza Jobs."},
+    {"source_id": "T030", "target_id": "T031", "description": "Jobs são compostos por Tasks."},
+    {"source_id": "T031", "target_id": "T032", "description": "Tasks permitem dependências em pipelines produtivos."},
+    {"source_id": "T038", "target_id": "T039", "description": "Unity Catalog organiza objetos como Catalog."},
+    {"source_id": "T039", "target_id": "T040", "description": "Catalog contém Schemas."},
+    {"source_id": "T040", "target_id": "T041", "description": "Schema contém Tables."},
+]
+
+prerequisite_edges = make_edges(
+    pairs=prerequisite_pairs,
+    source_label="Topic",
+    relationship="PREREQUISITE_FOR",
+    target_label="Topic",
+)
+
+prerequisite_edges.head()</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>source_id</th>
+<th>source_label</th>
+<th>relationship</th>
+<th>target_id</th>
+<th>target_label</th>
+<th>weight</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>T001</td>
+<td>Topic</td>
+<td>PREREQUISITE_FOR</td>
+<td>T020</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Lakehouse Architecture ajuda a compreender Medallion Architecture.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>T016</td>
+<td>Topic</td>
+<td>PREREQUISITE_FOR</td>
+<td>T017</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Delta Lake é pré-requisito para compreender Delta Table.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>T017</td>
+<td>Topic</td>
+<td>PREREQUISITE_FOR</td>
+<td>T021</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Delta Table é pré-requisito para aplicar MERGE INTO.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>T007</td>
+<td>Topic</td>
+<td>PREREQUISITE_FOR</td>
+<td>T008</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Data Ingestion antecede o uso de read_files.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>T007</td>
+<td>Topic</td>
+<td>PREREQUISITE_FOR</td>
+<td>T009</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Data Ingestion antecede COPY INTO.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 7. Relacionamentos de aprendizagem e portfólio</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Agora conectamos recursos, notebooks, labs e skills aos tópicos.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essas conexões serão fundamentais para responder perguntas como:<ul>
+<li><em>Qual notebook comprova determinado conhecimento?</em></li>
+<li><em>Qual recurso ensina determinado tópico?</em></li>
+<li><em>Qual skill está sustentada por quais tópicos?</em></li>
+<li><em>Onde estão minhas evidências de portfólio?</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">notebook_topic_pairs = [
+    {"source_id": "NB00", "target_id": "T001", "description": "Notebook 00 contextualiza Lakehouse Architecture."},
+    {"source_id": "NB00", "target_id": "T020", "description": "Notebook 00 contextualiza Medallion Architecture."},
+    {"source_id": "NB00", "target_id": "T038", "description": "Notebook 00 introduz governança via Unity Catalog."},
+    {"source_id": "NB01", "target_id": "T001", "description": "Notebook 01 transforma a ontologia em dados."},
+    {"source_id": "NB01", "target_id": "T020", "description": "Notebook 01 prepara a arquitetura medalhão como tópico rastreável."},
+    {"source_id": "NB01", "target_id": "T045", "description": "Notebook 01 introduz rastreabilidade para qualidade de dados."},
+    {"source_id": "NB02", "target_id": "T001", "description": "Notebook 02 deverá visualizar o grafo conceitual."},
+    {"source_id": "NB03", "target_id": "T038", "description": "Notebook 03 deverá preparar carga e consultas em grafo."},
+]
+
+notebook_topic_edges = make_edges(
+    pairs=notebook_topic_pairs,
+    source_label="Notebook",
+    relationship="PRACTICES",
+    target_label="Topic",
+)
+
+lab_topic_pairs = [
+    {"source_id": "LAB001", "target_id": "T001", "description": "Lab de mapa conceitual de Lakehouse."},
+    {"source_id": "LAB002", "target_id": "T020", "description": "Lab de arquitetura Bronze, Silver e Gold."},
+    {"source_id": "LAB003", "target_id": "T016", "description": "Lab de Delta Lake."},
+    {"source_id": "LAB003", "target_id": "T021", "description": "Lab de MERGE INTO."},
+    {"source_id": "LAB004", "target_id": "T029", "description": "Lab de Databricks Workflows."},
+    {"source_id": "LAB004", "target_id": "T030", "description": "Lab de Jobs."},
+    {"source_id": "LAB004", "target_id": "T031", "description": "Lab de Tasks."},
+]
+
+lab_topic_edges = make_edges(
+    pairs=lab_topic_pairs,
+    source_label="Lab",
+    relationship="IMPLEMENTS",
+    target_label="Topic",
+)
+</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">display(notebook_topic_edges)
+display(lab_topic_edges)</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>source_id</th>
+<th>source_label</th>
+<th>relationship</th>
+<th>target_id</th>
+<th>target_label</th>
+<th>weight</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>NB00</td>
+<td>Notebook</td>
+<td>PRACTICES</td>
+<td>T001</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Notebook 00 contextualiza Lakehouse Architecture.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>NB00</td>
+<td>Notebook</td>
+<td>PRACTICES</td>
+<td>T020</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Notebook 00 contextualiza Medallion Architecture.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>NB00</td>
+<td>Notebook</td>
+<td>PRACTICES</td>
+<td>T038</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Notebook 00 introduz governança via Unity Catalog.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>NB01</td>
+<td>Notebook</td>
+<td>PRACTICES</td>
+<td>T001</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Notebook 01 transforma a ontologia em dados.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>NB01</td>
+<td>Notebook</td>
+<td>PRACTICES</td>
+<td>T020</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Notebook 01 prepara a arquitetura medalhão como tópico rastreável.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>NB01</td>
+<td>Notebook</td>
+<td>PRACTICES</td>
+<td>T045</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Notebook 01 introduz rastreabilidade para qualidade de dados.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>NB02</td>
+<td>Notebook</td>
+<td>PRACTICES</td>
+<td>T001</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Notebook 02 deverá visualizar o grafo conceitual.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>NB03</td>
+<td>Notebook</td>
+<td>PRACTICES</td>
+<td>T038</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Notebook 03 deverá preparar carga e consultas em grafo.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>source_id</th>
+<th>source_label</th>
+<th>relationship</th>
+<th>target_id</th>
+<th>target_label</th>
+<th>weight</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>LAB001</td>
+<td>Lab</td>
+<td>IMPLEMENTS</td>
+<td>T001</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Lab de mapa conceitual de Lakehouse.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>LAB002</td>
+<td>Lab</td>
+<td>IMPLEMENTS</td>
+<td>T020</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Lab de arquitetura Bronze, Silver e Gold.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>LAB003</td>
+<td>Lab</td>
+<td>IMPLEMENTS</td>
+<td>T016</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Lab de Delta Lake.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>LAB003</td>
+<td>Lab</td>
+<td>IMPLEMENTS</td>
+<td>T021</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Lab de MERGE INTO.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>LAB004</td>
+<td>Lab</td>
+<td>IMPLEMENTS</td>
+<td>T029</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Lab de Databricks Workflows.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>LAB004</td>
+<td>Lab</td>
+<td>IMPLEMENTS</td>
+<td>T030</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Lab de Jobs.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>LAB004</td>
+<td>Lab</td>
+<td>IMPLEMENTS</td>
+<td>T031</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Lab de Tasks.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">resource_topic_pairs = [
+    {"source_id": "R001", "target_id": "T001", "description": "Databricks Academy apoia fundamentos de Lakehouse."},
+    {"source_id": "R001", "target_id": "T007", "description": "Databricks Academy apoia estudo de ingestão."},
+    {"source_id": "R001", "target_id": "T016", "description": "Databricks Academy apoia estudo de Delta Lake."},
+    {"source_id": "R001", "target_id": "T029", "description": "Databricks Academy apoia estudo de Workflows."},
+    {"source_id": "R002", "target_id": "T014", "description": "Exam Guide orienta tópicos de Spark SQL."},
+    {"source_id": "R002", "target_id": "T016", "description": "Exam Guide orienta tópicos de Delta Lake."},
+    {"source_id": "R002", "target_id": "T038", "description": "Exam Guide orienta tópicos de governança."},
+    {"source_id": "R003", "target_id": "T021", "description": "Documentação apoia estudo técnico de MERGE INTO."},
+    {"source_id": "R003", "target_id": "T038", "description": "Documentação apoia estudo de Unity Catalog."},
+    {"source_id": "R004", "target_id": "T001", "description": "Notebook 00 apoia entendimento conceitual da arquitetura."},
+]
+
+resource_topic_edges = make_edges(
+    pairs=resource_topic_pairs,
+    source_label="Resource",
+    relationship="TEACHES",
+    target_label="Topic",
+)
+
+skill_topic_pairs = [
+    {"source_id": "S001", "target_id": "T001", "description": "Lakehouse Architecture sustenta modelagem conceitual."},
+    {"source_id": "S001", "target_id": "T020", "description": "Medallion Architecture sustenta modelagem conceitual."},
+    {"source_id": "S002", "target_id": "T007", "description": "Data Ingestion sustenta desenho de ingestão."},
+    {"source_id": "S002", "target_id": "T008", "description": "read_files sustenta ingestão em Databricks."},
+    {"source_id": "S003", "target_id": "T016", "description": "Delta Lake sustenta transformações confiáveis."},
+    {"source_id": "S003", "target_id": "T021", "description": "MERGE INTO sustenta cargas incrementais."},
+    {"source_id": "S004", "target_id": "T029", "description": "Workflows sustentam orquestração."},
+    {"source_id": "S004", "target_id": "T030", "description": "Jobs sustentam produção."},
+    {"source_id": "S005", "target_id": "T038", "description": "Unity Catalog sustenta governança."},
+    {"source_id": "S005", "target_id": "T045", "description": "Data Quality sustenta governança."},
+    {"source_id": "S006", "target_id": "T001", "description": "Modelagem semântica apoia aprendizagem estruturada."},
+]
+
+skill_topic_edges = make_edges(
+    pairs=skill_topic_pairs,
+    source_label="Skill",
+    relationship="SUPPORTED_BY",
+    target_label="Topic",
+)
+</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">display(resource_topic_edges.head())
+display(skill_topic_edges.head())</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>source_id</th>
+<th>source_label</th>
+<th>relationship</th>
+<th>target_id</th>
+<th>target_label</th>
+<th>weight</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>R001</td>
+<td>Resource</td>
+<td>TEACHES</td>
+<td>T001</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Databricks Academy apoia fundamentos de Lakehouse.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>R001</td>
+<td>Resource</td>
+<td>TEACHES</td>
+<td>T007</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Databricks Academy apoia estudo de ingestão.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>R001</td>
+<td>Resource</td>
+<td>TEACHES</td>
+<td>T016</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Databricks Academy apoia estudo de Delta Lake.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>R001</td>
+<td>Resource</td>
+<td>TEACHES</td>
+<td>T029</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Databricks Academy apoia estudo de Workflows.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>R002</td>
+<td>Resource</td>
+<td>TEACHES</td>
+<td>T014</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Exam Guide orienta tópicos de Spark SQL.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>source_id</th>
+<th>source_label</th>
+<th>relationship</th>
+<th>target_id</th>
+<th>target_label</th>
+<th>weight</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>S001</td>
+<td>Skill</td>
+<td>SUPPORTED_BY</td>
+<td>T001</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Lakehouse Architecture sustenta modelagem conceitual.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>S001</td>
+<td>Skill</td>
+<td>SUPPORTED_BY</td>
+<td>T020</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Medallion Architecture sustenta modelagem conceitual.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>S002</td>
+<td>Skill</td>
+<td>SUPPORTED_BY</td>
+<td>T007</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Data Ingestion sustenta desenho de ingestão.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>S002</td>
+<td>Skill</td>
+<td>SUPPORTED_BY</td>
+<td>T008</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>read_files sustenta ingestão em Databricks.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>S003</td>
+<td>Skill</td>
+<td>SUPPORTED_BY</td>
+<td>T016</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Delta Lake sustenta transformações confiáveis.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">study_session_topic_pairs = [
+    {"source_id": "SS001", "target_id": "T001", "description": "Sessão inicial estudou Lakehouse Architecture."},
+    {"source_id": "SS001", "target_id": "T020", "description": "Sessão inicial estudou Medallion Architecture."},
+    {"source_id": "SS001", "target_id": "T038", "description": "Sessão inicial introduziu Unity Catalog como área futura."},
+    {"source_id": "SS001", "target_id": "T045", "description": "Sessão inicial posicionou qualidade como dimensão do KG."},
+]
+
+study_session_topic_edges = make_edges(
+    pairs=study_session_topic_pairs,
+    source_label="StudySession",
+    relationship="STUDIED",
+    target_label="Topic",
+)
+
+study_session_topic_edges</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>source_id</th>
+<th>source_label</th>
+<th>relationship</th>
+<th>target_id</th>
+<th>target_label</th>
+<th>weight</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>SS001</td>
+<td>StudySession</td>
+<td>STUDIED</td>
+<td>T001</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Sessão inicial estudou Lakehouse Architecture.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>SS001</td>
+<td>StudySession</td>
+<td>STUDIED</td>
+<td>T020</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Sessão inicial estudou Medallion Architecture.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>SS001</td>
+<td>StudySession</td>
+<td>STUDIED</td>
+<td>T038</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Sessão inicial introduziu Unity Catalog como área futura.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>SS001</td>
+<td>StudySession</td>
+<td>STUDIED</td>
+<td>T045</td>
+<td>Topic</td>
+<td>1.0</td>
+<td>Sessão inicial posicionou qualidade como dimensão do KG.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 8. Snapshot inicial de progresso</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>O snapshot representa uma fotografia temporal da jornada.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Nesta primeira versão, usamos o snapshot da semana 0 para capturar o estado inicial de todos os tópicos.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">topic_progress_snapshot = topics[
+    [
+        "topic_id",
+        "name",
+        "domain_id",
+        "confidence_score",
+        "mastery_score",
+        "status",
+        "priority",
+    ]
+].copy()
+
+topic_progress_snapshot.insert(0, "snapshot_id", "SNAP_W00")
+topic_progress_snapshot.insert(1, "snapshot_date", date.today().isoformat())
+topic_progress_snapshot.insert(2, "week_number", 0)
+
+topic_progress_snapshot.head()</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>snapshot_id</th>
+<th>snapshot_date</th>
+<th>week_number</th>
+<th>topic_id</th>
+<th>name</th>
+<th>domain_id</th>
+<th>confidence_score</th>
+<th>mastery_score</th>
+<th>status</th>
+<th>priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>SNAP_W00</td>
+<td>2026-04-27</td>
+<td>0</td>
+<td>T001</td>
+<td>Lakehouse Architecture</td>
+<td>D01</td>
+<td>0.25</td>
+<td>0.10</td>
+<td>initial_mapping</td>
+<td>high</td>
+</tr>
+<tr>
+<th>1</th>
+<td>SNAP_W00</td>
+<td>2026-04-27</td>
+<td>0</td>
+<td>T002</td>
+<td>Databricks Workspace</td>
+<td>D01</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>not_started</td>
+<td>medium</td>
+</tr>
+<tr>
+<th>2</th>
+<td>SNAP_W00</td>
+<td>2026-04-27</td>
+<td>0</td>
+<td>T003</td>
+<td>Compute</td>
+<td>D01</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>not_started</td>
+<td>medium</td>
+</tr>
+<tr>
+<th>3</th>
+<td>SNAP_W00</td>
+<td>2026-04-27</td>
+<td>0</td>
+<td>T004</td>
+<td>SQL Warehouse</td>
+<td>D01</td>
+<td>0.10</td>
+<td>0.00</td>
+<td>not_started</td>
+<td>medium</td>
+</tr>
+<tr>
+<th>4</th>
+<td>SNAP_W00</td>
+<td>2026-04-27</td>
+<td>0</td>
+<td>T005</td>
+<td>Notebooks</td>
+<td>D01</td>
+<td>0.50</td>
+<td>0.25</td>
+<td>initial_mapping</td>
+<td>high</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">snapshot_topic_edges = make_edges(
+    pairs=[
+        {
+            "source_id": "SNAP_W00",
+            "target_id": row["topic_id"],
+            "weight": row["mastery_score"],
+            "description": f"Snapshot inicial captura o status do tópico {row['name']}.",
+        }
+        for _, row in topics.iterrows()
+    ],
+    source_label="Snapshot",
+    relationship="CAPTURES_STATUS_OF",
+    target_label="Topic",
+)
+
+snapshot_topic_edges.head()</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>source_id</th>
+<th>source_label</th>
+<th>relationship</th>
+<th>target_id</th>
+<th>target_label</th>
+<th>weight</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>SNAP_W00</td>
+<td>Snapshot</td>
+<td>CAPTURES_STATUS_OF</td>
+<td>T001</td>
+<td>Topic</td>
+<td>0.10</td>
+<td>Snapshot inicial captura o status do tópico Lakehouse Architecture.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>SNAP_W00</td>
+<td>Snapshot</td>
+<td>CAPTURES_STATUS_OF</td>
+<td>T002</td>
+<td>Topic</td>
+<td>0.00</td>
+<td>Snapshot inicial captura o status do tópico Databricks Workspace.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>SNAP_W00</td>
+<td>Snapshot</td>
+<td>CAPTURES_STATUS_OF</td>
+<td>T003</td>
+<td>Topic</td>
+<td>0.00</td>
+<td>Snapshot inicial captura o status do tópico Compute.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>SNAP_W00</td>
+<td>Snapshot</td>
+<td>CAPTURES_STATUS_OF</td>
+<td>T004</td>
+<td>Topic</td>
+<td>0.00</td>
+<td>Snapshot inicial captura o status do tópico SQL Warehouse.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>SNAP_W00</td>
+<td>Snapshot</td>
+<td>CAPTURES_STATUS_OF</td>
+<td>T005</td>
+<td>Topic</td>
+<td>0.25</td>
+<td>Snapshot inicial captura o status do tópico Notebooks.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 9. Consolidação dos nós</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Agora vamos consolidar todas as tabelas de entidades em uma tabela única <code>nodes_all</code>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essa tabela será útil para:<ul>
+<li>auditoria;</li>
+<li>visualização;</li>
+<li>carga em ferramentas de grafos;</li>
+<li>validação de relacionamentos órfãos.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">nodes_all = pd.concat(
+    [
+        build_node_frame(
+            certifications,
+            id_col="certification_id",
+            label="Certification",
+            name_col="name",
+            category_col="level",
+            description_col="description",
+            status_col="status",
+        ),
+        build_node_frame(
+            exam_domains,
+            id_col="domain_id",
+            label="ExamDomain",
+            name_col="name",
+            category_col="priority",
+            description_col="description",
+            priority_col="priority",
+        ),
+        build_node_frame(
+            topics,
+            id_col="topic_id",
+            label="Topic",
+            name_col="name",
+            category_col="category",
+            status_col="status",
+            priority_col="priority",
+        ),
+        build_node_frame(
+            subtopics,
+            id_col="subtopic_id",
+            label="Subtopic",
+            name_col="name",
+            description_col="description",
+        ),
+        build_node_frame(
+            resources,
+            id_col="resource_id",
+            label="Resource",
+            name_col="name",
+            category_col="type",
+            description_col="description",
+            status_col="status",
+        ),
+        build_node_frame(
+            notebooks,
+            id_col="notebook_id",
+            label="Notebook",
+            name_col="name",
+            category_col="stage",
+            description_col="description",
+            status_col="status",
+        ),
+        build_node_frame(
+            labs,
+            id_col="lab_id",
+            label="Lab",
+            name_col="name",
+            description_col="description",
+            status_col="status",
+        ),
+        build_node_frame(
+            skills,
+            id_col="skill_id",
+            label="Skill",
+            name_col="name",
+            category_col="category",
+            description_col="description",
+            priority_col="priority",
+        ),
+        build_node_frame(
+            study_sessions,
+            id_col="session_id",
+            label="StudySession",
+            name_col="focus_area",
+            category_col="productivity_level",
+            description_col="summary",
+        ),
+        build_node_frame(
+            snapshots,
+            id_col="snapshot_id",
+            label="Snapshot",
+            name_col="snapshot_date",
+            category_col="week_number",
+            description_col="main_achievement",
+        ),
+    ],
+    ignore_index=True,
+)
+</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">nodes_all.head(10)</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>node_id</th>
+<th>node_label</th>
+<th>name</th>
+<th>category</th>
+<th>description</th>
+<th>status</th>
+<th>priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>CERT_DEA_001</td>
+<td>Certification</td>
+<td>Databricks Certified Data Engineer Associate</td>
+<td>Associate</td>
+<td>Certificação alvo para consolidar fundamentos de Engenharia de Dados na plataforma Databricks.</td>
+<td>planned</td>
+<td></td>
+</tr>
+<tr>
+<th>1</th>
+<td>D01</td>
+<td>ExamDomain</td>
+<td>Databricks Intelligence Platform</td>
+<td>medium</td>
+<td>Fundamentos da plataforma, workspace, compute e arquitetura Lakehouse.</td>
+<td></td>
+<td>medium</td>
+</tr>
+<tr>
+<th>2</th>
+<td>D02</td>
+<td>ExamDomain</td>
+<td>Development and Ingestion</td>
+<td>high</td>
+<td>Desenvolvimento, ingestão de dados e uso de SQL/PySpark.</td>
+<td></td>
+<td>high</td>
+</tr>
+<tr>
+<th>3</th>
+<td>D03</td>
+<td>ExamDomain</td>
+<td>Data Processing &amp; Transformations</td>
+<td>high</td>
+<td>Transformações, Delta Lake, tabelas, joins, agregações e arquitetura medalhão.</td>
+<td></td>
+<td>high</td>
+</tr>
+<tr>
+<th>4</th>
+<td>D04</td>
+<td>ExamDomain</td>
+<td>Productionizing Data Pipelines</td>
+<td>high</td>
+<td>Jobs, Workflows, tarefas, agendamento, monitoramento e operação.</td>
+<td></td>
+<td>high</td>
+</tr>
+<tr>
+<th>5</th>
+<td>D05</td>
+<td>ExamDomain</td>
+<td>Data Governance &amp; Quality</td>
+<td>medium</td>
+<td>Governança, Unity Catalog, qualidade, permissões e linhagem.</td>
+<td></td>
+<td>medium</td>
+</tr>
+<tr>
+<th>6</th>
+<td>T001</td>
+<td>Topic</td>
+<td>Lakehouse Architecture</td>
+<td>Platform</td>
+<td></td>
+<td>initial_mapping</td>
+<td>high</td>
+</tr>
+<tr>
+<th>7</th>
+<td>T002</td>
+<td>Topic</td>
+<td>Databricks Workspace</td>
+<td>Platform</td>
+<td></td>
+<td>not_started</td>
+<td>medium</td>
+</tr>
+<tr>
+<th>8</th>
+<td>T003</td>
+<td>Topic</td>
+<td>Compute</td>
+<td>Platform</td>
+<td></td>
+<td>not_started</td>
+<td>medium</td>
+</tr>
+<tr>
+<th>9</th>
+<td>T004</td>
+<td>Topic</td>
+<td>SQL Warehouse</td>
+<td>Platform</td>
+<td></td>
+<td>not_started</td>
+<td>medium</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 10. Consolidação dos relacionamentos</strong></font></p>
+<font color="#66666" size="2">
+<ul>
+<li><p>Agora vamos consolidar todas as arestas em uma tabela única <code>edges_all</code>.</p>
+</li>
+<li><p>Essa tabela representa a espinha dorsal do grafo.</p>
+</li>
+</ul>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">edges_all = pd.concat(
+    [
+        certification_domain_edges,
+        domain_topic_edges,
+        topic_subtopic_edges,
+        prerequisite_edges,
+        notebook_topic_edges,
+        lab_topic_edges,
+        resource_topic_edges,
+        skill_topic_edges,
+        study_session_topic_edges,
+        snapshot_topic_edges,
+    ],
+    ignore_index=True,
+)
+
+edges_all.insert(0, "edge_id", [f"E{i:04d}" for i in range(1, len(edges_all) + 1)])
+</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">edges_all.head(10)</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>edge_id</th>
+<th>source_id</th>
+<th>source_label</th>
+<th>relationship</th>
+<th>target_id</th>
+<th>target_label</th>
+<th>weight</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>E0001</td>
+<td>CERT_DEA_001</td>
+<td>Certification</td>
+<td>HAS_DOMAIN</td>
+<td>D01</td>
+<td>ExamDomain</td>
+<td>0.10</td>
+<td>A certificação cobre o domínio Databricks Intelligence Platform.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>E0002</td>
+<td>CERT_DEA_001</td>
+<td>Certification</td>
+<td>HAS_DOMAIN</td>
+<td>D02</td>
+<td>ExamDomain</td>
+<td>0.30</td>
+<td>A certificação cobre o domínio Development and Ingestion.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>E0003</td>
+<td>CERT_DEA_001</td>
+<td>Certification</td>
+<td>HAS_DOMAIN</td>
+<td>D03</td>
+<td>ExamDomain</td>
+<td>0.31</td>
+<td>A certificação cobre o domínio Data Processing &amp; Transformations.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>E0004</td>
+<td>CERT_DEA_001</td>
+<td>Certification</td>
+<td>HAS_DOMAIN</td>
+<td>D04</td>
+<td>ExamDomain</td>
+<td>0.18</td>
+<td>A certificação cobre o domínio Productionizing Data Pipelines.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>E0005</td>
+<td>CERT_DEA_001</td>
+<td>Certification</td>
+<td>HAS_DOMAIN</td>
+<td>D05</td>
+<td>ExamDomain</td>
+<td>0.11</td>
+<td>A certificação cobre o domínio Data Governance &amp; Quality.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>E0006</td>
+<td>D01</td>
+<td>ExamDomain</td>
+<td>COVERS</td>
+<td>T001</td>
+<td>Topic</td>
+<td>1.00</td>
+<td>O domínio D01 cobre o tópico Lakehouse Architecture.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>E0007</td>
+<td>D01</td>
+<td>ExamDomain</td>
+<td>COVERS</td>
+<td>T002</td>
+<td>Topic</td>
+<td>1.00</td>
+<td>O domínio D01 cobre o tópico Databricks Workspace.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>E0008</td>
+<td>D01</td>
+<td>ExamDomain</td>
+<td>COVERS</td>
+<td>T003</td>
+<td>Topic</td>
+<td>1.00</td>
+<td>O domínio D01 cobre o tópico Compute.</td>
+</tr>
+<tr>
+<th>8</th>
+<td>E0009</td>
+<td>D01</td>
+<td>ExamDomain</td>
+<td>COVERS</td>
+<td>T004</td>
+<td>Topic</td>
+<td>1.00</td>
+<td>O domínio D01 cobre o tópico SQL Warehouse.</td>
+</tr>
+<tr>
+<th>9</th>
+<td>E0010</td>
+<td>D01</td>
+<td>ExamDomain</td>
+<td>COVERS</td>
+<td>T005</td>
+<td>Topic</td>
+<td>1.00</td>
+<td>O domínio D01 cobre o tópico Notebooks.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 11. Validação de qualidade</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Antes de exportar os CSVs, vamos validar:<ul>
+<li>duplicidade de IDs de nós;</li>
+<li>relacionamentos com origem inexistente;</li>
+<li>relacionamentos com destino inexistente;</li>
+<li>quantidade de nós por tipo;</li>
+<li>quantidade de relacionamentos por tipo.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">duplicated_nodes = nodes_all[nodes_all.duplicated(subset=["node_id"], keep=False)]
+
+node_ids = set(nodes_all["node_id"])
+
+orphan_sources = sorted(set(edges_all["source_id"]) - node_ids)
+orphan_targets = sorted(set(edges_all["target_id"]) - node_ids)
+
+qa_summary = pd.DataFrame(
+    [
+        {
+            "check": "Duplicated node IDs",
+            "result": len(duplicated_nodes),
+            "status": "OK" if len(duplicated_nodes) == 0 else "REVIEW",
+        },
+        {
+            "check": "Orphan source IDs",
+            "result": len(orphan_sources),
+            "status": "OK" if len(orphan_sources) == 0 else "REVIEW",
+        },
+        {
+            "check": "Orphan target IDs",
+            "result": len(orphan_targets),
+            "status": "OK" if len(orphan_targets) == 0 else "REVIEW",
+        },
+        {
+            "check": "Total nodes",
+            "result": len(nodes_all),
+            "status": "INFO",
+        },
+        {
+            "check": "Total edges",
+            "result": len(edges_all),
+            "status": "INFO",
+        },
+    ]
+)
+
+qa_summary</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>check</th>
+<th>result</th>
+<th>status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>Duplicated node IDs</td>
+<td>0</td>
+<td>OK</td>
+</tr>
+<tr>
+<th>1</th>
+<td>Orphan source IDs</td>
+<td>0</td>
+<td>OK</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Orphan target IDs</td>
+<td>0</td>
+<td>OK</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Total nodes</td>
+<td>93</td>
+<td>INFO</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Total edges</td>
+<td>172</td>
+<td>INFO</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">nodes_by_label = (
+    nodes_all
+    .groupby("node_label", as_index=False)
+    .agg(total_nodes=("node_id", "count"))
+    .sort_values("total_nodes", ascending=False)
+)
+
+edges_by_type = (
+    edges_all
+    .groupby("relationship", as_index=False)
+    .agg(total_edges=("edge_id", "count"))
+    .sort_values("total_edges", ascending=False)
+)
+</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">display(nodes_by_label)
+display(edges_by_type)</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>node_label</th>
+<th>total_nodes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>9</th>
+<td>Topic</td>
+<td>46</td>
+</tr>
+<tr>
+<th>8</th>
+<td>Subtopic</td>
+<td>20</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Skill</td>
+<td>6</td>
+</tr>
+<tr>
+<th>1</th>
+<td>ExamDomain</td>
+<td>5</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Notebook</td>
+<td>5</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Resource</td>
+<td>4</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Lab</td>
+<td>4</td>
+</tr>
+<tr>
+<th>0</th>
+<td>Certification</td>
+<td>1</td>
+</tr>
+<tr>
+<th>7</th>
+<td>StudySession</td>
+<td>1</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Snapshot</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>relationship</th>
+<th>total_edges</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>CAPTURES_STATUS_OF</td>
+<td>46</td>
+</tr>
+<tr>
+<th>1</th>
+<td>COVERS</td>
+<td>46</td>
+</tr>
+<tr>
+<th>3</th>
+<td>HAS_SUBTOPIC</td>
+<td>20</td>
+</tr>
+<tr>
+<th>6</th>
+<td>PREREQUISITE_FOR</td>
+<td>15</td>
+</tr>
+<tr>
+<th>8</th>
+<td>SUPPORTED_BY</td>
+<td>11</td>
+</tr>
+<tr>
+<th>9</th>
+<td>TEACHES</td>
+<td>10</td>
+</tr>
+<tr>
+<th>5</th>
+<td>PRACTICES</td>
+<td>8</td>
+</tr>
+<tr>
+<th>4</th>
+<td>IMPLEMENTS</td>
+<td>7</td>
+</tr>
+<tr>
+<th>2</th>
+<td>HAS_DOMAIN</td>
+<td>5</td>
+</tr>
+<tr>
+<th>7</th>
+<td>STUDIED</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">assert duplicated_nodes.empty, "Existem IDs duplicados em nodes_all."
+assert len(orphan_sources) == 0, f"Existem source_ids órfãos: {orphan_sources}"
+assert len(orphan_targets) == 0, f"Existem target_ids órfãos: {orphan_targets}"
+
+print("Validação concluída com sucesso.")</code></pre>
+</div>
+<div class="output-stream">
+<pre>Validação concluída com sucesso.
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 12. Exportação dos CSVs</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Nesta etapa, salvaremos os arquivos em:<ul>
+<li><code>data/processed/</code></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Esses arquivos serão usados nos próximos notebooks para visualização, carga em grafo e análise de evolução.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">tables_to_export = {
+    "certifications.csv": certifications,
+    "exam_domains.csv": exam_domains,
+    "topics.csv": topics,
+    "subtopics.csv": subtopics,
+    "resources.csv": resources,
+    "notebooks.csv": notebooks,
+    "labs.csv": labs,
+    "skills.csv": skills,
+    "study_sessions.csv": study_sessions,
+    "snapshots.csv": snapshots,
+    "topic_progress_snapshot.csv": topic_progress_snapshot,
+    "nodes_all.csv": nodes_all,
+    "edges_all.csv": edges_all,
+    "relationship_types_summary.csv": edges_by_type,
+    "node_labels_summary.csv": nodes_by_label,
+}
+
+manifest_rows = []
+
+for filename, df in tables_to_export.items():
+    manifest_rows.append(save_table(df, filename))
+
+export_manifest = pd.DataFrame(manifest_rows)
+
+manifest_path = PROCESSED_DIR / "export_manifest.csv"
+export_manifest.to_csv(manifest_path, index=False, encoding="utf-8")
+
+export_manifest</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>filename</th>
+<th>path</th>
+<th>rows</th>
+<th>columns</th>
+<th>export_date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>certifications.csv</td>
+<td>D:\_DS-Projects\Data-Science\databricks-learning-kg\data\processed\certifications.csv</td>
+<td>1</td>
+<td>10</td>
+<td>2026-04-27</td>
+</tr>
+<tr>
+<th>1</th>
+<td>exam_domains.csv</td>
+<td>D:\_DS-Projects\Data-Science\databricks-learning-kg\data\processed\exam_domains.csv</td>
+<td>5</td>
+<td>5</td>
+<td>2026-04-27</td>
+</tr>
+<tr>
+<th>2</th>
+<td>topics.csv</td>
+<td>D:\_DS-Projects\Data-Science\databricks-learning-kg\data\processed\topics.csv</td>
+<td>46</td>
+<td>12</td>
+<td>2026-04-27</td>
+</tr>
+<tr>
+<th>3</th>
+<td>subtopics.csv</td>
+<td>D:\_DS-Projects\Data-Science\databricks-learning-kg\data\processed\subtopics.csv</td>
+<td>20</td>
+<td>4</td>
+<td>2026-04-27</td>
+</tr>
+<tr>
+<th>4</th>
+<td>resources.csv</td>
+<td>D:\_DS-Projects\Data-Science\databricks-learning-kg\data\processed\resources.csv</td>
+<td>4</td>
+<td>6</td>
+<td>2026-04-27</td>
+</tr>
+<tr>
+<th>5</th>
+<td>notebooks.csv</td>
+<td>D:\_DS-Projects\Data-Science\databricks-learning-kg\data\processed\notebooks.csv</td>
+<td>5</td>
+<td>5</td>
+<td>2026-04-27</td>
+</tr>
+<tr>
+<th>6</th>
+<td>labs.csv</td>
+<td>D:\_DS-Projects\Data-Science\databricks-learning-kg\data\processed\labs.csv</td>
+<td>4</td>
+<td>4</td>
+<td>2026-04-27</td>
+</tr>
+<tr>
+<th>7</th>
+<td>skills.csv</td>
+<td>D:\_DS-Projects\Data-Science\databricks-learning-kg\data\processed\skills.csv</td>
+<td>6</td>
+<td>5</td>
+<td>2026-04-27</td>
+</tr>
+<tr>
+<th>8</th>
+<td>study_sessions.csv</td>
+<td>D:\_DS-Projects\Data-Science\databricks-learning-kg\data\processed\study_sessions.csv</td>
+<td>1</td>
+<td>8</td>
+<td>2026-04-27</td>
+</tr>
+<tr>
+<th>9</th>
+<td>snapshots.csv</td>
+<td>D:\_DS-Projects\Data-Science\databricks-learning-kg\data\processed\snapshots.csv</td>
+<td>1</td>
+<td>9</td>
+<td>2026-04-27</td>
+</tr>
+<tr>
+<th>10</th>
+<td>topic_progress_snapshot.csv</td>
+<td>D:\_DS-Projects\Data-Science\databricks-learning-kg\data\processed\topic_progress_snapshot.csv</td>
+<td>46</td>
+<td>10</td>
+<td>2026-04-27</td>
+</tr>
+<tr>
+<th>11</th>
+<td>nodes_all.csv</td>
+<td>D:\_DS-Projects\Data-Science\databricks-learning-kg\data\processed\nodes_all.csv</td>
+<td>93</td>
+<td>7</td>
+<td>2026-04-27</td>
+</tr>
+<tr>
+<th>12</th>
+<td>edges_all.csv</td>
+<td>D:\_DS-Projects\Data-Science\databricks-learning-kg\data\processed\edges_all.csv</td>
+<td>172</td>
+<td>8</td>
+<td>2026-04-27</td>
+</tr>
+<tr>
+<th>13</th>
+<td>relationship_types_summary.csv</td>
+<td>D:\_DS-Projects\Data-Science\databricks-learning-kg\data\processed\relationship_types_summary.csv</td>
+<td>10</td>
+<td>2</td>
+<td>2026-04-27</td>
+</tr>
+<tr>
+<th>14</th>
+<td>node_labels_summary.csv</td>
+<td>D:\_DS-Projects\Data-Science\databricks-learning-kg\data\processed\node_labels_summary.csv</td>
+<td>10</td>
+<td>2</td>
+<td>2026-04-27</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">sorted([path.name for path in PROCESSED_DIR.glob("*.csv")])</code></pre>
+</div>
+<div class="output-text">
+<pre>['certifications.csv',
+ 'edges_all.csv',
+ 'exam_domains.csv',
+ 'export_manifest.csv',
+ 'labs.csv',
+ 'node_labels_summary.csv',
+ 'nodes_all.csv',
+ 'notebooks.csv',
+ 'relationship_types_summary.csv',
+ 'resources.csv',
+ 'skills.csv',
+ 'snapshots.csv',
+ 'study_sessions.csv',
+ 'subtopics.csv',
+ 'topic_progress_snapshot.csv',
+ 'topics.csv']</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 13. Documentação automática da ontologia</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Além dos CSVs, vamos gerar uma documentação simples em Markdown com os principais números do grafo inicial.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">ontology_doc = f"""# Ontology v0.1 — Databricks Learning Knowledge Graph
+
+## Projeto
+
+{PROJECT_NAME}
+
+## Certificação alvo
+
+{CERTIFICATION_NAME}
+
+## Data de geração
+
+{date.today().isoformat()}
+
+## Visão geral
+
+Este documento descreve a primeira versão materializada da ontologia do projeto.
+
+## Quantidade de nós por tipo
+
+{nodes_by_label.to_markdown(index=False)}
+
+## Quantidade de relacionamentos por tipo
+
+{edges_by_type.to_markdown(index=False)}
+
+## Arquivos gerados
+
+{export_manifest[["filename", "rows", "columns"]].to_markdown(index=False)}
+
+## Observação
+
+Esta é a versão inicial da ontologia como dados.  
+Nos próximos notebooks, essa estrutura poderá ser visualizada como grafo, carregada no Neo4j e enriquecida com novos snapshots de progresso.
+"""
+
+ontology_path = DOCS_DIR / "ontology_v01.md"
+ontology_path.write_text(ontology_doc, encoding="utf-8")
+
+ontology_path</code></pre>
+</div>
+<div class="output-text">
+<pre>WindowsPath('D:/_DS-Projects/Data-Science/databricks-learning-kg/docs/ontology_v01.md')</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 14. Conclusão executiva</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Este notebook materializou a ontologia inicial do projeto Databricks Certification Learning Knowledge Graph.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Foram criados:<ul>
+<li>nós de certificação;</li>
+<li>domínios do exame;</li>
+<li>tópicos técnicos;</li>
+<li>subtópicos;</li>
+<li>recursos;</li>
+<li>notebooks;</li>
+<li>labs;</li>
+<li>skills;</li>
+<li>sessão inicial de estudo;</li>
+<li>snapshot inicial;</li>
+<li>relacionamentos estruturais;</li>
+<li>relacionamentos de aprendizagem;</li>
+<li>relacionamentos de portfólio;</li>
+<li>CSV consolidado de nós;</li>
+<li>CSV consolidado de relacionamentos;</li>
+<li>manifesto de exportação;</li>
+<li>documentação Markdown da ontologia.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Próximo passo</strong><ul>
+<li>O próximo notebook será:</li>
+<li><code>Notebook 02 — Graph Building: visualização inicial do KG com Python</code></li>
+<li>Nele vamos carregar <code>nodes_all.csv</code> e <code>edges_all.csv</code>, construir o grafo com NetworkX e gerar uma primeira visualização navegável.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">%reload_ext watermark 
+%watermark -a "Roberto-SSoares-LfLngLrnng" -d -t -u --iversions -v -m -h</code></pre>
+</div>
+<div class="output-stream">
+<pre>Author: Roberto-SSoares-LfLngLrnng
+
+Last updated: 2026-04-27 16:41:58
+
+Python implementation: CPython
+Python version       : 3.12.12
+IPython version      : 9.13.0
+
+Compiler    : MSC v.1944 64 bit (AMD64)
+OS          : Windows
+Release     : 11
+Machine     : AMD64
+Processor   : Intel64 Family 6 Model 158 Stepping 9, GenuineIntel
+CPU cores   : 4
+Architecture: 64bit
+
+Hostname: PC-ROBERTO
+
+pandas  : 3.0.2
+tabulate: 0.10.0
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="6"><strong>Fim</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">#!uv pip install nbconvert -U -q
+!jupyter nbconvert --to html --template-file my-template-html-v10.tpl 01_ontology_as_data_nodes_relationships.ipynb</code></pre>
+</div>
+</div>
+<div class="footer">
+<p>RobertoSSoares-LfLngLrnng — <span id="datetime"></span></p>
+</div>
+<script>
+            document.getElementById("datetime").innerText = new Date().toLocaleString('pt-BR');
+        </script>
+</div>
+</body>
+</html>
