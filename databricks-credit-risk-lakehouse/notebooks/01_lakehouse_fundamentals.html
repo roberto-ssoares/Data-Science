@@ -1,0 +1,2454 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>01_lakehouse_fundamentals</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/jupyterlab/3.6.3/themes/JupyterLab-light-theme.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@300;400;600&amp;family=Reddit+Sans:wght@300;400;600&amp;family=Courier+Prime:wght@400;700&amp;family=Montserrat:wght@300;400;600;700&amp;family=Source+Code+Pro:wght@400&amp;family=Red+Hat+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['\\(', '\\)'], ['$', '$']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+          ignoreHtmlClass: 'tex2jax_ignore',
+          processHtmlClass: 'mathjax_process'
+        }
+      };
+    </script>
+<script async="" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+        :root{
+            --bg:#f5f5f5;
+            --paper:#ffffff;
+            --text:#1f2937;
+            --muted:#6b7280;
+            --border:#d9dde3;
+            --shadow:0 4px 12px rgba(0,0,0,.08);
+            --shadow-soft:0 2px 8px rgba(15,23,42,.06);
+            --md-bg:#f3f2ee;
+            --md-accent:#ff9800;
+            --code-bg:#f7f7f7;
+            --code-accent:#4caf50;
+            --out-bg:#f3f9fa;
+            --out-accent:#2196f3;
+            --stream-bg:#eef8ff;
+            --table-head:#f8fafc;
+            --table-zebra:#f6f8fa;
+            --exec-bg:#f7fbff;
+            --exec-border:#2E86C1;
+            --insight-bg:#f8fffb;
+            --insight-border:#22a06b;
+            --warning-bg:#fffaf2;
+            --warning-border:#f59e0b;
+            --danger-bg:#fff6f6;
+            --danger-border:#ef4444;
+            --metric-bg:#ffffff;
+            --metric-border:#d6e7f7;
+        }
+
+        *{ box-sizing:border-box; }
+
+        body{
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            background:var(--bg);
+            padding:40px 0;
+            color:var(--text);
+            line-height:1.55;
+        }
+
+        .container{
+            max-width:1550px;
+            margin:auto;
+            background:var(--paper);
+            padding:20px 30px 28px;
+            border-radius:8px;
+            box-shadow:var(--shadow);
+        }
+
+        .cell{ margin-bottom:10px; }
+
+        h1.title-header{
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            font-weight:700;
+            color:#8eb4c4;
+            text-transform:uppercase;
+            text-align:center;
+            margin:0 0 24px;
+            letter-spacing:.04em;
+        }
+
+        .markdown{
+            background:var(--md-bg);
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            padding:10px 15px;
+            border-left:5px solid var(--md-accent);
+            border-radius:4px;
+            margin:4px 0 8px;
+            line-height:1.6;
+        }
+        .markdown h1,.markdown h2,.markdown h3,.markdown h4,.markdown h5,.markdown h6{
+            margin-top:0;
+            color:#d64545;
+        }
+        .markdown p:last-child,
+        .markdown ul:last-child,
+        .markdown ol:last-child{ margin-bottom:0; }
+
+        img, svg, figure img{
+            max-width:100%;
+            height:auto;
+            display:block;
+            margin-left:auto;
+            margin-right:auto;
+            border:1px solid #ddd;
+            border-radius:6px;
+            box-shadow:0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        figure{ margin:20px auto; text-align:center; }
+        figure figcaption{ font-size:13px; color:#555; margin-top:6px; }
+
+        .cell-toolbar{
+            display:flex;
+            justify-content:flex-end;
+            margin:0 0 4px;
+            gap:6px;
+            flex-wrap:wrap;
+        }
+        .cell-badge{
+            display:inline-block;
+            background:#eef2f7;
+            border:1px solid #d7dee8;
+            color:#516072;
+            border-radius:999px;
+            font-size:11px;
+            font-weight:600;
+            padding:2px 8px;
+            letter-spacing:.02em;
+        }
+
+        .code_cell{
+            background:var(--code-bg);
+            border-left:5px solid var(--code-accent);
+            padding:6px 8px;
+            margin:4px 0;
+            overflow-x:auto;
+            border-radius:4px;
+        }
+        .code_cell pre,
+        .code_cell .hljs{
+            margin:0;
+            background:transparent !important;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+            white-space:pre;
+        }
+
+        .output-text,
+        .output-stream,
+        .output-error,
+        .output-image,
+        .output-html{
+            margin:4px 0;
+            border-radius:4px;
+            overflow-x:auto;
+        }
+
+        .output-text{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:10px 10px 10px 8px;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+        }
+        .output-text pre{
+            margin:0;
+            white-space:pre-wrap;
+            word-break:break-word;
+            font-family:inherit;
+            font-size:inherit;
+            line-height:inherit;
+        }
+
+        .output-stream{
+            background:var(--stream-bg);
+            border-left:5px solid var(--out-accent);
+            padding:8px 10px;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+        }
+        .output-stream pre{ margin:0; white-space:pre-wrap; word-break:break-word; }
+
+        .output-image{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:10px;
+        }
+
+        .output-html{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:8px 10px;
+            color:var(--text);
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            line-height:1.55;
+            white-space:normal;
+        }
+        .output-html *{ white-space:normal; word-break:normal; max-width:100%; }
+        .output-html p{ margin:0 0 10px; }
+        .output-html p:last-child{ margin-bottom:0; }
+        .output-html h1,.output-html h2,.output-html h3,.output-html h4,.output-html h5,.output-html h6{
+            margin:0 0 10px;
+            color:var(--text);
+            line-height:1.3;
+        }
+        .output-html ul,
+        .output-html ol{ margin:0 0 10px 20px; padding-left:12px; }
+        .output-html li{ margin-bottom:4px; }
+        .output-html li:last-child{ margin-bottom:0; }
+        .output-html code{ font-family:'Red Hat Mono','Noto Sans Mono',monospace; font-size:.95em; }
+        .output-html pre{
+            white-space:pre-wrap;
+            word-break:break-word;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.5;
+            margin:0;
+        }
+
+        .table-output{ padding:8px 10px; }
+        .table-output table,
+        .table-output table.dataframe{
+            border-collapse:collapse;
+            border-spacing:0;
+            width:auto;
+            max-width:100%;
+            margin:0;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.45;
+            color:#263238;
+            background:#fff;
+        }
+        .table-output table th,
+        .table-output table td,
+        .table-output table.dataframe th,
+        .table-output table.dataframe td{
+            padding:8px 10px;
+            border:1px solid var(--border);
+            vertical-align:top;
+            text-align:left;
+        }
+        .table-output table thead,
+        .table-output table.dataframe thead{ background:var(--table-head); font-weight:600; }
+        .table-output table tbody tr:nth-child(even),
+        .table-output table.dataframe tbody tr:nth-child(even){ background:var(--table-zebra); }
+        .table-output .dataframe tbody tr:hover,
+        .table-output table tbody tr:hover{ background:#eef6ff; }
+
+        /* Premium HTML blocks */
+        .output-html .executive-card,
+        .output-html .insight-card,
+        .output-html .warning-card,
+        .output-html .danger-card,
+        .output-html .summary-card{
+            border-radius:10px;
+            padding:14px 16px;
+            box-shadow:var(--shadow-soft);
+            border:1px solid #dbe5ef;
+            margin:4px 0;
+        }
+        .output-html .executive-card{
+            background:var(--exec-bg);
+            border-left:6px solid var(--exec-border);
+        }
+        .output-html .summary-card{
+            background:#f8fbff;
+            border-left:6px solid #64748b;
+        }
+        .output-html .insight-card{
+            background:var(--insight-bg);
+            border-left:6px solid var(--insight-border);
+        }
+        .output-html .warning-card{
+            background:var(--warning-bg);
+            border-left:6px solid var(--warning-border);
+        }
+        .output-html .danger-card{
+            background:var(--danger-bg);
+            border-left:6px solid var(--danger-border);
+        }
+        .output-html .card-title{
+            margin:0 0 10px;
+            font-size:20px;
+            font-weight:700;
+            color:#1f2937;
+            line-height:1.25;
+        }
+        .output-html .card-subtitle{
+            margin:0 0 12px;
+            font-size:13px;
+            font-weight:600;
+            color:#64748b;
+            text-transform:uppercase;
+            letter-spacing:.03em;
+        }
+        .output-html .card-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+            gap:10px;
+            margin:10px 0 12px;
+        }
+        .output-html .metric-card{
+            background:var(--metric-bg);
+            border:1px solid var(--metric-border);
+            border-radius:10px;
+            padding:10px 12px;
+            min-height:82px;
+            box-shadow:0 1px 3px rgba(15,23,42,.05);
+        }
+        .output-html .metric-label{
+            display:block;
+            margin:0 0 6px;
+            font-size:12px;
+            font-weight:700;
+            color:#64748b;
+            text-transform:uppercase;
+            letter-spacing:.03em;
+        }
+        .output-html .metric-value{
+            display:block;
+            font-size:24px;
+            font-weight:700;
+            line-height:1.15;
+            color:#0f172a;
+        }
+        .output-html .metric-note{
+            display:block;
+            margin-top:4px;
+            font-size:12px;
+            color:#6b7280;
+        }
+        .output-html .chip-row{
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px;
+            margin:8px 0 10px;
+        }
+        .output-html .chip{
+            display:inline-flex;
+            align-items:center;
+            background:#edf4ff;
+            border:1px solid #d8e6ff;
+            color:#2457a6;
+            border-radius:999px;
+            padding:4px 10px;
+            font-size:12px;
+            font-weight:600;
+        }
+        .output-html .callout-compact p{ margin-bottom:8px; }
+        .output-html .callout-compact ul,
+        .output-html .callout-compact ol{ margin-bottom:8px; }
+
+        .output-error{
+            background:#fff5f5;
+            border-left:5px solid #ef4444;
+            padding:10px 12px;
+            color:#7f1d1d;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.5;
+        }
+        .output-error pre{ margin:8px 0 0; white-space:pre-wrap; word-break:break-word; }
+
+        .hidden-note{
+            margin:4px 0;
+            padding:6px 10px;
+            border-radius:6px;
+            background:#f8fafc;
+            border:1px dashed #cbd5e1;
+            color:#64748b;
+            font-size:12px;
+            font-weight:600;
+        }
+
+        .footer{
+            text-align:right;
+            margin-top:30px;
+            padding:12px;
+            background:#e9ecef;
+            border-radius:4px;
+            font-size:14px;
+            color:#555;
+        }
+
+        @media (max-width: 768px) {
+            body{ padding:16px 0; }
+            .container{ max-width:100%; padding:14px 16px 20px; border-radius:0; }
+            .output-html,
+            .output-text,
+            .output-stream,
+            .output-image,
+            .output-error,
+            .markdown,
+            .code_cell{ padding-left:10px; padding-right:10px; }
+            .output-html .card-title{ font-size:18px; }
+            .output-html .metric-value{ font-size:20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<h1 class="title-header">01_lakehouse_fundamentals</h1>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#F3F2EE">
+<br/><br/>
+<p style="text-align: center;">
+<font color="#0A1781" size="6">
+<strong>
+                    Databricks Credit Risk Lakehouse - Data Science Project
+                </strong>
+</font>
+</p>
+<p style="text-align: center;">
+<font color="#C58A1E" size="6">
+<strong>
+                    Lakehouse Fundamentals
+                </strong>
+</font>
+</p>
+<p style="text-align: center;">
+<font color="#C58A1E" size="5">
+<strong>
+                    Apresentar o propósito do notebook e posicionar o estudo<br/>dentro da jornada de preparação para a certificação Databricks.
+                </strong>
+</font>
+</p>
+<br/>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#F3F2EE">
+<p style="text-align: right;">
+<font color="#444444" size="4">
+            Roberto SSoares - LfLngLrnng
+      </font>
+</p>
+<p style="text-align: right;"><font color="#444444" size="2">
+<a href="https://www.linkedin.com/in/roberto-dos-santos-soares/">in/roberto-dos-santos-soares</a><br/><a href="https://roberto-ssoares.github.io/meu-portfolio/">Portifólio: roberto-ssoares</a>
+</font></p>
+<p style="text-align: right;">
+<font color="#444444" size="4">
+            " [+] Faturamento [-] Custo [+] Qualidade de vida "
+        </font>
+<br/>
+<font color="#918e8e" size="2">"Mestre Bruno Jardim"
+        </font>
+</p>
+<p style="text-align: right;">
+<font color="#918e8e" size="2">
+</font>
+</p>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 Objetivo</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li><strong>Ações realizadas</strong><ul>
+<li><em>Definição do escopo inicial do notebook.</em></li>
+<li><em>Introdução dos conceitos fundamentais de Lakehouse.</em></li>
+<li><em>Conexão entre arquitetura de dados e risco de crédito.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>Antes de implementar pipelines, tabelas Delta, notebooks produtivos e workflows, é necessário compreender os conceitos arquiteturais que sustentam a plataforma Databricks.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultados esperados</strong><ul>
+<li>Ao final deste notebook, teremos <strong>uma visão clara sobre Data Lake, Data Warehouse, Lakehouse, Delta Lake e Arquitetura Medalhão aplicada a um projeto de risco de crédito</strong>.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">#!uv pip install watermark -q -U
+#!uv pip install tabulate -q -U</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">from datetime import date
+from pathlib import Path
+import tabulate
+
+import pandas as pd</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Versões dos pacotes usados neste jupyter notebook
+%reload_ext watermark
+%watermark -a "RobertoSSoares-LfLngLrnng"</code></pre>
+</div>
+<div class="output-stream">
+<pre>Author: RobertoSSoares-LfLngLrnng
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">pd.set_option("display.max_columns", 100)
+pd.set_option("display.max_colwidth", 120)</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">PROJECT_NAME = "Databricks Credit Risk Lakehouse"
+NOTEBOOK_NAME = "01_lakehouse_fundamentals"
+STUDY_DATE = date.today().isoformat()
+
+BASE_DIR = Path.cwd().parent if Path.cwd().name == "notebooks" else Path.cwd()
+
+DATA_DIR = BASE_DIR / "data"
+RAW_DIR = DATA_DIR / "raw"
+BRONZE_DIR = DATA_DIR / "bronze"
+SILVER_DIR = DATA_DIR / "silver"
+GOLD_DIR = DATA_DIR / "gold"
+EXPORTS_DIR = DATA_DIR / "exports"
+DOCS_DIR = BASE_DIR / "docs"
+
+for directory in [
+    DATA_DIR,
+    RAW_DIR,
+    BRONZE_DIR,
+    SILVER_DIR,
+    GOLD_DIR,
+    EXPORTS_DIR,
+    DOCS_DIR,
+]:
+    directory.mkdir(parents=True, exist_ok=True)
+
+{
+    "project": PROJECT_NAME,
+    "notebook": NOTEBOOK_NAME,
+    "study_date": STUDY_DATE,
+    "base_dir": str(BASE_DIR),
+}</code></pre>
+</div>
+<div class="output-text">
+<pre>{'project': 'Databricks Credit Risk Lakehouse',
+ 'notebook': '01_lakehouse_fundamentals',
+ 'study_date': '2026-04-27',
+ 'base_dir': 'D:\\_DS-Projects\\Data-Science\\databricks-credit-risk-lakehouse'}</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 1. Contexto do projeto</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Este projeto tem como objetivo construir um Lakehouse analítico para dados de risco de crédito.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A ideia é criar uma jornada prática de estudo em Databricks, conectando:<ul>
+<li>arquitetura Lakehouse;</li>
+<li>ingestão de dados;</li>
+<li>arquitetura medalhão;</li>
+<li>Delta Lake;</li>
+<li>Spark SQL;</li>
+<li>PySpark;</li>
+<li>qualidade de dados;</li>
+<li>governança;</li>
+<li>preparação de dados para análise de risco.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>O domínio escolhido é risco de crédito porque permite criar uma narrativa forte de negócio:</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><em>Como organizar dados confiáveis para apoiar análise de inadimplência, concessão de crédito e segmentação de risco?</em></li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 2. O que é um Data Lake?</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Um <strong>Data Lake é uma arquitetura de armazenamento voltada para guardar grandes volumes de dados em formatos variados</strong>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Ele pode armazenar:<ul>
+<li><em>arquivos CSV;</em></li>
+<li><em>arquivos JSON;</em></li>
+<li><em>arquivos Parquet;</em></li>
+<li><em>logs;</em></li>
+<li><em>imagens;</em></li>
+<li><em>dados semiestruturados;</em></li>
+<li><em>dados ainda não tratados.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Visão prática</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>No contexto deste projeto, o Data Lake representa a área onde os dados brutos de crédito chegam antes de qualquer tratamento.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Exemplo:<ul>
+<li>cadastro de clientes;</li>
+<li>contratos;</li>
+<li>pagamentos;</li>
+<li>atrasos;</li>
+<li>transações;</li>
+<li>histórico de crédito;</li>
+<li>eventos de cobrança.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 3. O que é um Data Warehouse?</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Um <strong>Data Warehouse é uma arquitetura orientada a dados estruturados, modelados e preparados para análise</strong>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Ele normalmente é usado para:<ul>
+<li><em>relatórios executivos;</em></li>
+<li><em>dashboards;</em></li>
+<li><em>indicadores de negócio;</em></li>
+<li><em>consultas SQL;</em></li>
+<li><em>análises históricas;</em></li>
+<li><em>dados já tratados e confiáveis.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Visão prática</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>No contexto de risco de crédito, o Data Warehouse seria usado para responder perguntas como:<ul>
+<li>Qual é a taxa de inadimplência por segmento?</li>
+<li>Qual é o volume de crédito por faixa de renda?</li>
+<li>Qual é o percentual de atraso por safra?</li>
+<li>Quais clientes possuem maior exposição ao risco?</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 4. O que é um Lakehouse?</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li><strong>Lakehouse é uma arquitetura que combina características de Data Lake e Data Warehouse</strong>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A proposta é permitir que dados brutos, tratados e analíticos convivam em uma arquitetura única, com suporte a:<ul>
+<li><em>armazenamento escalável;</em></li>
+<li><em>transações;</em></li>
+<li><em>tabelas confiáveis;</em></li>
+<li><em>processamento distribuído;</em></li>
+<li><em>SQL;</em></li>
+<li><em>machine learning;</em></li>
+<li><em>governança;</em></li>
+<li><em>versionamento;</em></li>
+<li><em>pipelines analíticos.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Interpretação simples</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>O Lakehouse tenta resolver uma dor comum:<ul>
+<li>O Data Lake é flexível, mas pode virar bagunça.</li>
+<li>O Data Warehouse é organizado, mas pode ser caro e menos flexível.</li>
+<li>O Lakehouse busca unir flexibilidade com governança e confiabilidade.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">architecture_comparison = pd.DataFrame(
+    [
+        {
+            "architecture": "Data Lake",
+            "main_purpose": "Armazenar grandes volumes de dados brutos e variados.",
+            "strength": "Flexibilidade e baixo custo de armazenamento.",
+            "risk": "Pode virar um data swamp se não houver governança.",
+            "credit_risk_example": "Receber arquivos brutos de clientes, contratos e pagamentos.",
+        },
+        {
+            "architecture": "Data Warehouse",
+            "main_purpose": "Organizar dados estruturados para análise e BI.",
+            "strength": "Consistência, performance analítica e modelagem clara.",
+            "risk": "Menor flexibilidade para dados brutos e semiestruturados.",
+            "credit_risk_example": "Gerar indicadores consolidados de inadimplência por segmento.",
+        },
+        {
+            "architecture": "Lakehouse",
+            "main_purpose": "Unificar dados brutos, tratados e analíticos em uma arquitetura governada.",
+            "strength": "Combina flexibilidade do Data Lake com confiabilidade analítica.",
+            "risk": "Exige boas práticas de organização, governança e engenharia.",
+            "credit_risk_example": "Construir pipeline Raw → Bronze → Silver → Gold para análise de risco.",
+        },
+    ]
+)
+
+architecture_comparison</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>architecture</th>
+<th>main_purpose</th>
+<th>strength</th>
+<th>risk</th>
+<th>credit_risk_example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>Data Lake</td>
+<td>Armazenar grandes volumes de dados brutos e variados.</td>
+<td>Flexibilidade e baixo custo de armazenamento.</td>
+<td>Pode virar um data swamp se não houver governança.</td>
+<td>Receber arquivos brutos de clientes, contratos e pagamentos.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>Data Warehouse</td>
+<td>Organizar dados estruturados para análise e BI.</td>
+<td>Consistência, performance analítica e modelagem clara.</td>
+<td>Menor flexibilidade para dados brutos e semiestruturados.</td>
+<td>Gerar indicadores consolidados de inadimplência por segmento.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Lakehouse</td>
+<td>Unificar dados brutos, tratados e analíticos em uma arquitetura governada.</td>
+<td>Combina flexibilidade do Data Lake com confiabilidade analítica.</td>
+<td>Exige boas práticas de organização, governança e engenharia.</td>
+<td>Construir pipeline Raw → Bronze → Silver → Gold para análise de risco.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 5. O papel da Databricks</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A <strong>Databricks é uma plataforma de dados e IA orientada à arquitetura Lakehouse</strong>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Dentro da jornada deste projeto, a Databricks será entendida como o ambiente onde podemos:<ul>
+<li><em>criar notebooks;</em></li>
+<li><em>executar código SQL, Python e PySpark;</em></li>
+<li><em>processar dados com Spark;</em></li>
+<li><em>trabalhar com Delta Lake;</em></li>
+<li><em>organizar dados por catálogo, schema e tabela;</em></li>
+<li><em>criar jobs e workflows;</em></li>
+<li><em>aplicar governança;</em></li>
+<li><em>preparar dados para análise e machine learning.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Componentes importantes</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Neste primeiro momento, precisamos entender alguns termos:<ul>
+<li><strong>Workspace</strong>: ambiente de trabalho.</li>
+<li><strong>Notebook</strong>: documento executável com código, texto e resultados.</li>
+<li><strong>Compute</strong>: recurso computacional usado para executar processamento.</li>
+<li><strong>Catalog</strong>: camada superior de organização e governança.</li>
+<li><strong>Schema</strong>: agrupamento lógico dentro de um catálogo.</li>
+<li><strong>Table</strong>: objeto tabular consultável.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">databricks_components = pd.DataFrame(
+    [
+        {
+            "component": "Workspace",
+            "simple_definition": "Ambiente onde usuários organizam notebooks, dados, jobs e recursos.",
+            "credit_risk_usage": "Organizar notebooks do projeto de risco de crédito.",
+        },
+        {
+            "component": "Notebook",
+            "simple_definition": "Documento interativo para executar código e documentar análises.",
+            "credit_risk_usage": "Criar notebooks de ingestão, transformação, qualidade e análise.",
+        },
+        {
+            "component": "Compute",
+            "simple_definition": "Recurso computacional que executa workloads.",
+            "credit_risk_usage": "Executar transformações em bases de clientes, contratos e pagamentos.",
+        },
+        {
+            "component": "Catalog",
+            "simple_definition": "Nível superior de organização e governança de dados.",
+            "credit_risk_usage": "Separar objetos do projeto em um catálogo controlado.",
+        },
+        {
+            "component": "Schema",
+            "simple_definition": "Agrupamento lógico de tabelas dentro de um catálogo.",
+            "credit_risk_usage": "Agrupar tabelas de bronze, silver e gold.",
+        },
+        {
+            "component": "Table",
+            "simple_definition": "Objeto tabular consultável via SQL ou APIs.",
+            "credit_risk_usage": "Representar clientes, contratos, pagamentos e features de risco.",
+        },
+    ]
+)
+
+databricks_components</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>component</th>
+<th>simple_definition</th>
+<th>credit_risk_usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>Workspace</td>
+<td>Ambiente onde usuários organizam notebooks, dados, jobs e recursos.</td>
+<td>Organizar notebooks do projeto de risco de crédito.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>Notebook</td>
+<td>Documento interativo para executar código e documentar análises.</td>
+<td>Criar notebooks de ingestão, transformação, qualidade e análise.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Compute</td>
+<td>Recurso computacional que executa workloads.</td>
+<td>Executar transformações em bases de clientes, contratos e pagamentos.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Catalog</td>
+<td>Nível superior de organização e governança de dados.</td>
+<td>Separar objetos do projeto em um catálogo controlado.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Schema</td>
+<td>Agrupamento lógico de tabelas dentro de um catálogo.</td>
+<td>Agrupar tabelas de bronze, silver e gold.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Table</td>
+<td>Objeto tabular consultável via SQL ou APIs.</td>
+<td>Representar clientes, contratos, pagamentos e features de risco.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 6. O que é Delta Lake?</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li><strong>Delta Lake é uma camada de armazenamento transacional usada em arquiteturas Lakehouse</strong>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Ele adiciona recursos importantes sobre arquivos de dados, como:<ul>
+<li><em>transações ACID;</em></li>
+<li><em>versionamento;</em></li>
+<li><em>histórico de alterações;</em></li>
+<li><em>atualização e deleção de registros;</em></li>
+<li><em>suporte a operações incrementais;</em></li>
+<li><em>controle de schema;</em></li>
+<li><em>maior confiabilidade para pipelines.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Por que isso importa?</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Em projetos de risco de crédito, confiabilidade dos dados é crítica.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Não basta apenas armazenar arquivos. É necessário controlar:<ul>
+<li>quais dados entraram;</li>
+<li>quando entraram;</li>
+<li>se foram corrigidos;</li>
+<li>qual versão está sendo analisada;</li>
+<li>se a tabela pode ser reproduzida;</li>
+<li>se o pipeline é auditável.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">delta_lake_capabilities = pd.DataFrame(
+    [
+        {
+            "capability": "ACID Transactions",
+            "meaning": "Garante consistência em operações de escrita e atualização.",
+            "credit_risk_relevance": "Evita tabelas inconsistentes durante atualização de contratos ou pagamentos.",
+        },
+        {
+            "capability": "Schema Enforcement",
+            "meaning": "Ajuda a impedir gravação de dados incompatíveis com o schema esperado.",
+            "credit_risk_relevance": "Reduz risco de colunas críticas entrarem com tipos incorretos.",
+        },
+        {
+            "capability": "Schema Evolution",
+            "meaning": "Permite evolução controlada da estrutura da tabela.",
+            "credit_risk_relevance": "Permite adicionar novas variáveis de risco sem quebrar o pipeline.",
+        },
+        {
+            "capability": "Time Travel",
+            "meaning": "Permite consultar versões anteriores da tabela.",
+            "credit_risk_relevance": "Ajuda em auditoria e reprodutibilidade de análises.",
+        },
+        {
+            "capability": "MERGE INTO",
+            "meaning": "Permite operações de upsert em tabelas Delta.",
+            "credit_risk_relevance": "Útil para atualizar cadastros, contratos e status de pagamento.",
+        },
+    ]
+)
+
+delta_lake_capabilities</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>capability</th>
+<th>meaning</th>
+<th>credit_risk_relevance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>ACID Transactions</td>
+<td>Garante consistência em operações de escrita e atualização.</td>
+<td>Evita tabelas inconsistentes durante atualização de contratos ou pagamentos.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>Schema Enforcement</td>
+<td>Ajuda a impedir gravação de dados incompatíveis com o schema esperado.</td>
+<td>Reduz risco de colunas críticas entrarem com tipos incorretos.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Schema Evolution</td>
+<td>Permite evolução controlada da estrutura da tabela.</td>
+<td>Permite adicionar novas variáveis de risco sem quebrar o pipeline.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Time Travel</td>
+<td>Permite consultar versões anteriores da tabela.</td>
+<td>Ajuda em auditoria e reprodutibilidade de análises.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>MERGE INTO</td>
+<td>Permite operações de upsert em tabelas Delta.</td>
+<td>Útil para atualizar cadastros, contratos e status de pagamento.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 7. Arquitetura Medalhão</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A <strong>Arquitetura Medalhão organiza dados em camadas progressivas de qualidade e valor analítico</strong>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Neste projeto, usaremos a seguinte lógica:<ul>
+<li>Raw → Bronze → Silver → Gold</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Raw - Camada de chegada dos arquivos originais.</li>
+<li>Bronze - Camada de dados ingeridos, preservando o máximo possível da estrutura original.</li>
+<li>Silver - Camada de dados limpos, padronizados e integrados.</li>
+<li>Gold - Camada de dados prontos para consumo analítico, indicadores, features ou modelos.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">medallion_layers = pd.DataFrame(
+    [
+        {
+            "layer": "Raw",
+            "purpose": "Guardar arquivos originais recebidos.",
+            "data_quality_level": "Baixo",
+            "transformation_level": "Nenhuma ou mínima",
+            "credit_risk_example": "Arquivo original de clientes ou contratos recebido da fonte.",
+        },
+        {
+            "layer": "Bronze",
+            "purpose": "Registrar dados ingeridos de forma rastreável.",
+            "data_quality_level": "Inicial",
+            "transformation_level": "Padronização leve e metadados de ingestão.",
+            "credit_risk_example": "Tabela bronze_customers com dados brutos carregados.",
+        },
+        {
+            "layer": "Silver",
+            "purpose": "Limpar, tipar, deduplicar e integrar dados.",
+            "data_quality_level": "Intermediário/alto",
+            "transformation_level": "Tratamento, joins, regras de negócio e qualidade.",
+            "credit_risk_example": "Tabela silver_customers_clean com clientes tratados.",
+        },
+        {
+            "layer": "Gold",
+            "purpose": "Entregar dados prontos para análise, BI ou ML.",
+            "data_quality_level": "Alto",
+            "transformation_level": "Agregação, features, KPIs e modelagem analítica.",
+            "credit_risk_example": "Tabela gold_credit_risk_features com variáveis para análise de risco.",
+        },
+    ]
+)
+
+medallion_layers</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>layer</th>
+<th>purpose</th>
+<th>data_quality_level</th>
+<th>transformation_level</th>
+<th>credit_risk_example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>Raw</td>
+<td>Guardar arquivos originais recebidos.</td>
+<td>Baixo</td>
+<td>Nenhuma ou mínima</td>
+<td>Arquivo original de clientes ou contratos recebido da fonte.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>Bronze</td>
+<td>Registrar dados ingeridos de forma rastreável.</td>
+<td>Inicial</td>
+<td>Padronização leve e metadados de ingestão.</td>
+<td>Tabela bronze_customers com dados brutos carregados.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Silver</td>
+<td>Limpar, tipar, deduplicar e integrar dados.</td>
+<td>Intermediário/alto</td>
+<td>Tratamento, joins, regras de negócio e qualidade.</td>
+<td>Tabela silver_customers_clean com clientes tratados.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Gold</td>
+<td>Entregar dados prontos para análise, BI ou ML.</td>
+<td>Alto</td>
+<td>Agregação, features, KPIs e modelagem analítica.</td>
+<td>Tabela gold_credit_risk_features com variáveis para análise de risco.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 8. Aplicação ao domínio de risco de crédito</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Agora conectamos a arquitetura com o problema de negócio.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Um projeto de risco de crédito precisa organizar dados para responder perguntas como:<ul>
+<li><em>Quem são os clientes?</em></li>
+<li><em>Qual é a renda declarada?</em></li>
+<li><em>Quais contratos estão ativos?</em></li>
+<li><em>Qual é o histórico de pagamentos?</em></li>
+<li><em>Existe atraso recente?</em></li>
+<li><em>Qual é a exposição total ao crédito?</em></li>
+<li><em>Qual é o perfil de risco do cliente?</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essas perguntas exigem dados confiáveis, rastreáveis e bem modelados.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">credit_risk_entities = pd.DataFrame(
+    [
+        {
+            "entity": "customers",
+            "description": "Cadastro de clientes.",
+            "possible_columns": "customer_id, age, income, employment_type, region",
+            "business_value": "Permite segmentar o perfil do cliente.",
+        },
+        {
+            "entity": "contracts",
+            "description": "Contratos de crédito.",
+            "possible_columns": "contract_id, customer_id, product_type, principal_amount, interest_rate, start_date",
+            "business_value": "Permite medir exposição e características do crédito.",
+        },
+        {
+            "entity": "payments",
+            "description": "Histórico de pagamentos.",
+            "possible_columns": "payment_id, contract_id, due_date, payment_date, amount_paid, days_late",
+            "business_value": "Permite avaliar comportamento de pagamento e atraso.",
+        },
+        {
+            "entity": "credit_events",
+            "description": "Eventos relevantes de crédito.",
+            "possible_columns": "event_id, customer_id, event_type, event_date, event_value",
+            "business_value": "Permite rastrear eventos de risco, renegociação ou cobrança.",
+        },
+    ]
+)
+
+credit_risk_entities</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>entity</th>
+<th>description</th>
+<th>possible_columns</th>
+<th>business_value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>customers</td>
+<td>Cadastro de clientes.</td>
+<td>customer_id, age, income, employment_type, region</td>
+<td>Permite segmentar o perfil do cliente.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>contracts</td>
+<td>Contratos de crédito.</td>
+<td>contract_id, customer_id, product_type, principal_amount, interest_rate, start_date</td>
+<td>Permite medir exposição e características do crédito.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>payments</td>
+<td>Histórico de pagamentos.</td>
+<td>payment_id, contract_id, due_date, payment_date, amount_paid, days_late</td>
+<td>Permite avaliar comportamento de pagamento e atraso.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>credit_events</td>
+<td>Eventos relevantes de crédito.</td>
+<td>event_id, customer_id, event_type, event_date, event_value</td>
+<td>Permite rastrear eventos de risco, renegociação ou cobrança.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 9. Proposta inicial de tabelas por camada</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Neste projeto, vamos organizar as entidades de risco de crédito em camadas.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A proposta inicial é:</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Bronze</strong><ul>
+<li>bronze_customers</li>
+<li>bronze_contracts</li>
+<li>bronze_payments</li>
+<li>bronze_credit_events</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Silver</strong><ul>
+<li>silver_customers_clean</li>
+<li>silver_contracts_clean</li>
+<li>silver_payments_clean</li>
+<li>silver_customer_credit_profile</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Gold</strong><ul>
+<li>gold_credit_risk_features</li>
+<li>gold_default_risk_indicators</li>
+<li>gold_customer_risk_segments</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">table_inventory = pd.DataFrame(
+    [
+        {
+            "layer": "Bronze",
+            "table_name": "bronze_customers",
+            "source_entity": "customers",
+            "description": "Clientes ingeridos com estrutura próxima da origem.",
+        },
+        {
+            "layer": "Bronze",
+            "table_name": "bronze_contracts",
+            "source_entity": "contracts",
+            "description": "Contratos de crédito ingeridos a partir da origem.",
+        },
+        {
+            "layer": "Bronze",
+            "table_name": "bronze_payments",
+            "source_entity": "payments",
+            "description": "Pagamentos ingeridos a partir da origem.",
+        },
+        {
+            "layer": "Bronze",
+            "table_name": "bronze_credit_events",
+            "source_entity": "credit_events",
+            "description": "Eventos de crédito ingeridos a partir da origem.",
+        },
+        {
+            "layer": "Silver",
+            "table_name": "silver_customers_clean",
+            "source_entity": "customers",
+            "description": "Clientes com tipos padronizados, nulos tratados e duplicidades avaliadas.",
+        },
+        {
+            "layer": "Silver",
+            "table_name": "silver_contracts_clean",
+            "source_entity": "contracts",
+            "description": "Contratos tratados, tipados e validados.",
+        },
+        {
+            "layer": "Silver",
+            "table_name": "silver_payments_clean",
+            "source_entity": "payments",
+            "description": "Pagamentos tratados com cálculo de atraso.",
+        },
+        {
+            "layer": "Silver",
+            "table_name": "silver_customer_credit_profile",
+            "source_entity": "customers + contracts + payments",
+            "description": "Perfil integrado do cliente com informações cadastrais e comportamento financeiro.",
+        },
+        {
+            "layer": "Gold",
+            "table_name": "gold_credit_risk_features",
+            "source_entity": "silver_customer_credit_profile",
+            "description": "Features analíticas para análise ou modelagem de risco de crédito.",
+        },
+        {
+            "layer": "Gold",
+            "table_name": "gold_default_risk_indicators",
+            "source_entity": "silver_customer_credit_profile",
+            "description": "Indicadores agregados de inadimplência e atraso.",
+        },
+        {
+            "layer": "Gold",
+            "table_name": "gold_customer_risk_segments",
+            "source_entity": "gold_credit_risk_features",
+            "description": "Segmentação analítica dos clientes por perfil de risco.",
+        },
+    ]
+)
+
+table_inventory</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>layer</th>
+<th>table_name</th>
+<th>source_entity</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>Bronze</td>
+<td>bronze_customers</td>
+<td>customers</td>
+<td>Clientes ingeridos com estrutura próxima da origem.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>Bronze</td>
+<td>bronze_contracts</td>
+<td>contracts</td>
+<td>Contratos de crédito ingeridos a partir da origem.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Bronze</td>
+<td>bronze_payments</td>
+<td>payments</td>
+<td>Pagamentos ingeridos a partir da origem.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Bronze</td>
+<td>bronze_credit_events</td>
+<td>credit_events</td>
+<td>Eventos de crédito ingeridos a partir da origem.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Silver</td>
+<td>silver_customers_clean</td>
+<td>customers</td>
+<td>Clientes com tipos padronizados, nulos tratados e duplicidades avaliadas.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Silver</td>
+<td>silver_contracts_clean</td>
+<td>contracts</td>
+<td>Contratos tratados, tipados e validados.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Silver</td>
+<td>silver_payments_clean</td>
+<td>payments</td>
+<td>Pagamentos tratados com cálculo de atraso.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>Silver</td>
+<td>silver_customer_credit_profile</td>
+<td>customers + contracts + payments</td>
+<td>Perfil integrado do cliente com informações cadastrais e comportamento financeiro.</td>
+</tr>
+<tr>
+<th>8</th>
+<td>Gold</td>
+<td>gold_credit_risk_features</td>
+<td>silver_customer_credit_profile</td>
+<td>Features analíticas para análise ou modelagem de risco de crédito.</td>
+</tr>
+<tr>
+<th>9</th>
+<td>Gold</td>
+<td>gold_default_risk_indicators</td>
+<td>silver_customer_credit_profile</td>
+<td>Indicadores agregados de inadimplência e atraso.</td>
+</tr>
+<tr>
+<th>10</th>
+<td>Gold</td>
+<td>gold_customer_risk_segments</td>
+<td>gold_credit_risk_features</td>
+<td>Segmentação analítica dos clientes por perfil de risco.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 10. Diferença entre Managed Table e External Table</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Em Databricks, é importante entender a diferença conceitual entre tabelas gerenciadas e externas.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Managed Table</strong><ul>
+<li>A plataforma gerencia os dados e os metadados da tabela.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>External Table</strong><ul>
+<li>A plataforma gerencia os metadados, mas os dados ficam em uma localização externa controlada pelo usuário ou pela organização.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Interpretação prática</strong><ul>
+<li>Para fins de estudo, podemos começar com tabelas gerenciadas.</li>
+<li>Para cenários corporativos, tabelas externas podem ser importantes quando há necessidade de controle explícito sobre armazenamento, paths e integração com Data Lake corporativo.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">table_type_comparison = pd.DataFrame(
+    [
+        {
+            "table_type": "Managed Table",
+            "data_management": "Databricks/plataforma gerencia dados e metadados.",
+            "best_for": "Ambientes de estudo, protótipos e tabelas internas controladas.",
+            "credit_risk_example": "Tabela silver_customers_clean criada dentro do ambiente Databricks.",
+        },
+        {
+            "table_type": "External Table",
+            "data_management": "Usuário/organização controla a localização dos dados; Databricks gerencia metadados.",
+            "best_for": "Ambientes corporativos com armazenamento externo padronizado.",
+            "credit_risk_example": "Tabela bronze_contracts apontando para arquivos Parquet em um Data Lake corporativo.",
+        },
+    ]
+)
+
+table_type_comparison</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>table_type</th>
+<th>data_management</th>
+<th>best_for</th>
+<th>credit_risk_example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>Managed Table</td>
+<td>Databricks/plataforma gerencia dados e metadados.</td>
+<td>Ambientes de estudo, protótipos e tabelas internas controladas.</td>
+<td>Tabela silver_customers_clean criada dentro do ambiente Databricks.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>External Table</td>
+<td>Usuário/organização controla a localização dos dados; Databricks gerencia metadados.</td>
+<td>Ambientes corporativos com armazenamento externo padronizado.</td>
+<td>Tabela bronze_contracts apontando para arquivos Parquet em um Data Lake corporativo.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 11. Convenção inicial de nomes</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Uma boa arquitetura precisa de nomes previsíveis.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Neste projeto, usaremos convenções simples:</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Camadas</strong><ul>
+<li><code>bronze_</code> para dados ingeridos;</li>
+<li><code>silver_</code> para dados tratados;</li>
+<li><code>gold_</code> para dados prontos para consumo.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Entidades</strong><ul>
+<li>nomes em inglês;</li>
+<li>letras minúsculas;</li>
+<li>separação por underscore;</li>
+<li>sem acentos;</li>
+<li>sem espaços;</li>
+<li>nomes claros e descritivos.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Exemplo:<ul>
+<li>gold_credit_risk_features</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">naming_conventions = pd.DataFrame(
+    [
+        {
+            "object_type": "Layer prefix",
+            "rule": "Usar bronze_, silver_ ou gold_ no início do nome da tabela.",
+            "example": "silver_payments_clean",
+        },
+        {
+            "object_type": "Table name",
+            "rule": "Usar letras minúsculas e underscore.",
+            "example": "gold_credit_risk_features",
+        },
+        {
+            "object_type": "Column name",
+            "rule": "Usar nomes claros, sem espaços e sem acentos.",
+            "example": "days_late",
+        },
+        {
+            "object_type": "Identifier",
+            "rule": "Usar sufixo _id para identificadores.",
+            "example": "customer_id",
+        },
+        {
+            "object_type": "Date columns",
+            "rule": "Usar sufixo _date para datas.",
+            "example": "payment_date",
+        },
+    ]
+)
+
+naming_conventions</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>object_type</th>
+<th>rule</th>
+<th>example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>Layer prefix</td>
+<td>Usar bronze_, silver_ ou gold_ no início do nome da tabela.</td>
+<td>silver_payments_clean</td>
+</tr>
+<tr>
+<th>1</th>
+<td>Table name</td>
+<td>Usar letras minúsculas e underscore.</td>
+<td>gold_credit_risk_features</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Column name</td>
+<td>Usar nomes claros, sem espaços e sem acentos.</td>
+<td>days_late</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Identifier</td>
+<td>Usar sufixo _id para identificadores.</td>
+<td>customer_id</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Date columns</td>
+<td>Usar sufixo _date para datas.</td>
+<td>payment_date</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 12. Blueprint arquitetural inicial</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A arquitetura-alvo do projeto pode ser descrita assim:</li>
+</ul>
+</blockquote>
+<div class="highlight"><pre><span></span>Raw Files
+   ↓
+Bronze Tables
+   ↓
+Silver Clean Tables
+   ↓
+Silver Integrated Profile
+   ↓
+Gold Risk Features / Indicators / Segments
+   ↓
+Analytics / BI / Machine Learning
+</pre></div>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 Observe</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Essa estrutura será implementada progressivamente nos próximos notebooks.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">architecture_flow = pd.DataFrame(
+    [
+        {
+            "step": 1,
+            "stage": "Raw",
+            "description": "Receber arquivos originais de clientes, contratos, pagamentos e eventos.",
+            "expected_output": "Arquivos preservados em data/raw.",
+        },
+        {
+            "step": 2,
+            "stage": "Bronze",
+            "description": "Ingerir dados com mínima transformação e metadados de carga.",
+            "expected_output": "Tabelas bronze_*.",
+        },
+        {
+            "step": 3,
+            "stage": "Silver",
+            "description": "Limpar, tipar, deduplicar e integrar dados.",
+            "expected_output": "Tabelas silver_* tratadas.",
+        },
+        {
+            "step": 4,
+            "stage": "Gold",
+            "description": "Criar features, indicadores e segmentações.",
+            "expected_output": "Tabelas gold_* prontas para análise.",
+        },
+        {
+            "step": 5,
+            "stage": "Consumption",
+            "description": "Consumir dados em dashboards, análises ou modelos.",
+            "expected_output": "Insights, métricas e modelos de risco.",
+        },
+    ]
+)
+
+architecture_flow</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>step</th>
+<th>stage</th>
+<th>description</th>
+<th>expected_output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>1</td>
+<td>Raw</td>
+<td>Receber arquivos originais de clientes, contratos, pagamentos e eventos.</td>
+<td>Arquivos preservados em data/raw.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>2</td>
+<td>Bronze</td>
+<td>Ingerir dados com mínima transformação e metadados de carga.</td>
+<td>Tabelas bronze_*.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>3</td>
+<td>Silver</td>
+<td>Limpar, tipar, deduplicar e integrar dados.</td>
+<td>Tabelas silver_* tratadas.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>4</td>
+<td>Gold</td>
+<td>Criar features, indicadores e segmentações.</td>
+<td>Tabelas gold_* prontas para análise.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>5</td>
+<td>Consumption</td>
+<td>Consumir dados em dashboards, análises ou modelos.</td>
+<td>Insights, métricas e modelos de risco.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 13. Evidência de aprendizagem para o KG</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Este notebook gera uma evidência real de estudo para o projeto <code>databricks-learning-kg</code>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A evidência não significa domínio completo ainda.<ul>
+<li>Ela significa que houve uma primeira prática documentada sobre os fundamentos.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Os tópicos que poderão receber evidência inicial são:<ul>
+<li>Lakehouse Architecture;</li>
+<li>Medallion Architecture;</li>
+<li>Delta Lake;</li>
+<li>Managed Table;</li>
+<li>External Table;</li>
+<li>Catalog, Schema e Table;</li>
+<li>Naming Conventions.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">learning_evidence = pd.DataFrame(
+    [
+        {
+            "evidence_id": "EVID_CR_LH_001",
+            "project": PROJECT_NAME,
+            "notebook": NOTEBOOK_NAME,
+            "evidence_date": STUDY_DATE,
+            "topic": "Lakehouse Architecture",
+            "evidence_type": "conceptual_study",
+            "confidence_delta_suggested": 0.20,
+            "mastery_delta_suggested": 0.05,
+            "evidence_description": "Comparação entre Data Lake, Data Warehouse e Lakehouse aplicada ao domínio de risco de crédito.",
+        },
+        {
+            "evidence_id": "EVID_CR_LH_002",
+            "project": PROJECT_NAME,
+            "notebook": NOTEBOOK_NAME,
+            "evidence_date": STUDY_DATE,
+            "topic": "Medallion Architecture",
+            "evidence_type": "architecture_mapping",
+            "confidence_delta_suggested": 0.20,
+            "mastery_delta_suggested": 0.10,
+            "evidence_description": "Mapeamento Raw, Bronze, Silver e Gold para entidades de risco de crédito.",
+        },
+        {
+            "evidence_id": "EVID_CR_LH_003",
+            "project": PROJECT_NAME,
+            "notebook": NOTEBOOK_NAME,
+            "evidence_date": STUDY_DATE,
+            "topic": "Delta Lake",
+            "evidence_type": "conceptual_study",
+            "confidence_delta_suggested": 0.10,
+            "mastery_delta_suggested": 0.00,
+            "evidence_description": "Estudo inicial sobre capacidades do Delta Lake e relevância para confiabilidade dos dados.",
+        },
+        {
+            "evidence_id": "EVID_CR_LH_004",
+            "project": PROJECT_NAME,
+            "notebook": NOTEBOOK_NAME,
+            "evidence_date": STUDY_DATE,
+            "topic": "Managed Table",
+            "evidence_type": "conceptual_study",
+            "confidence_delta_suggested": 0.10,
+            "mastery_delta_suggested": 0.00,
+            "evidence_description": "Diferenciação inicial entre tabela gerenciada e tabela externa.",
+        },
+        {
+            "evidence_id": "EVID_CR_LH_005",
+            "project": PROJECT_NAME,
+            "notebook": NOTEBOOK_NAME,
+            "evidence_date": STUDY_DATE,
+            "topic": "External Table",
+            "evidence_type": "conceptual_study",
+            "confidence_delta_suggested": 0.10,
+            "mastery_delta_suggested": 0.00,
+            "evidence_description": "Diferenciação inicial entre tabela externa e tabela gerenciada.",
+        },
+        {
+            "evidence_id": "EVID_CR_LH_006",
+            "project": PROJECT_NAME,
+            "notebook": NOTEBOOK_NAME,
+            "evidence_date": STUDY_DATE,
+            "topic": "Naming Conventions",
+            "evidence_type": "project_standard",
+            "confidence_delta_suggested": 0.10,
+            "mastery_delta_suggested": 0.05,
+            "evidence_description": "Definição de convenções iniciais para tabelas, colunas e identificadores.",
+        },
+    ]
+)
+
+learning_evidence</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>evidence_id</th>
+<th>project</th>
+<th>notebook</th>
+<th>evidence_date</th>
+<th>topic</th>
+<th>evidence_type</th>
+<th>confidence_delta_suggested</th>
+<th>mastery_delta_suggested</th>
+<th>evidence_description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>EVID_CR_LH_001</td>
+<td>Databricks Credit Risk Lakehouse</td>
+<td>01_lakehouse_fundamentals</td>
+<td>2026-04-27</td>
+<td>Lakehouse Architecture</td>
+<td>conceptual_study</td>
+<td>0.2</td>
+<td>0.05</td>
+<td>Comparação entre Data Lake, Data Warehouse e Lakehouse aplicada ao domínio de risco de crédito.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>EVID_CR_LH_002</td>
+<td>Databricks Credit Risk Lakehouse</td>
+<td>01_lakehouse_fundamentals</td>
+<td>2026-04-27</td>
+<td>Medallion Architecture</td>
+<td>architecture_mapping</td>
+<td>0.2</td>
+<td>0.10</td>
+<td>Mapeamento Raw, Bronze, Silver e Gold para entidades de risco de crédito.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>EVID_CR_LH_003</td>
+<td>Databricks Credit Risk Lakehouse</td>
+<td>01_lakehouse_fundamentals</td>
+<td>2026-04-27</td>
+<td>Delta Lake</td>
+<td>conceptual_study</td>
+<td>0.1</td>
+<td>0.00</td>
+<td>Estudo inicial sobre capacidades do Delta Lake e relevância para confiabilidade dos dados.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>EVID_CR_LH_004</td>
+<td>Databricks Credit Risk Lakehouse</td>
+<td>01_lakehouse_fundamentals</td>
+<td>2026-04-27</td>
+<td>Managed Table</td>
+<td>conceptual_study</td>
+<td>0.1</td>
+<td>0.00</td>
+<td>Diferenciação inicial entre tabela gerenciada e tabela externa.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>EVID_CR_LH_005</td>
+<td>Databricks Credit Risk Lakehouse</td>
+<td>01_lakehouse_fundamentals</td>
+<td>2026-04-27</td>
+<td>External Table</td>
+<td>conceptual_study</td>
+<td>0.1</td>
+<td>0.00</td>
+<td>Diferenciação inicial entre tabela externa e tabela gerenciada.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>EVID_CR_LH_006</td>
+<td>Databricks Credit Risk Lakehouse</td>
+<td>01_lakehouse_fundamentals</td>
+<td>2026-04-27</td>
+<td>Naming Conventions</td>
+<td>project_standard</td>
+<td>0.1</td>
+<td>0.05</td>
+<td>Definição de convenções iniciais para tabelas, colunas e identificadores.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 14. Exportação dos artefatos do notebook</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Nesta etapa, salvamos os artefatos gerados pelo notebook.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Esses arquivos serão úteis para:<ul>
+<li>documentação do projeto;</li>
+<li>README;</li>
+<li>próximos notebooks;</li>
+<li>atualização futura do Knowledge Graph de aprendizagem.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">architecture_comparison.to_csv(EXPORTS_DIR / "architecture_comparison.csv", index=False, encoding="utf-8")
+databricks_components.to_csv(EXPORTS_DIR / "databricks_components.csv", index=False, encoding="utf-8")
+delta_lake_capabilities.to_csv(EXPORTS_DIR / "delta_lake_capabilities.csv", index=False, encoding="utf-8")
+medallion_layers.to_csv(EXPORTS_DIR / "medallion_layers.csv", index=False, encoding="utf-8")
+credit_risk_entities.to_csv(EXPORTS_DIR / "credit_risk_entities.csv", index=False, encoding="utf-8")
+table_inventory.to_csv(EXPORTS_DIR / "table_inventory.csv", index=False, encoding="utf-8")
+table_type_comparison.to_csv(EXPORTS_DIR / "table_type_comparison.csv", index=False, encoding="utf-8")
+naming_conventions.to_csv(EXPORTS_DIR / "naming_conventions.csv", index=False, encoding="utf-8")
+architecture_flow.to_csv(EXPORTS_DIR / "architecture_flow.csv", index=False, encoding="utf-8")
+learning_evidence.to_csv(EXPORTS_DIR / "learning_evidence_notebook_01.csv", index=False, encoding="utf-8")
+
+print("Artefatos exportados com sucesso.")</code></pre>
+</div>
+<div class="output-stream">
+<pre>Artefatos exportados com sucesso.
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">summary_report = f"""# Notebook 01 — Lakehouse Fundamentals
+
+## Projeto
+
+{PROJECT_NAME}
+
+## Data
+
+{STUDY_DATE}
+
+## Objetivo
+
+Entender os fundamentos de Lakehouse, Databricks, Delta Lake e Arquitetura Medalhão aplicados a um projeto de risco de crédito.
+
+## Conceitos estudados
+
+- Data Lake
+- Data Warehouse
+- Lakehouse
+- Databricks Workspace
+- Notebooks
+- Compute
+- Catalog
+- Schema
+- Table
+- Delta Lake
+- Managed Table
+- External Table
+- Arquitetura Medalhão
+- Raw, Bronze, Silver e Gold
+- Convenções de nomenclatura
+
+## Aplicação ao domínio de risco de crédito
+
+O projeto propõe organizar entidades como clientes, contratos, pagamentos e eventos de crédito em uma arquitetura medalhão.
+
+## Tabelas propostas
+
+{table_inventory.to_markdown(index=False)}
+
+## Evidências de aprendizagem geradas
+
+{learning_evidence[["evidence_id", "topic", "evidence_type", "confidence_delta_suggested", "mastery_delta_suggested"]].to_markdown(index=False)}
+
+## Próximo passo
+
+O próximo notebook deverá iniciar a preparação dos dados sintéticos ou públicos para ingestão na camada Raw/Bronze.
+"""
+
+report_path = DOCS_DIR / "notebook_01_lakehouse_fundamentals_summary.md"
+report_path.write_text(summary_report, encoding="utf-8")
+
+report_path</code></pre>
+</div>
+<div class="output-text">
+<pre>WindowsPath('D:/_DS-Projects/Data-Science/databricks-credit-risk-lakehouse/docs/notebook_01_lakehouse_fundamentals_summary.md')</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 15. Conclusão executiva</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Este notebook estabeleceu a base conceitual do projeto <code>Databricks Credit Risk Lakehouse</code>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Foram estudados:<ul>
+<li>Data Lake;</li>
+<li>Data Warehouse;</li>
+<li>Lakehouse;</li>
+<li>Databricks como plataforma Lakehouse;</li>
+<li>Delta Lake;</li>
+<li>Arquitetura Medalhão;</li>
+<li>Managed Tables;</li>
+<li>External Tables;</li>
+<li>convenções de nomenclatura;</li>
+<li>aplicação das camadas Raw, Bronze, Silver e Gold ao domínio de risco de crédito.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Leitura executiva</strong><ul>
+<li>A arquitetura Lakehouse oferece uma abordagem adequada para projetos de risco de crédito porque combina flexibilidade de armazenamento, processamento escalável, governança e confiabilidade analítica.</li>
+<li>No contexto deste projeto, a Arquitetura Medalhão será usada para transformar dados brutos de clientes, contratos, pagamentos e eventos em tabelas analíticas preparadas para indicadores, segmentação e modelagem de risco.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Próximo notebook</strong><ul>
+<li><code>Notebook 02 — Data Source and Raw Layer Preparation</code></li>
+<li>O próximo passo será definir ou gerar os dados iniciais do projeto e preparar a primeira camada de ingestão.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">%reload_ext watermark 
+%watermark -a "Roberto-SSoares-LfLngLrnng" -d -t -u --iversions -v -m -h</code></pre>
+</div>
+<div class="output-stream">
+<pre>Author: Roberto-SSoares-LfLngLrnng
+
+Last updated: 2026-04-27 21:32:51
+
+Python implementation: CPython
+Python version       : 3.12.12
+IPython version      : 9.13.0
+
+Compiler    : MSC v.1944 64 bit (AMD64)
+OS          : Windows
+Release     : 11
+Machine     : AMD64
+Processor   : Intel64 Family 6 Model 158 Stepping 9, GenuineIntel
+CPU cores   : 4
+Architecture: 64bit
+
+Hostname: PC-ROBERTO
+
+pandas  : 3.0.2
+tabulate: 0.10.0
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="6"><strong>Fim</strong></font></p>
+<p><font color="#66666" size="3"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">#!uv pip install nbconvert -U -q
+!jupyter nbconvert --to html --template-file my-template-html-v10.tpl 01_lakehouse_fundamentals.ipynb</code></pre>
+</div>
+</div>
+<div class="footer">
+<p>RobertoSSoares-LfLngLrnng — <span id="datetime"></span></p>
+</div>
+<script>
+            document.getElementById("datetime").innerText = new Date().toLocaleString('pt-BR');
+        </script>
+</div>
+</body>
+</html>
