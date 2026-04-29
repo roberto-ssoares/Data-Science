@@ -1,0 +1,3310 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>02_data_source_and_raw_layer_preparation</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/jupyterlab/3.6.3/themes/JupyterLab-light-theme.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@300;400;600&amp;family=Reddit+Sans:wght@300;400;600&amp;family=Courier+Prime:wght@400;700&amp;family=Montserrat:wght@300;400;600;700&amp;family=Source+Code+Pro:wght@400&amp;family=Red+Hat+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['\\(', '\\)'], ['$', '$']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+          ignoreHtmlClass: 'tex2jax_ignore',
+          processHtmlClass: 'mathjax_process'
+        }
+      };
+    </script>
+<script async="" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+        :root{
+            --bg:#f5f5f5;
+            --paper:#ffffff;
+            --text:#1f2937;
+            --muted:#6b7280;
+            --border:#d9dde3;
+            --shadow:0 4px 12px rgba(0,0,0,.08);
+            --shadow-soft:0 2px 8px rgba(15,23,42,.06);
+            --md-bg:#f3f2ee;
+            --md-accent:#ff9800;
+            --code-bg:#f7f7f7;
+            --code-accent:#4caf50;
+            --out-bg:#f3f9fa;
+            --out-accent:#2196f3;
+            --stream-bg:#eef8ff;
+            --table-head:#f8fafc;
+            --table-zebra:#f6f8fa;
+            --exec-bg:#f7fbff;
+            --exec-border:#2E86C1;
+            --insight-bg:#f8fffb;
+            --insight-border:#22a06b;
+            --warning-bg:#fffaf2;
+            --warning-border:#f59e0b;
+            --danger-bg:#fff6f6;
+            --danger-border:#ef4444;
+            --metric-bg:#ffffff;
+            --metric-border:#d6e7f7;
+        }
+
+        *{ box-sizing:border-box; }
+
+        body{
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            background:var(--bg);
+            padding:40px 0;
+            color:var(--text);
+            line-height:1.55;
+        }
+
+        .container{
+            max-width:1550px;
+            margin:auto;
+            background:var(--paper);
+            padding:20px 30px 28px;
+            border-radius:8px;
+            box-shadow:var(--shadow);
+        }
+
+        .cell{ margin-bottom:10px; }
+
+        h1.title-header{
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            font-weight:700;
+            color:#8eb4c4;
+            text-transform:uppercase;
+            text-align:center;
+            margin:0 0 24px;
+            letter-spacing:.04em;
+        }
+
+        .markdown{
+            background:var(--md-bg);
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            padding:10px 15px;
+            border-left:5px solid var(--md-accent);
+            border-radius:4px;
+            margin:4px 0 8px;
+            line-height:1.6;
+        }
+        .markdown h1,.markdown h2,.markdown h3,.markdown h4,.markdown h5,.markdown h6{
+            margin-top:0;
+            color:#d64545;
+        }
+        .markdown p:last-child,
+        .markdown ul:last-child,
+        .markdown ol:last-child{ margin-bottom:0; }
+
+        img, svg, figure img{
+            max-width:100%;
+            height:auto;
+            display:block;
+            margin-left:auto;
+            margin-right:auto;
+            border:1px solid #ddd;
+            border-radius:6px;
+            box-shadow:0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        figure{ margin:20px auto; text-align:center; }
+        figure figcaption{ font-size:13px; color:#555; margin-top:6px; }
+
+        .cell-toolbar{
+            display:flex;
+            justify-content:flex-end;
+            margin:0 0 4px;
+            gap:6px;
+            flex-wrap:wrap;
+        }
+        .cell-badge{
+            display:inline-block;
+            background:#eef2f7;
+            border:1px solid #d7dee8;
+            color:#516072;
+            border-radius:999px;
+            font-size:11px;
+            font-weight:600;
+            padding:2px 8px;
+            letter-spacing:.02em;
+        }
+
+        .code_cell{
+            background:var(--code-bg);
+            border-left:5px solid var(--code-accent);
+            padding:6px 8px;
+            margin:4px 0;
+            overflow-x:auto;
+            border-radius:4px;
+        }
+        .code_cell pre,
+        .code_cell .hljs{
+            margin:0;
+            background:transparent !important;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+            white-space:pre;
+        }
+
+        .output-text,
+        .output-stream,
+        .output-error,
+        .output-image,
+        .output-html{
+            margin:4px 0;
+            border-radius:4px;
+            overflow-x:auto;
+        }
+
+        .output-text{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:10px 10px 10px 8px;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+        }
+        .output-text pre{
+            margin:0;
+            white-space:pre-wrap;
+            word-break:break-word;
+            font-family:inherit;
+            font-size:inherit;
+            line-height:inherit;
+        }
+
+        .output-stream{
+            background:var(--stream-bg);
+            border-left:5px solid var(--out-accent);
+            padding:8px 10px;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+        }
+        .output-stream pre{ margin:0; white-space:pre-wrap; word-break:break-word; }
+
+        .output-image{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:10px;
+        }
+
+        .output-html{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:8px 10px;
+            color:var(--text);
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            line-height:1.55;
+            white-space:normal;
+        }
+        .output-html *{ white-space:normal; word-break:normal; max-width:100%; }
+        .output-html p{ margin:0 0 10px; }
+        .output-html p:last-child{ margin-bottom:0; }
+        .output-html h1,.output-html h2,.output-html h3,.output-html h4,.output-html h5,.output-html h6{
+            margin:0 0 10px;
+            color:var(--text);
+            line-height:1.3;
+        }
+        .output-html ul,
+        .output-html ol{ margin:0 0 10px 20px; padding-left:12px; }
+        .output-html li{ margin-bottom:4px; }
+        .output-html li:last-child{ margin-bottom:0; }
+        .output-html code{ font-family:'Red Hat Mono','Noto Sans Mono',monospace; font-size:.95em; }
+        .output-html pre{
+            white-space:pre-wrap;
+            word-break:break-word;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.5;
+            margin:0;
+        }
+
+        .table-output{ padding:8px 10px; }
+        .table-output table,
+        .table-output table.dataframe{
+            border-collapse:collapse;
+            border-spacing:0;
+            width:auto;
+            max-width:100%;
+            margin:0;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.45;
+            color:#263238;
+            background:#fff;
+        }
+        .table-output table th,
+        .table-output table td,
+        .table-output table.dataframe th,
+        .table-output table.dataframe td{
+            padding:8px 10px;
+            border:1px solid var(--border);
+            vertical-align:top;
+            text-align:left;
+        }
+        .table-output table thead,
+        .table-output table.dataframe thead{ background:var(--table-head); font-weight:600; }
+        .table-output table tbody tr:nth-child(even),
+        .table-output table.dataframe tbody tr:nth-child(even){ background:var(--table-zebra); }
+        .table-output .dataframe tbody tr:hover,
+        .table-output table tbody tr:hover{ background:#eef6ff; }
+
+        /* Premium HTML blocks */
+        .output-html .executive-card,
+        .output-html .insight-card,
+        .output-html .warning-card,
+        .output-html .danger-card,
+        .output-html .summary-card{
+            border-radius:10px;
+            padding:14px 16px;
+            box-shadow:var(--shadow-soft);
+            border:1px solid #dbe5ef;
+            margin:4px 0;
+        }
+        .output-html .executive-card{
+            background:var(--exec-bg);
+            border-left:6px solid var(--exec-border);
+        }
+        .output-html .summary-card{
+            background:#f8fbff;
+            border-left:6px solid #64748b;
+        }
+        .output-html .insight-card{
+            background:var(--insight-bg);
+            border-left:6px solid var(--insight-border);
+        }
+        .output-html .warning-card{
+            background:var(--warning-bg);
+            border-left:6px solid var(--warning-border);
+        }
+        .output-html .danger-card{
+            background:var(--danger-bg);
+            border-left:6px solid var(--danger-border);
+        }
+        .output-html .card-title{
+            margin:0 0 10px;
+            font-size:20px;
+            font-weight:700;
+            color:#1f2937;
+            line-height:1.25;
+        }
+        .output-html .card-subtitle{
+            margin:0 0 12px;
+            font-size:13px;
+            font-weight:600;
+            color:#64748b;
+            text-transform:uppercase;
+            letter-spacing:.03em;
+        }
+        .output-html .card-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+            gap:10px;
+            margin:10px 0 12px;
+        }
+        .output-html .metric-card{
+            background:var(--metric-bg);
+            border:1px solid var(--metric-border);
+            border-radius:10px;
+            padding:10px 12px;
+            min-height:82px;
+            box-shadow:0 1px 3px rgba(15,23,42,.05);
+        }
+        .output-html .metric-label{
+            display:block;
+            margin:0 0 6px;
+            font-size:12px;
+            font-weight:700;
+            color:#64748b;
+            text-transform:uppercase;
+            letter-spacing:.03em;
+        }
+        .output-html .metric-value{
+            display:block;
+            font-size:24px;
+            font-weight:700;
+            line-height:1.15;
+            color:#0f172a;
+        }
+        .output-html .metric-note{
+            display:block;
+            margin-top:4px;
+            font-size:12px;
+            color:#6b7280;
+        }
+        .output-html .chip-row{
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px;
+            margin:8px 0 10px;
+        }
+        .output-html .chip{
+            display:inline-flex;
+            align-items:center;
+            background:#edf4ff;
+            border:1px solid #d8e6ff;
+            color:#2457a6;
+            border-radius:999px;
+            padding:4px 10px;
+            font-size:12px;
+            font-weight:600;
+        }
+        .output-html .callout-compact p{ margin-bottom:8px; }
+        .output-html .callout-compact ul,
+        .output-html .callout-compact ol{ margin-bottom:8px; }
+
+        .output-error{
+            background:#fff5f5;
+            border-left:5px solid #ef4444;
+            padding:10px 12px;
+            color:#7f1d1d;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.5;
+        }
+        .output-error pre{ margin:8px 0 0; white-space:pre-wrap; word-break:break-word; }
+
+        .hidden-note{
+            margin:4px 0;
+            padding:6px 10px;
+            border-radius:6px;
+            background:#f8fafc;
+            border:1px dashed #cbd5e1;
+            color:#64748b;
+            font-size:12px;
+            font-weight:600;
+        }
+
+        .footer{
+            text-align:right;
+            margin-top:30px;
+            padding:12px;
+            background:#e9ecef;
+            border-radius:4px;
+            font-size:14px;
+            color:#555;
+        }
+
+        @media (max-width: 768px) {
+            body{ padding:16px 0; }
+            .container{ max-width:100%; padding:14px 16px 20px; border-radius:0; }
+            .output-html,
+            .output-text,
+            .output-stream,
+            .output-image,
+            .output-error,
+            .markdown,
+            .code_cell{ padding-left:10px; padding-right:10px; }
+            .output-html .card-title{ font-size:18px; }
+            .output-html .metric-value{ font-size:20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<h1 class="title-header">02_data_source_and_raw_layer_preparation</h1>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"></code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#F3F2EE">
+<br/><br/>
+<p style="text-align: center;">
+<font color="#0A1781" size="6">
+<strong>
+                    Databricks Credit Risk Lakehouse - Data Science Project
+                </strong>
+</font>
+</p>
+<p style="text-align: center;">
+<font color="#C58A1E" size="6">
+<strong>
+                    Data Source and Raw Layer Preparation
+                </strong>
+</font>
+</p>
+<p style="text-align: center;">
+<font color="#C58A1E" size="5">
+<strong>
+                    Apresentar o propósito do notebook e posicionar a preparação<br/>da camada Raw dentro da arquitetura Lakehouse.
+                </strong>
+</font>
+</p>
+<br/>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#F3F2EE">
+<p style="text-align: right;">
+<font color="#444444" size="4">
+            Roberto SSoares - LfLngLrnng
+      </font>
+</p>
+<p style="text-align: right;"><font color="#444444" size="2">
+<a href="https://www.linkedin.com/in/roberto-dos-santos-soares/">in/roberto-dos-santos-soares</a><br/><a href="https://roberto-ssoares.github.io/meu-portfolio/">Portifólio: roberto-ssoares</a>
+</font></p>
+<p style="text-align: right;">
+<font color="#444444" size="4">
+            " [+] Faturamento [-] Custo [+] Qualidade de vida "
+        </font>
+<br/>
+<font color="#918e8e" size="2">"Mestre Bruno Jardim"
+        </font>
+</p>
+<p style="text-align: right;">
+<font color="#918e8e" size="2">
+</font>
+</p>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 Objetivo</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li><strong>Ações realizadas</strong><ul>
+<li><em>Definição das entidades iniciais do domínio de risco de crédito.</em></li>
+<li><em>Geração de dados sintéticos controlados.</em></li>
+<li><em>Criação dos arquivos brutos na camada Raw.</em></li>
+<li><em>Documentação inicial de schema, qualidade e manifesto dos arquivos.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>Antes de construir camadas Bronze, Silver e Gold, é necessário definir uma fonte de dados inicial rastreável.</li>
+<li>A camada Raw preserva os arquivos originais e serve como ponto de partida para ingestão, auditoria e reprocessamento.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultados esperados</strong><ul>
+<li>Ao final deste notebook, teremos quatro arquivos CSV brutos representando clientes, contratos, pagamentos e eventos de crédito,<ul>
+<li>além de documentação e evidências para atualização futura do Knowledge Graph.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">#!uv pip install watermark -q -U
+#!uv pip install tabulate -q -U</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">from datetime import date, datetime, timedelta
+from pathlib import Path
+import random
+import string
+
+import numpy as np
+import pandas as pd</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Versões dos pacotes usados neste jupyter notebook
+%reload_ext watermark
+%watermark -a "RobertoSSoares-LfLngLrnng"</code></pre>
+</div>
+<div class="output-stream">
+<pre>Author: RobertoSSoares-LfLngLrnng
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">pd.set_option("display.max_columns", 100)
+pd.set_option("display.max_colwidth", 120)</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">PROJECT_NAME = "Databricks Credit Risk Lakehouse"
+NOTEBOOK_NAME = "02_data_source_and_raw_layer_preparation"
+STUDY_DATE = date.today().isoformat()
+
+BASE_DIR = Path.cwd().parent if Path.cwd().name == "notebooks" else Path.cwd()
+
+DATA_DIR = BASE_DIR / "data"
+RAW_DIR = DATA_DIR / "raw"
+BRONZE_DIR = DATA_DIR / "bronze"
+SILVER_DIR = DATA_DIR / "silver"
+GOLD_DIR = DATA_DIR / "gold"
+EXPORTS_DIR = DATA_DIR / "exports"
+DOCS_DIR = BASE_DIR / "docs"
+
+for directory in [
+    RAW_DIR,
+    BRONZE_DIR,
+    SILVER_DIR,
+    GOLD_DIR,
+    EXPORTS_DIR,
+    DOCS_DIR,
+]:
+    directory.mkdir(parents=True, exist_ok=True)
+
+{
+    "project": PROJECT_NAME,
+    "notebook": NOTEBOOK_NAME,
+    "study_date": STUDY_DATE,
+    "base_dir": str(BASE_DIR),
+    "raw_dir": str(RAW_DIR),
+}
+</code></pre>
+</div>
+<div class="output-text">
+<pre>{'project': 'Databricks Credit Risk Lakehouse',
+ 'notebook': '02_data_source_and_raw_layer_preparation',
+ 'study_date': '2026-04-28',
+ 'base_dir': 'D:\\_DS-Projects\\Data-Science\\databricks-credit-risk-lakehouse',
+ 'raw_dir': 'D:\\_DS-Projects\\Data-Science\\databricks-credit-risk-lakehouse\\data\\raw'}</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 1. Estratégia da camada Raw</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A camada Raw representa a chegada dos arquivos originais.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Neste projeto, os arquivos serão sintéticos, mas controlados para simular um cenário realista de risco de crédito.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Entidades iniciais</strong><ul>
+<li><code>customers</code>: cadastro de clientes;</li>
+<li><code>contracts</code>: contratos de crédito;</li>
+<li><code>payments</code>: histórico de pagamentos;</li>
+<li><code>credit_events</code>: eventos relevantes de crédito.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Princípio importante</strong>
+A camada Raw não deve corrigir os dados.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Ela deve preservar os arquivos como chegaram, permitindo que as regras de limpeza, padronização e qualidade sejam aplicadas posteriormente nas camadas Bronze e Silver.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">RANDOM_SEED = 42
+
+random.seed(RANDOM_SEED)
+np.random.seed(RANDOM_SEED)
+
+N_CUSTOMERS = 500
+MIN_CONTRACTS_PER_CUSTOMER = 0
+MAX_CONTRACTS_PER_CUSTOMER = 3
+MAX_PAYMENT_MONTHS = 24
+
+GENERATION_CONFIG = {
+    "random_seed": RANDOM_SEED,
+    "n_customers": N_CUSTOMERS,
+    "min_contracts_per_customer": MIN_CONTRACTS_PER_CUSTOMER,
+    "max_contracts_per_customer": MAX_CONTRACTS_PER_CUSTOMER,
+    "max_payment_months": MAX_PAYMENT_MONTHS,
+}
+
+GENERATION_CONFIG</code></pre>
+</div>
+<div class="output-text">
+<pre>{'random_seed': 42,
+ 'n_customers': 500,
+ 'min_contracts_per_customer': 0,
+ 'max_contracts_per_customer': 3,
+ 'max_payment_months': 24}</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 2. Funções auxiliares</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>As funções abaixo serão usadas para gerar dados sintéticos reprodutíveis.<ul>
+<li>A ideia não é criar dados perfeitos, mas sim dados suficientemente realistas para alimentar uma esteira Raw → Bronze → Silver → Gold.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">def random_date(start: date, end: date) -&gt; date:
+    """
+    Gera uma data aleatória entre duas datas.
+    """
+    delta_days = (end - start).days
+    return start + timedelta(days=random.randint(0, delta_days))
+
+
+def make_id(prefix: str, number: int, width: int = 6) -&gt; str:
+    """
+    Cria identificadores padronizados.
+    """
+    return f"{prefix}{number:0{width}d}"
+
+
+def random_choice_with_probs(values: list, probs: list):
+    """
+    Escolhe um valor com base em probabilidades.
+    """
+    return np.random.choice(values, p=probs)
+
+
+def calculate_risk_band(credit_score: int) -&gt; str:
+    """
+    Classifica o cliente em uma faixa simples de risco.
+    """
+    if credit_score &gt;= 720:
+        return "low"
+    if credit_score &gt;= 620:
+        return "medium"
+    return "high"
+
+
+def safe_to_csv(df: pd.DataFrame, path: Path) -&gt; None:
+    """
+    Salva CSV com encoding UTF-8.
+    """
+    df.to_csv(path, index=False, encoding="utf-8")</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 3. Geração da entidade "customers"</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A tabela <code>customers</code> representa o cadastro dos clientes.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Ela inclui dados como:<ul>
+<li>identificador do cliente;</li>
+<li>idade;</li>
+<li>renda mensal;</li>
+<li>tipo de ocupação;</li>
+<li>região;</li>
+<li>score sintético inicial;</li>
+<li>data de cadastro.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>Algumas pequenas imperfeições serão introduzidas de propósito, simulando problemas comuns em arquivos brutos.</p>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">employment_types = ["formal_employee", "self_employed", "public_servant", "retired", "unemployed"]
+employment_probs = [0.46, 0.24, 0.12, 0.10, 0.08]
+
+regions = ["SP", "RJ", "MG", "PR", "RS", "BA", "PE", "GO"]
+region_probs = [0.36, 0.14, 0.13, 0.09, 0.08, 0.08, 0.06, 0.06]
+
+customers_rows = []
+
+for i in range(1, N_CUSTOMERS + 1):
+    age = int(np.clip(np.random.normal(loc=41, scale=12), 18, 75))
+    employment_type = random_choice_with_probs(employment_types, employment_probs)
+    
+    base_income = {
+        "formal_employee": np.random.normal(5200, 2100),
+        "self_employed": np.random.normal(6200, 3300),
+        "public_servant": np.random.normal(6800, 2200),
+        "retired": np.random.normal(3600, 1400),
+        "unemployed": np.random.normal(1800, 900),
+    }[employment_type]
+    
+    monthly_income = round(max(base_income, 500), 2)
+    credit_score = int(np.clip(np.random.normal(loc=650, scale=95), 300, 900))
+    
+    customers_rows.append(
+        {
+            "customer_id": make_id("C", i),
+            "customer_name": f"Customer {i:04d}",
+            "age": age,
+            "monthly_income": monthly_income,
+            "employment_type": employment_type,
+            "region": random_choice_with_probs(regions, region_probs),
+            "credit_score_base": credit_score,
+            "risk_band_source": calculate_risk_band(credit_score),
+            "signup_date": random_date(date(2018, 1, 1), date(2025, 12, 31)).isoformat(),
+            "source_system": "crm_core",
+            "extraction_date": STUDY_DATE,
+        }
+    )
+
+customers = pd.DataFrame(customers_rows)
+
+customers.head()
+</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>customer_id</th>
+<th>customer_name</th>
+<th>age</th>
+<th>monthly_income</th>
+<th>employment_type</th>
+<th>region</th>
+<th>credit_score_base</th>
+<th>risk_band_source</th>
+<th>signup_date</th>
+<th>source_system</th>
+<th>extraction_date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>C000001</td>
+<td>Customer 0001</td>
+<td>46</td>
+<td>7501.58</td>
+<td>public_servant</td>
+<td>SP</td>
+<td>594</td>
+<td>high</td>
+<td>2025-03-04</td>
+<td>crm_core</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>1</th>
+<td>C000002</td>
+<td>Customer 0002</td>
+<td>34</td>
+<td>500.00</td>
+<td>formal_employee</td>
+<td>RJ</td>
+<td>579</td>
+<td>high</td>
+<td>2019-04-02</td>
+<td>crm_core</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>2</th>
+<td>C000003</td>
+<td>Customer 0003</td>
+<td>58</td>
+<td>4725.87</td>
+<td>formal_employee</td>
+<td>SP</td>
+<td>592</td>
+<td>high</td>
+<td>2018-04-13</td>
+<td>crm_core</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>3</th>
+<td>C000004</td>
+<td>Customer 0004</td>
+<td>52</td>
+<td>5666.21</td>
+<td>self_employed</td>
+<td>PR</td>
+<td>686</td>
+<td>medium</td>
+<td>2021-01-31</td>
+<td>crm_core</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>4</th>
+<td>C000005</td>
+<td>Customer 0005</td>
+<td>43</td>
+<td>6921.51</td>
+<td>self_employed</td>
+<td>SP</td>
+<td>723</td>
+<td>low</td>
+<td>2020-09-30</td>
+<td>crm_core</td>
+<td>2026-04-28</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Introdução controlada de pequenas imperfeições na camada Raw
+
+customers_raw = customers.copy()
+
+# 3% de renda mensal ausente
+missing_income_idx = customers_raw.sample(frac=0.03, random_state=RANDOM_SEED).index
+customers_raw.loc[missing_income_idx, "monthly_income"] = np.nan
+
+# 1% de região inválida
+invalid_region_idx = customers_raw.sample(frac=0.01, random_state=RANDOM_SEED + 1).index
+customers_raw.loc[invalid_region_idx, "region"] = "UNKNOWN"
+
+# 1 registro duplicado proposital
+customers_raw = pd.concat(
+    [customers_raw, customers_raw.sample(n=1, random_state=RANDOM_SEED + 2)],
+    ignore_index=True,
+)
+
+customers_raw.tail()</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>customer_id</th>
+<th>customer_name</th>
+<th>age</th>
+<th>monthly_income</th>
+<th>employment_type</th>
+<th>region</th>
+<th>credit_score_base</th>
+<th>risk_band_source</th>
+<th>signup_date</th>
+<th>source_system</th>
+<th>extraction_date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>496</th>
+<td>C000497</td>
+<td>Customer 0497</td>
+<td>25</td>
+<td>1829.44</td>
+<td>unemployed</td>
+<td>SP</td>
+<td>659</td>
+<td>medium</td>
+<td>2024-01-06</td>
+<td>crm_core</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>497</th>
+<td>C000498</td>
+<td>Customer 0498</td>
+<td>42</td>
+<td>5642.41</td>
+<td>self_employed</td>
+<td>SP</td>
+<td>722</td>
+<td>low</td>
+<td>2021-09-18</td>
+<td>crm_core</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>498</th>
+<td>C000499</td>
+<td>Customer 0499</td>
+<td>33</td>
+<td>7091.12</td>
+<td>formal_employee</td>
+<td>SP</td>
+<td>690</td>
+<td>medium</td>
+<td>2018-04-24</td>
+<td>crm_core</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>499</th>
+<td>C000500</td>
+<td>Customer 0500</td>
+<td>59</td>
+<td>500.00</td>
+<td>self_employed</td>
+<td>SP</td>
+<td>866</td>
+<td>low</td>
+<td>2019-04-18</td>
+<td>crm_core</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>500</th>
+<td>C000092</td>
+<td>Customer 0092</td>
+<td>53</td>
+<td>3665.82</td>
+<td>retired</td>
+<td>RJ</td>
+<td>585</td>
+<td>high</td>
+<td>2023-03-09</td>
+<td>crm_core</td>
+<td>2026-04-28</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 4. Geração da entidade "contracts"</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A tabela <code>contracts</code> representa contratos de crédito.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Cada cliente pode ter nenhum, um ou mais contratos.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Os contratos incluem:<ul>
+<li>tipo de produto;</li>
+<li>valor principal;</li>
+<li>taxa de juros;</li>
+<li>prazo;</li>
+<li>data de início;</li>
+<li>status;</li>
+<li>relacionamento com o cliente.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">product_types = ["personal_loan", "credit_card", "auto_loan", "payroll_loan"]
+product_probs = [0.36, 0.34, 0.16, 0.14]
+
+contract_rows = []
+contract_counter = 1
+
+for _, customer in customers.iterrows():
+    n_contracts = np.random.choice(
+        [0, 1, 2, 3],
+        p=[0.16, 0.52, 0.24, 0.08],
+    )
+    
+    for _ in range(n_contracts):
+        product_type = random_choice_with_probs(product_types, product_probs)
+        
+        principal_multiplier = {
+            "personal_loan": np.random.uniform(0.6, 2.8),
+            "credit_card": np.random.uniform(0.2, 1.2),
+            "auto_loan": np.random.uniform(3.0, 9.0),
+            "payroll_loan": np.random.uniform(0.8, 3.5),
+        }[product_type]
+        
+        principal_amount = round(customer["monthly_income"] * principal_multiplier, 2)
+        
+        interest_rate_monthly = {
+            "personal_loan": np.random.uniform(0.025, 0.075),
+            "credit_card": np.random.uniform(0.045, 0.13),
+            "auto_loan": np.random.uniform(0.012, 0.035),
+            "payroll_loan": np.random.uniform(0.010, 0.030),
+        }[product_type]
+        
+        term_months = int(
+            {
+                "personal_loan": np.random.choice([12, 18, 24, 36, 48]),
+                "credit_card": np.random.choice([12, 24]),
+                "auto_loan": np.random.choice([36, 48, 60]),
+                "payroll_loan": np.random.choice([24, 36, 48, 60]),
+            }[product_type]
+        )
+        
+        start_dt = random_date(date(2020, 1, 1), date(2025, 10, 31))
+        
+        status = random_choice_with_probs(
+            ["active", "closed", "defaulted"],
+            [0.70, 0.22, 0.08],
+        )
+        
+        contract_rows.append(
+            {
+                "contract_id": make_id("CTR", contract_counter),
+                "customer_id": customer["customer_id"],
+                "product_type": product_type,
+                "principal_amount": principal_amount,
+                "interest_rate_monthly": round(interest_rate_monthly, 4),
+                "term_months": term_months,
+                "start_date": start_dt.isoformat(),
+                "contract_status": status,
+                "source_system": "loan_management",
+                "extraction_date": STUDY_DATE,
+            }
+        )
+        
+        contract_counter += 1
+
+contracts = pd.DataFrame(contract_rows)
+
+contracts.head()
+</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>contract_id</th>
+<th>customer_id</th>
+<th>product_type</th>
+<th>principal_amount</th>
+<th>interest_rate_monthly</th>
+<th>term_months</th>
+<th>start_date</th>
+<th>contract_status</th>
+<th>source_system</th>
+<th>extraction_date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>CTR000001</td>
+<td>C000001</td>
+<td>credit_card</td>
+<td>2863.83</td>
+<td>0.0844</td>
+<td>24</td>
+<td>2022-12-05</td>
+<td>active</td>
+<td>loan_management</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>1</th>
+<td>CTR000002</td>
+<td>C000002</td>
+<td>auto_loan</td>
+<td>3431.72</td>
+<td>0.0225</td>
+<td>48</td>
+<td>2022-01-01</td>
+<td>closed</td>
+<td>loan_management</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>2</th>
+<td>CTR000003</td>
+<td>C000002</td>
+<td>credit_card</td>
+<td>232.56</td>
+<td>0.0538</td>
+<td>24</td>
+<td>2022-12-23</td>
+<td>active</td>
+<td>loan_management</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>3</th>
+<td>CTR000004</td>
+<td>C000003</td>
+<td>credit_card</td>
+<td>4453.18</td>
+<td>0.0637</td>
+<td>24</td>
+<td>2020-06-05</td>
+<td>closed</td>
+<td>loan_management</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>4</th>
+<td>CTR000005</td>
+<td>C000003</td>
+<td>payroll_loan</td>
+<td>15677.32</td>
+<td>0.0193</td>
+<td>24</td>
+<td>2021-03-20</td>
+<td>defaulted</td>
+<td>loan_management</td>
+<td>2026-04-28</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">contracts_raw = contracts.copy()
+
+# Pequena imperfeição: alguns contratos sem status informado
+missing_status_idx = contracts_raw.sample(frac=0.01, random_state=RANDOM_SEED + 3).index
+contracts_raw.loc[missing_status_idx, "contract_status"] = ""
+
+# Registro duplicado proposital
+contracts_raw = pd.concat(
+    [contracts_raw, contracts_raw.sample(n=1, random_state=RANDOM_SEED + 4)],
+    ignore_index=True,
+)
+
+contracts_raw.head()</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>contract_id</th>
+<th>customer_id</th>
+<th>product_type</th>
+<th>principal_amount</th>
+<th>interest_rate_monthly</th>
+<th>term_months</th>
+<th>start_date</th>
+<th>contract_status</th>
+<th>source_system</th>
+<th>extraction_date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>CTR000001</td>
+<td>C000001</td>
+<td>credit_card</td>
+<td>2863.83</td>
+<td>0.0844</td>
+<td>24</td>
+<td>2022-12-05</td>
+<td>active</td>
+<td>loan_management</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>1</th>
+<td>CTR000002</td>
+<td>C000002</td>
+<td>auto_loan</td>
+<td>3431.72</td>
+<td>0.0225</td>
+<td>48</td>
+<td>2022-01-01</td>
+<td>closed</td>
+<td>loan_management</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>2</th>
+<td>CTR000003</td>
+<td>C000002</td>
+<td>credit_card</td>
+<td>232.56</td>
+<td>0.0538</td>
+<td>24</td>
+<td>2022-12-23</td>
+<td>active</td>
+<td>loan_management</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>3</th>
+<td>CTR000004</td>
+<td>C000003</td>
+<td>credit_card</td>
+<td>4453.18</td>
+<td>0.0637</td>
+<td>24</td>
+<td>2020-06-05</td>
+<td>closed</td>
+<td>loan_management</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>4</th>
+<td>CTR000005</td>
+<td>C000003</td>
+<td>payroll_loan</td>
+<td>15677.32</td>
+<td>0.0193</td>
+<td>24</td>
+<td>2021-03-20</td>
+<td></td>
+<td>loan_management</td>
+<td>2026-04-28</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 5. Geração da entidade "payments"</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A tabela <code>payments</code> representa o histórico mensal de pagamentos dos contratos.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Ela inclui:<ul>
+<li>número da parcela;</li>
+<li>data de vencimento;</li>
+<li>data de pagamento;</li>
+<li>valor esperado;</li>
+<li>valor pago;</li>
+<li>dias de atraso.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Esta entidade será essencial para criar variáveis de risco na camada Gold.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">payment_rows = []
+payment_counter = 1
+
+contracts_enriched = contracts.merge(
+    customers[["customer_id", "risk_band_source", "credit_score_base"]],
+    on="customer_id",
+    how="left",
+)
+
+for _, contract in contracts_enriched.iterrows():
+    months_to_generate = min(contract["term_months"], MAX_PAYMENT_MONTHS)
+    start_dt = pd.to_datetime(contract["start_date"]).date()
+    monthly_amount = round(
+        contract["principal_amount"] 
+        * (1 + contract["interest_rate_monthly"] * contract["term_months"])
+        / contract["term_months"],
+        2,
+    )
+    
+    risk_band = contract["risk_band_source"]
+    
+    late_probability = {
+        "low": 0.08,
+        "medium": 0.18,
+        "high": 0.34,
+    }[risk_band]
+    
+    for installment in range(1, months_to_generate + 1):
+        due_dt = start_dt + timedelta(days=30 * installment)
+        
+        is_late = np.random.random() &lt; late_probability
+        is_unpaid = np.random.random() &lt; (late_probability * 0.12)
+        
+        if is_unpaid:
+            payment_dt = ""
+            days_late = int(np.random.choice([30, 45, 60, 90, 120]))
+            amount_paid = 0.0
+            payment_status = "unpaid"
+        elif is_late:
+            days_late = int(np.random.choice([5, 10, 15, 30, 45, 60]))
+            payment_dt = (due_dt + timedelta(days=days_late)).isoformat()
+            amount_paid = monthly_amount
+            payment_status = "late"
+        else:
+            days_late = int(np.random.choice([-5, -2, 0, 0, 0, 1]))
+            payment_dt = (due_dt + timedelta(days=days_late)).isoformat()
+            amount_paid = monthly_amount
+            payment_status = "paid"
+        
+        payment_rows.append(
+            {
+                "payment_id": make_id("PAY", payment_counter),
+                "contract_id": contract["contract_id"],
+                "installment_number": installment,
+                "due_date": due_dt.isoformat(),
+                "payment_date": payment_dt,
+                "scheduled_amount": monthly_amount,
+                "amount_paid": round(amount_paid, 2),
+                "days_late": days_late,
+                "payment_status": payment_status,
+                "source_system": "payment_gateway",
+                "extraction_date": STUDY_DATE,
+            }
+        )
+        
+        payment_counter += 1
+
+payments = pd.DataFrame(payment_rows)
+
+payments.head()
+</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>payment_id</th>
+<th>contract_id</th>
+<th>installment_number</th>
+<th>due_date</th>
+<th>payment_date</th>
+<th>scheduled_amount</th>
+<th>amount_paid</th>
+<th>days_late</th>
+<th>payment_status</th>
+<th>source_system</th>
+<th>extraction_date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>PAY000001</td>
+<td>CTR000001</td>
+<td>1</td>
+<td>2023-01-04</td>
+<td>2023-02-03</td>
+<td>361.03</td>
+<td>361.03</td>
+<td>30</td>
+<td>late</td>
+<td>payment_gateway</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>1</th>
+<td>PAY000002</td>
+<td>CTR000001</td>
+<td>2</td>
+<td>2023-02-03</td>
+<td>2023-02-03</td>
+<td>361.03</td>
+<td>361.03</td>
+<td>0</td>
+<td>paid</td>
+<td>payment_gateway</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>2</th>
+<td>PAY000003</td>
+<td>CTR000001</td>
+<td>3</td>
+<td>2023-03-05</td>
+<td>2023-03-06</td>
+<td>361.03</td>
+<td>361.03</td>
+<td>1</td>
+<td>paid</td>
+<td>payment_gateway</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>3</th>
+<td>PAY000004</td>
+<td>CTR000001</td>
+<td>4</td>
+<td>2023-04-04</td>
+<td>2023-06-03</td>
+<td>361.03</td>
+<td>361.03</td>
+<td>60</td>
+<td>late</td>
+<td>payment_gateway</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>4</th>
+<td>PAY000005</td>
+<td>CTR000001</td>
+<td>5</td>
+<td>2023-05-04</td>
+<td>2023-05-05</td>
+<td>361.03</td>
+<td>361.03</td>
+<td>1</td>
+<td>paid</td>
+<td>payment_gateway</td>
+<td>2026-04-28</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">payments_raw = payments.copy()
+
+# Pequena imperfeição: alguns amount_paid ausentes
+missing_amount_idx = payments_raw.sample(frac=0.005, random_state=RANDOM_SEED + 5).index
+payments_raw.loc[missing_amount_idx, "amount_paid"] = np.nan
+
+# Pequena imperfeição: 1 pagamento duplicado
+payments_raw = pd.concat(
+    [payments_raw, payments_raw.sample(n=1, random_state=RANDOM_SEED + 6)],
+    ignore_index=True,
+)
+
+payments_raw.head()</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>payment_id</th>
+<th>contract_id</th>
+<th>installment_number</th>
+<th>due_date</th>
+<th>payment_date</th>
+<th>scheduled_amount</th>
+<th>amount_paid</th>
+<th>days_late</th>
+<th>payment_status</th>
+<th>source_system</th>
+<th>extraction_date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>PAY000001</td>
+<td>CTR000001</td>
+<td>1</td>
+<td>2023-01-04</td>
+<td>2023-02-03</td>
+<td>361.03</td>
+<td>361.03</td>
+<td>30</td>
+<td>late</td>
+<td>payment_gateway</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>1</th>
+<td>PAY000002</td>
+<td>CTR000001</td>
+<td>2</td>
+<td>2023-02-03</td>
+<td>2023-02-03</td>
+<td>361.03</td>
+<td>361.03</td>
+<td>0</td>
+<td>paid</td>
+<td>payment_gateway</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>2</th>
+<td>PAY000003</td>
+<td>CTR000001</td>
+<td>3</td>
+<td>2023-03-05</td>
+<td>2023-03-06</td>
+<td>361.03</td>
+<td>361.03</td>
+<td>1</td>
+<td>paid</td>
+<td>payment_gateway</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>3</th>
+<td>PAY000004</td>
+<td>CTR000001</td>
+<td>4</td>
+<td>2023-04-04</td>
+<td>2023-06-03</td>
+<td>361.03</td>
+<td>361.03</td>
+<td>60</td>
+<td>late</td>
+<td>payment_gateway</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>4</th>
+<td>PAY000005</td>
+<td>CTR000001</td>
+<td>5</td>
+<td>2023-05-04</td>
+<td>2023-05-05</td>
+<td>361.03</td>
+<td>361.03</td>
+<td>1</td>
+<td>paid</td>
+<td>payment_gateway</td>
+<td>2026-04-28</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 6. Geração da entidade "credit_events"</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A tabela <code>credit_events</code> representa eventos relevantes no ciclo de crédito.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Exemplos:<ul>
+<li>atualização cadastral;</li>
+<li>renegociação;</li>
+<li>contato de cobrança;</li>
+<li>alteração de limite;</li>
+<li>alerta de atraso;</li>
+<li>atualização de bureau.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Esses eventos ajudam a enriquecer o perfil do cliente e podem ser usados futuramente em análises comportamentais.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">event_types = [
+    "bureau_update",
+    "collection_contact",
+    "renegotiation",
+    "limit_change",
+    "delinquency_alert",
+    "customer_update",
+]
+
+event_probs = [0.25, 0.18, 0.10, 0.16, 0.16, 0.15]
+
+event_rows = []
+event_counter = 1
+
+contracts_sample = contracts[["contract_id", "customer_id", "start_date"]].copy()
+
+for _, contract in contracts_sample.iterrows():
+    n_events = np.random.choice([0, 1, 2, 3], p=[0.38, 0.36, 0.18, 0.08])
+    contract_start = pd.to_datetime(contract["start_date"]).date()
+    
+    for _ in range(n_events):
+        event_type = random_choice_with_probs(event_types, event_probs)
+        event_dt = random_date(contract_start, date(2025, 12, 31))
+        
+        event_value = {
+            "bureau_update": np.random.randint(300, 900),
+            "collection_contact": np.random.choice([1, 2, 3, 4]),
+            "renegotiation": round(np.random.uniform(500, 15000), 2),
+            "limit_change": round(np.random.uniform(-3000, 8000), 2),
+            "delinquency_alert": np.random.choice([15, 30, 60, 90]),
+            "customer_update": 1,
+        }[event_type]
+        
+        event_rows.append(
+            {
+                "event_id": make_id("EVT", event_counter),
+                "customer_id": contract["customer_id"],
+                "contract_id": contract["contract_id"],
+                "event_type": event_type,
+                "event_date": event_dt.isoformat(),
+                "event_value": event_value,
+                "source_system": "credit_operations",
+                "extraction_date": STUDY_DATE,
+            }
+        )
+        
+        event_counter += 1
+
+credit_events = pd.DataFrame(event_rows)
+
+credit_events.head()
+</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>event_id</th>
+<th>customer_id</th>
+<th>contract_id</th>
+<th>event_type</th>
+<th>event_date</th>
+<th>event_value</th>
+<th>source_system</th>
+<th>extraction_date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>EVT000001</td>
+<td>C000001</td>
+<td>CTR000001</td>
+<td>collection_contact</td>
+<td>2024-03-27</td>
+<td>1.0</td>
+<td>credit_operations</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>1</th>
+<td>EVT000002</td>
+<td>C000001</td>
+<td>CTR000001</td>
+<td>bureau_update</td>
+<td>2025-07-27</td>
+<td>886.0</td>
+<td>credit_operations</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>2</th>
+<td>EVT000003</td>
+<td>C000002</td>
+<td>CTR000002</td>
+<td>delinquency_alert</td>
+<td>2022-02-21</td>
+<td>30.0</td>
+<td>credit_operations</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>3</th>
+<td>EVT000004</td>
+<td>C000002</td>
+<td>CTR000002</td>
+<td>collection_contact</td>
+<td>2025-06-22</td>
+<td>2.0</td>
+<td>credit_operations</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>4</th>
+<td>EVT000005</td>
+<td>C000002</td>
+<td>CTR000003</td>
+<td>bureau_update</td>
+<td>2024-10-24</td>
+<td>444.0</td>
+<td>credit_operations</td>
+<td>2026-04-28</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">credit_events_raw = credit_events.copy()
+
+# Pequena imperfeição: alguns event_value ausentes
+if len(credit_events_raw) &gt; 0:
+    missing_event_value_idx = credit_events_raw.sample(frac=0.01, random_state=RANDOM_SEED + 7).index
+    credit_events_raw.loc[missing_event_value_idx, "event_value"] = np.nan
+
+credit_events_raw.head()</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>event_id</th>
+<th>customer_id</th>
+<th>contract_id</th>
+<th>event_type</th>
+<th>event_date</th>
+<th>event_value</th>
+<th>source_system</th>
+<th>extraction_date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>EVT000001</td>
+<td>C000001</td>
+<td>CTR000001</td>
+<td>collection_contact</td>
+<td>2024-03-27</td>
+<td>1.0</td>
+<td>credit_operations</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>1</th>
+<td>EVT000002</td>
+<td>C000001</td>
+<td>CTR000001</td>
+<td>bureau_update</td>
+<td>2025-07-27</td>
+<td>886.0</td>
+<td>credit_operations</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>2</th>
+<td>EVT000003</td>
+<td>C000002</td>
+<td>CTR000002</td>
+<td>delinquency_alert</td>
+<td>2022-02-21</td>
+<td>30.0</td>
+<td>credit_operations</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>3</th>
+<td>EVT000004</td>
+<td>C000002</td>
+<td>CTR000002</td>
+<td>collection_contact</td>
+<td>2025-06-22</td>
+<td>2.0</td>
+<td>credit_operations</td>
+<td>2026-04-28</td>
+</tr>
+<tr>
+<th>4</th>
+<td>EVT000005</td>
+<td>C000002</td>
+<td>CTR000003</td>
+<td>bureau_update</td>
+<td>2024-10-24</td>
+<td>444.0</td>
+<td>credit_operations</td>
+<td>2026-04-28</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 7. Visão geral dos dados gerados</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Antes de salvar os arquivos Raw, vamos verificar o volume de registros por entidade.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">raw_tables = {
+    "customers": customers_raw,
+    "contracts": contracts_raw,
+    "payments": payments_raw,
+    "credit_events": credit_events_raw,
+}
+
+raw_volume_summary = pd.DataFrame(
+    [
+        {
+            "entity": entity,
+            "rows": len(df),
+            "columns": len(df.columns),
+        }
+        for entity, df in raw_tables.items()
+    ]
+)
+
+raw_volume_summary</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>entity</th>
+<th>rows</th>
+<th>columns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>customers</td>
+<td>501</td>
+<td>11</td>
+</tr>
+<tr>
+<th>1</th>
+<td>contracts</td>
+<td>622</td>
+<td>10</td>
+</tr>
+<tr>
+<th>2</th>
+<td>payments</td>
+<td>12919</td>
+<td>11</td>
+</tr>
+<tr>
+<th>3</th>
+<td>credit_events</td>
+<td>580</td>
+<td>8</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 8. Perfil inicial de qualidade dos arquivos Raw</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A camada Raw não corrige os problemas.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Mesmo assim, é útil gerar um perfil inicial para registrar:<ul>
+<li>quantidade de linhas;</li>
+<li>quantidade de colunas;</li>
+<li>células nulas;</li>
+<li>linhas duplicadas;</li>
+<li>percentual de completude.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Esse perfil será usado como insumo para as camadas Bronze e Silver.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">def profile_raw_frame(entity_name: str, df: pd.DataFrame) -&gt; pd.DataFrame:
+    """
+    Gera um perfil simples de qualidade por coluna.
+    """
+    rows = []
+    total_rows = len(df)
+    
+    for column in df.columns:
+        null_count = df[column].isna().sum() + (df[column].astype(str).str.strip() == "").sum()
+        null_pct = round(null_count / total_rows, 4) if total_rows &gt; 0 else 0
+        
+        rows.append(
+            {
+                "entity": entity_name,
+                "column": column,
+                "total_rows": total_rows,
+                "null_or_blank_count": int(null_count),
+                "null_or_blank_pct": null_pct,
+                "inferred_dtype": str(df[column].dtype),
+                "sample_values": ", ".join(df[column].dropna().astype(str).head(3).tolist()),
+            }
+        )
+    
+    return pd.DataFrame(rows)
+
+
+raw_profile_summary = pd.concat(
+    [
+        profile_raw_frame(entity, df)
+        for entity, df in raw_tables.items()
+    ],
+    ignore_index=True,
+)
+
+raw_profile_summary.head(20)
+</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>entity</th>
+<th>column</th>
+<th>total_rows</th>
+<th>null_or_blank_count</th>
+<th>null_or_blank_pct</th>
+<th>inferred_dtype</th>
+<th>sample_values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>customers</td>
+<td>customer_id</td>
+<td>501</td>
+<td>0</td>
+<td>0.0000</td>
+<td>str</td>
+<td>C000001, C000002, C000003</td>
+</tr>
+<tr>
+<th>1</th>
+<td>customers</td>
+<td>customer_name</td>
+<td>501</td>
+<td>0</td>
+<td>0.0000</td>
+<td>str</td>
+<td>Customer 0001, Customer 0002, Customer 0003</td>
+</tr>
+<tr>
+<th>2</th>
+<td>customers</td>
+<td>age</td>
+<td>501</td>
+<td>0</td>
+<td>0.0000</td>
+<td>int64</td>
+<td>46, 34, 58</td>
+</tr>
+<tr>
+<th>3</th>
+<td>customers</td>
+<td>monthly_income</td>
+<td>501</td>
+<td>15</td>
+<td>0.0299</td>
+<td>float64</td>
+<td>7501.58, 500.0, 4725.87</td>
+</tr>
+<tr>
+<th>4</th>
+<td>customers</td>
+<td>employment_type</td>
+<td>501</td>
+<td>0</td>
+<td>0.0000</td>
+<td>str</td>
+<td>public_servant, formal_employee, formal_employee</td>
+</tr>
+<tr>
+<th>5</th>
+<td>customers</td>
+<td>region</td>
+<td>501</td>
+<td>0</td>
+<td>0.0000</td>
+<td>str</td>
+<td>SP, RJ, SP</td>
+</tr>
+<tr>
+<th>6</th>
+<td>customers</td>
+<td>credit_score_base</td>
+<td>501</td>
+<td>0</td>
+<td>0.0000</td>
+<td>int64</td>
+<td>594, 579, 592</td>
+</tr>
+<tr>
+<th>7</th>
+<td>customers</td>
+<td>risk_band_source</td>
+<td>501</td>
+<td>0</td>
+<td>0.0000</td>
+<td>str</td>
+<td>high, high, high</td>
+</tr>
+<tr>
+<th>8</th>
+<td>customers</td>
+<td>signup_date</td>
+<td>501</td>
+<td>0</td>
+<td>0.0000</td>
+<td>str</td>
+<td>2025-03-04, 2019-04-02, 2018-04-13</td>
+</tr>
+<tr>
+<th>9</th>
+<td>customers</td>
+<td>source_system</td>
+<td>501</td>
+<td>0</td>
+<td>0.0000</td>
+<td>str</td>
+<td>crm_core, crm_core, crm_core</td>
+</tr>
+<tr>
+<th>10</th>
+<td>customers</td>
+<td>extraction_date</td>
+<td>501</td>
+<td>0</td>
+<td>0.0000</td>
+<td>str</td>
+<td>2026-04-28, 2026-04-28, 2026-04-28</td>
+</tr>
+<tr>
+<th>11</th>
+<td>contracts</td>
+<td>contract_id</td>
+<td>622</td>
+<td>0</td>
+<td>0.0000</td>
+<td>str</td>
+<td>CTR000001, CTR000002, CTR000003</td>
+</tr>
+<tr>
+<th>12</th>
+<td>contracts</td>
+<td>customer_id</td>
+<td>622</td>
+<td>0</td>
+<td>0.0000</td>
+<td>str</td>
+<td>C000001, C000002, C000002</td>
+</tr>
+<tr>
+<th>13</th>
+<td>contracts</td>
+<td>product_type</td>
+<td>622</td>
+<td>0</td>
+<td>0.0000</td>
+<td>str</td>
+<td>credit_card, auto_loan, credit_card</td>
+</tr>
+<tr>
+<th>14</th>
+<td>contracts</td>
+<td>principal_amount</td>
+<td>622</td>
+<td>0</td>
+<td>0.0000</td>
+<td>float64</td>
+<td>2863.83, 3431.72, 232.56</td>
+</tr>
+<tr>
+<th>15</th>
+<td>contracts</td>
+<td>interest_rate_monthly</td>
+<td>622</td>
+<td>0</td>
+<td>0.0000</td>
+<td>float64</td>
+<td>0.0844, 0.0225, 0.0538</td>
+</tr>
+<tr>
+<th>16</th>
+<td>contracts</td>
+<td>term_months</td>
+<td>622</td>
+<td>0</td>
+<td>0.0000</td>
+<td>int64</td>
+<td>24, 48, 24</td>
+</tr>
+<tr>
+<th>17</th>
+<td>contracts</td>
+<td>start_date</td>
+<td>622</td>
+<td>0</td>
+<td>0.0000</td>
+<td>str</td>
+<td>2022-12-05, 2022-01-01, 2022-12-23</td>
+</tr>
+<tr>
+<th>18</th>
+<td>contracts</td>
+<td>contract_status</td>
+<td>622</td>
+<td>6</td>
+<td>0.0096</td>
+<td>str</td>
+<td>active, closed, active</td>
+</tr>
+<tr>
+<th>19</th>
+<td>contracts</td>
+<td>source_system</td>
+<td>622</td>
+<td>0</td>
+<td>0.0000</td>
+<td>str</td>
+<td>loan_management, loan_management, loan_management</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">raw_entity_quality_summary = pd.DataFrame(
+    [
+        {
+            "entity": entity,
+            "rows": len(df),
+            "columns": len(df.columns),
+            "duplicated_rows": int(df.duplicated().sum()),
+            "total_null_cells": int(df.isna().sum().sum()),
+            "total_blank_cells": int((df.astype(str).apply(lambda col: col.str.strip() == "")).sum().sum()),
+        }
+        for entity, df in raw_tables.items()
+    ]
+)
+
+raw_entity_quality_summary</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>entity</th>
+<th>rows</th>
+<th>columns</th>
+<th>duplicated_rows</th>
+<th>total_null_cells</th>
+<th>total_blank_cells</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>customers</td>
+<td>501</td>
+<td>11</td>
+<td>1</td>
+<td>15</td>
+<td>0</td>
+</tr>
+<tr>
+<th>1</th>
+<td>contracts</td>
+<td>622</td>
+<td>10</td>
+<td>1</td>
+<td>0</td>
+<td>6</td>
+</tr>
+<tr>
+<th>2</th>
+<td>payments</td>
+<td>12919</td>
+<td>11</td>
+<td>1</td>
+<td>65</td>
+<td>313</td>
+</tr>
+<tr>
+<th>3</th>
+<td>credit_events</td>
+<td>580</td>
+<td>8</td>
+<td>0</td>
+<td>6</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 9. Dicionário de dados inicial</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>O dicionário de dados descreve o significado das entidades e colunas.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Neste momento, ele representa a expectativa inicial de schema para os arquivos Raw.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">data_dictionary_rows = [
+    # customers
+    ("customers", "customer_id", "Identificador único do cliente.", "string", "primary_key", "no"),
+    ("customers", "customer_name", "Nome sintético do cliente.", "string", "attribute", "no"),
+    ("customers", "age", "Idade do cliente.", "integer", "attribute", "no"),
+    ("customers", "monthly_income", "Renda mensal declarada.", "float", "attribute", "yes"),
+    ("customers", "employment_type", "Tipo de ocupação.", "string", "attribute", "no"),
+    ("customers", "region", "Unidade federativa/região sintética.", "string", "attribute", "no"),
+    ("customers", "credit_score_base", "Score de crédito sintético inicial.", "integer", "attribute", "no"),
+    ("customers", "risk_band_source", "Faixa de risco derivada do score inicial.", "string", "attribute", "no"),
+    ("customers", "signup_date", "Data de cadastro.", "date", "attribute", "no"),
+    
+    # contracts
+    ("contracts", "contract_id", "Identificador único do contrato.", "string", "primary_key", "no"),
+    ("contracts", "customer_id", "Identificador do cliente relacionado.", "string", "foreign_key", "no"),
+    ("contracts", "product_type", "Tipo de produto de crédito.", "string", "attribute", "no"),
+    ("contracts", "principal_amount", "Valor principal do contrato.", "float", "measure", "no"),
+    ("contracts", "interest_rate_monthly", "Taxa de juros mensal.", "float", "measure", "no"),
+    ("contracts", "term_months", "Prazo do contrato em meses.", "integer", "attribute", "no"),
+    ("contracts", "start_date", "Data de início do contrato.", "date", "attribute", "no"),
+    ("contracts", "contract_status", "Status do contrato.", "string", "attribute", "yes"),
+    
+    # payments
+    ("payments", "payment_id", "Identificador único do pagamento.", "string", "primary_key", "no"),
+    ("payments", "contract_id", "Identificador do contrato relacionado.", "string", "foreign_key", "no"),
+    ("payments", "installment_number", "Número da parcela.", "integer", "attribute", "no"),
+    ("payments", "due_date", "Data de vencimento.", "date", "attribute", "no"),
+    ("payments", "payment_date", "Data de pagamento.", "date", "attribute", "yes"),
+    ("payments", "scheduled_amount", "Valor esperado da parcela.", "float", "measure", "no"),
+    ("payments", "amount_paid", "Valor pago.", "float", "measure", "yes"),
+    ("payments", "days_late", "Dias de atraso.", "integer", "measure", "no"),
+    ("payments", "payment_status", "Status do pagamento.", "string", "attribute", "no"),
+    
+    # credit_events
+    ("credit_events", "event_id", "Identificador único do evento.", "string", "primary_key", "no"),
+    ("credit_events", "customer_id", "Identificador do cliente relacionado.", "string", "foreign_key", "no"),
+    ("credit_events", "contract_id", "Identificador do contrato relacionado.", "string", "foreign_key", "no"),
+    ("credit_events", "event_type", "Tipo de evento de crédito.", "string", "attribute", "no"),
+    ("credit_events", "event_date", "Data do evento.", "date", "attribute", "no"),
+    ("credit_events", "event_value", "Valor associado ao evento.", "float/string", "measure", "yes"),
+]
+
+raw_data_dictionary = pd.DataFrame(
+    data_dictionary_rows,
+    columns=[
+        "entity",
+        "column",
+        "description",
+        "expected_type",
+        "column_role",
+        "nullable_expected",
+    ],
+)
+
+# Colunas técnicas comuns
+technical_columns = pd.DataFrame(
+    [
+        {
+            "entity": "all",
+            "column": "source_system",
+            "description": "Sistema de origem do registro.",
+            "expected_type": "string",
+            "column_role": "metadata",
+            "nullable_expected": "no",
+        },
+        {
+            "entity": "all",
+            "column": "extraction_date",
+            "description": "Data de extração do registro.",
+            "expected_type": "date",
+            "column_role": "metadata",
+            "nullable_expected": "no",
+        },
+    ]
+)
+
+raw_data_dictionary = pd.concat(
+    [raw_data_dictionary, technical_columns],
+    ignore_index=True,
+)
+
+raw_data_dictionary.head(20)
+</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>entity</th>
+<th>column</th>
+<th>description</th>
+<th>expected_type</th>
+<th>column_role</th>
+<th>nullable_expected</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>customers</td>
+<td>customer_id</td>
+<td>Identificador único do cliente.</td>
+<td>string</td>
+<td>primary_key</td>
+<td>no</td>
+</tr>
+<tr>
+<th>1</th>
+<td>customers</td>
+<td>customer_name</td>
+<td>Nome sintético do cliente.</td>
+<td>string</td>
+<td>attribute</td>
+<td>no</td>
+</tr>
+<tr>
+<th>2</th>
+<td>customers</td>
+<td>age</td>
+<td>Idade do cliente.</td>
+<td>integer</td>
+<td>attribute</td>
+<td>no</td>
+</tr>
+<tr>
+<th>3</th>
+<td>customers</td>
+<td>monthly_income</td>
+<td>Renda mensal declarada.</td>
+<td>float</td>
+<td>attribute</td>
+<td>yes</td>
+</tr>
+<tr>
+<th>4</th>
+<td>customers</td>
+<td>employment_type</td>
+<td>Tipo de ocupação.</td>
+<td>string</td>
+<td>attribute</td>
+<td>no</td>
+</tr>
+<tr>
+<th>5</th>
+<td>customers</td>
+<td>region</td>
+<td>Unidade federativa/região sintética.</td>
+<td>string</td>
+<td>attribute</td>
+<td>no</td>
+</tr>
+<tr>
+<th>6</th>
+<td>customers</td>
+<td>credit_score_base</td>
+<td>Score de crédito sintético inicial.</td>
+<td>integer</td>
+<td>attribute</td>
+<td>no</td>
+</tr>
+<tr>
+<th>7</th>
+<td>customers</td>
+<td>risk_band_source</td>
+<td>Faixa de risco derivada do score inicial.</td>
+<td>string</td>
+<td>attribute</td>
+<td>no</td>
+</tr>
+<tr>
+<th>8</th>
+<td>customers</td>
+<td>signup_date</td>
+<td>Data de cadastro.</td>
+<td>date</td>
+<td>attribute</td>
+<td>no</td>
+</tr>
+<tr>
+<th>9</th>
+<td>contracts</td>
+<td>contract_id</td>
+<td>Identificador único do contrato.</td>
+<td>string</td>
+<td>primary_key</td>
+<td>no</td>
+</tr>
+<tr>
+<th>10</th>
+<td>contracts</td>
+<td>customer_id</td>
+<td>Identificador do cliente relacionado.</td>
+<td>string</td>
+<td>foreign_key</td>
+<td>no</td>
+</tr>
+<tr>
+<th>11</th>
+<td>contracts</td>
+<td>product_type</td>
+<td>Tipo de produto de crédito.</td>
+<td>string</td>
+<td>attribute</td>
+<td>no</td>
+</tr>
+<tr>
+<th>12</th>
+<td>contracts</td>
+<td>principal_amount</td>
+<td>Valor principal do contrato.</td>
+<td>float</td>
+<td>measure</td>
+<td>no</td>
+</tr>
+<tr>
+<th>13</th>
+<td>contracts</td>
+<td>interest_rate_monthly</td>
+<td>Taxa de juros mensal.</td>
+<td>float</td>
+<td>measure</td>
+<td>no</td>
+</tr>
+<tr>
+<th>14</th>
+<td>contracts</td>
+<td>term_months</td>
+<td>Prazo do contrato em meses.</td>
+<td>integer</td>
+<td>attribute</td>
+<td>no</td>
+</tr>
+<tr>
+<th>15</th>
+<td>contracts</td>
+<td>start_date</td>
+<td>Data de início do contrato.</td>
+<td>date</td>
+<td>attribute</td>
+<td>no</td>
+</tr>
+<tr>
+<th>16</th>
+<td>contracts</td>
+<td>contract_status</td>
+<td>Status do contrato.</td>
+<td>string</td>
+<td>attribute</td>
+<td>yes</td>
+</tr>
+<tr>
+<th>17</th>
+<td>payments</td>
+<td>payment_id</td>
+<td>Identificador único do pagamento.</td>
+<td>string</td>
+<td>primary_key</td>
+<td>no</td>
+</tr>
+<tr>
+<th>18</th>
+<td>payments</td>
+<td>contract_id</td>
+<td>Identificador do contrato relacionado.</td>
+<td>string</td>
+<td>foreign_key</td>
+<td>no</td>
+</tr>
+<tr>
+<th>19</th>
+<td>payments</td>
+<td>installment_number</td>
+<td>Número da parcela.</td>
+<td>integer</td>
+<td>attribute</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 10. Salvando os arquivos na camada Raw</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Agora os arquivos serão salvos em <code>data/raw</code>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Eles serão usados no próximo notebook para iniciar a ingestão Raw → Bronze.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">raw_file_paths = {
+    "customers": RAW_DIR / "customers.csv",
+    "contracts": RAW_DIR / "contracts.csv",
+    "payments": RAW_DIR / "payments.csv",
+    "credit_events": RAW_DIR / "credit_events.csv",
+}
+
+for entity, path in raw_file_paths.items():
+    safe_to_csv(raw_tables[entity], path)
+
+sorted([path.name for path in RAW_DIR.glob("*.csv")])</code></pre>
+</div>
+<div class="output-text">
+<pre>['contracts.csv', 'credit_events.csv', 'customers.csv', 'payments.csv']</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">raw_layer_manifest = pd.DataFrame(
+    [
+        {
+            "entity": entity,
+            "file_name": path.name,
+            "file_path": str(path),
+            "layer": "raw",
+            "file_format": "csv",
+            "rows": len(raw_tables[entity]),
+            "columns": len(raw_tables[entity].columns),
+            "source_systems": ", ".join(sorted(raw_tables[entity]["source_system"].dropna().astype(str).unique())),
+            "generation_date": STUDY_DATE,
+            "notebook": NOTEBOOK_NAME,
+        }
+        for entity, path in raw_file_paths.items()
+    ]
+)
+
+raw_layer_manifest
+</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>entity</th>
+<th>file_name</th>
+<th>file_path</th>
+<th>layer</th>
+<th>file_format</th>
+<th>rows</th>
+<th>columns</th>
+<th>source_systems</th>
+<th>generation_date</th>
+<th>notebook</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>customers</td>
+<td>customers.csv</td>
+<td>D:\_DS-Projects\Data-Science\databricks-credit-risk-lakehouse\data\raw\customers.csv</td>
+<td>raw</td>
+<td>csv</td>
+<td>501</td>
+<td>11</td>
+<td>crm_core</td>
+<td>2026-04-28</td>
+<td>02_data_source_and_raw_layer_preparation</td>
+</tr>
+<tr>
+<th>1</th>
+<td>contracts</td>
+<td>contracts.csv</td>
+<td>D:\_DS-Projects\Data-Science\databricks-credit-risk-lakehouse\data\raw\contracts.csv</td>
+<td>raw</td>
+<td>csv</td>
+<td>622</td>
+<td>10</td>
+<td>loan_management</td>
+<td>2026-04-28</td>
+<td>02_data_source_and_raw_layer_preparation</td>
+</tr>
+<tr>
+<th>2</th>
+<td>payments</td>
+<td>payments.csv</td>
+<td>D:\_DS-Projects\Data-Science\databricks-credit-risk-lakehouse\data\raw\payments.csv</td>
+<td>raw</td>
+<td>csv</td>
+<td>12919</td>
+<td>11</td>
+<td>payment_gateway</td>
+<td>2026-04-28</td>
+<td>02_data_source_and_raw_layer_preparation</td>
+</tr>
+<tr>
+<th>3</th>
+<td>credit_events</td>
+<td>credit_events.csv</td>
+<td>D:\_DS-Projects\Data-Science\databricks-credit-risk-lakehouse\data\raw\credit_events.csv</td>
+<td>raw</td>
+<td>csv</td>
+<td>580</td>
+<td>8</td>
+<td>credit_operations</td>
+<td>2026-04-28</td>
+<td>02_data_source_and_raw_layer_preparation</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 11. Evidências de aprendizagem para o KG</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Este notebook gera evidência real para o <code>databricks-learning-kg</code>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A evidência agora é mais prática do que no Notebook 01, porque criamos dados, schemas, arquivos, manifesto e perfil de qualidade inicial.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">learning_evidence = pd.DataFrame(
+    [
+        {
+            "evidence_id": "EVID_CR_LH_007",
+            "project": PROJECT_NAME,
+            "notebook": NOTEBOOK_NAME,
+            "evidence_date": STUDY_DATE,
+            "topic": "Data Ingestion",
+            "evidence_type": "raw_layer_preparation",
+            "confidence_delta_suggested": 0.15,
+            "mastery_delta_suggested": 0.05,
+            "evidence_description": "Preparação dos arquivos brutos que serão usados como origem para ingestão Raw to Bronze.",
+        },
+        {
+            "evidence_id": "EVID_CR_LH_008",
+            "project": PROJECT_NAME,
+            "notebook": NOTEBOOK_NAME,
+            "evidence_date": STUDY_DATE,
+            "topic": "File Formats",
+            "evidence_type": "csv_generation",
+            "confidence_delta_suggested": 0.10,
+            "mastery_delta_suggested": 0.05,
+            "evidence_description": "Geração de arquivos CSV para customers, contracts, payments e credit_events.",
+        },
+        {
+            "evidence_id": "EVID_CR_LH_009",
+            "project": PROJECT_NAME,
+            "notebook": NOTEBOOK_NAME,
+            "evidence_date": STUDY_DATE,
+            "topic": "Schema Definition",
+            "evidence_type": "schema_documentation",
+            "confidence_delta_suggested": 0.15,
+            "mastery_delta_suggested": 0.05,
+            "evidence_description": "Criação de dicionário de dados inicial com tipos esperados, papéis de coluna e nulidade esperada.",
+        },
+        {
+            "evidence_id": "EVID_CR_LH_010",
+            "project": PROJECT_NAME,
+            "notebook": NOTEBOOK_NAME,
+            "evidence_date": STUDY_DATE,
+            "topic": "Data Quality",
+            "evidence_type": "raw_quality_profile",
+            "confidence_delta_suggested": 0.10,
+            "mastery_delta_suggested": 0.05,
+            "evidence_description": "Geração de perfil inicial de qualidade com nulos, blanks, duplicidades e tipos inferidos.",
+        },
+        {
+            "evidence_id": "EVID_CR_LH_011",
+            "project": PROJECT_NAME,
+            "notebook": NOTEBOOK_NAME,
+            "evidence_date": STUDY_DATE,
+            "topic": "Naming Conventions",
+            "evidence_type": "raw_file_naming",
+            "confidence_delta_suggested": 0.05,
+            "mastery_delta_suggested": 0.05,
+            "evidence_description": "Aplicação de convenções simples de nomes para entidades e arquivos Raw.",
+        },
+    ]
+)
+
+learning_evidence</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>evidence_id</th>
+<th>project</th>
+<th>notebook</th>
+<th>evidence_date</th>
+<th>topic</th>
+<th>evidence_type</th>
+<th>confidence_delta_suggested</th>
+<th>mastery_delta_suggested</th>
+<th>evidence_description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>EVID_CR_LH_007</td>
+<td>Databricks Credit Risk Lakehouse</td>
+<td>02_data_source_and_raw_layer_preparation</td>
+<td>2026-04-28</td>
+<td>Data Ingestion</td>
+<td>raw_layer_preparation</td>
+<td>0.15</td>
+<td>0.05</td>
+<td>Preparação dos arquivos brutos que serão usados como origem para ingestão Raw to Bronze.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>EVID_CR_LH_008</td>
+<td>Databricks Credit Risk Lakehouse</td>
+<td>02_data_source_and_raw_layer_preparation</td>
+<td>2026-04-28</td>
+<td>File Formats</td>
+<td>csv_generation</td>
+<td>0.10</td>
+<td>0.05</td>
+<td>Geração de arquivos CSV para customers, contracts, payments e credit_events.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>EVID_CR_LH_009</td>
+<td>Databricks Credit Risk Lakehouse</td>
+<td>02_data_source_and_raw_layer_preparation</td>
+<td>2026-04-28</td>
+<td>Schema Definition</td>
+<td>schema_documentation</td>
+<td>0.15</td>
+<td>0.05</td>
+<td>Criação de dicionário de dados inicial com tipos esperados, papéis de coluna e nulidade esperada.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>EVID_CR_LH_010</td>
+<td>Databricks Credit Risk Lakehouse</td>
+<td>02_data_source_and_raw_layer_preparation</td>
+<td>2026-04-28</td>
+<td>Data Quality</td>
+<td>raw_quality_profile</td>
+<td>0.10</td>
+<td>0.05</td>
+<td>Geração de perfil inicial de qualidade com nulos, blanks, duplicidades e tipos inferidos.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>EVID_CR_LH_011</td>
+<td>Databricks Credit Risk Lakehouse</td>
+<td>02_data_source_and_raw_layer_preparation</td>
+<td>2026-04-28</td>
+<td>Naming Conventions</td>
+<td>raw_file_naming</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>Aplicação de convenções simples de nomes para entidades e arquivos Raw.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 12. Exportação dos artefatos</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Nesta etapa, salvamos os arquivos auxiliares em <code>data/exports</code> e <code>docs</code>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Esses artefatos servirão para documentação, auditoria e atualização futura do Knowledge Graph.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">safe_to_csv(raw_volume_summary, EXPORTS_DIR / "raw_volume_summary.csv")
+safe_to_csv(raw_profile_summary, EXPORTS_DIR / "raw_profile_summary.csv")
+safe_to_csv(raw_entity_quality_summary, EXPORTS_DIR / "raw_entity_quality_summary.csv")
+safe_to_csv(raw_data_dictionary, EXPORTS_DIR / "raw_data_dictionary.csv")
+safe_to_csv(raw_layer_manifest, EXPORTS_DIR / "raw_layer_manifest.csv")
+safe_to_csv(learning_evidence, EXPORTS_DIR / "learning_evidence_notebook_02.csv")
+
+print("Artefatos exportados com sucesso.")</code></pre>
+</div>
+<div class="output-stream">
+<pre>Artefatos exportados com sucesso.
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">summary_report = f"""# Notebook 02 — Data Source and Raw Layer Preparation
+
+## Projeto
+
+{PROJECT_NAME}
+
+## Data
+
+{STUDY_DATE}
+
+## Objetivo
+
+Criar a base inicial de dados sintéticos para o projeto de risco de crédito e preparar os arquivos da camada Raw.
+
+## Entidades geradas
+
+{raw_volume_summary.to_markdown(index=False)}
+
+## Manifesto da camada Raw
+
+{raw_layer_manifest[["entity", "file_name", "layer", "file_format", "rows", "columns", "source_systems"]].to_markdown(index=False)}
+
+## Qualidade inicial por entidade
+
+{raw_entity_quality_summary.to_markdown(index=False)}
+
+## Evidências de aprendizagem geradas
+
+{learning_evidence[["evidence_id", "topic", "evidence_type", "confidence_delta_suggested", "mastery_delta_suggested"]].to_markdown(index=False)}
+
+## Leitura executiva
+
+Este notebook criou a primeira fonte de dados do projeto `Databricks Credit Risk Lakehouse`.
+
+Foram gerados arquivos brutos para clientes, contratos, pagamentos e eventos de crédito. Os dados incluem pequenas imperfeições controladas, como valores ausentes, blanks e duplicidades, para permitir a prática realista de ingestão, validação e tratamento nas próximas camadas.
+
+## Próximo passo
+
+O próximo notebook será:
+
+`Notebook 03 — Raw to Bronze Ingestion`
+
+Nele, os arquivos CSV da camada Raw serão lidos, enriquecidos com metadados técnicos e persistidos na camada Bronze em formato analítico.
+"""
+
+report_path = DOCS_DIR / "notebook_02_data_source_and_raw_layer_summary.md"
+report_path.write_text(summary_report, encoding="utf-8")
+
+report_path</code></pre>
+</div>
+<div class="output-text">
+<pre>WindowsPath('D:/_DS-Projects/Data-Science/databricks-credit-risk-lakehouse/docs/notebook_02_data_source_and_raw_layer_summary.md')</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>✔️ 13. Conclusão executiva</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Este notebook preparou a fonte de dados inicial do projeto <code>Databricks Credit Risk Lakehouse</code>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Foram criadas quatro entidades principais:<ul>
+<li>customers;</li>
+<li>contracts;</li>
+<li>payments;</li>
+<li>credit_events.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Também foram gerados:<ul>
+<li>arquivos CSV na camada Raw;</li>
+<li>manifesto da camada Raw;</li>
+<li>dicionário de dados inicial;</li>
+<li>perfil de qualidade inicial;</li>
+<li>sumário de volume;</li>
+<li>evidências reais para atualização futura do Knowledge Graph.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Leitura executiva</strong><ul>
+<li>A camada Raw agora possui dados suficientes para iniciar uma esteira Lakehouse progressiva.</li>
+<li>Os arquivos gerados preservam características típicas de dados brutos, incluindo pequenas inconsistências,<ul>
+<li>permitindo que os próximos notebooks implementem ingestão, validação, padronização e tratamento.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Próximo notebook</strong><ul>
+<li><code>Notebook 03 — Raw to Bronze Ingestion</code></li>
+<li>O próximo passo será transformar os arquivos Raw em tabelas Bronze com metadados de ingestão, rastreabilidade e persistência em formato analítico.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">%reload_ext watermark 
+%watermark -a "Roberto-SSoares-LfLngLrnng" -d -t -u --iversions -v -m -h</code></pre>
+</div>
+<div class="output-stream">
+<pre>Author: Roberto-SSoares-LfLngLrnng
+
+Last updated: 2026-04-28 19:51:15
+
+Python implementation: CPython
+Python version       : 3.12.12
+IPython version      : 9.13.0
+
+Compiler    : MSC v.1944 64 bit (AMD64)
+OS          : Windows
+Release     : 11
+Machine     : AMD64
+Processor   : Intel64 Family 6 Model 158 Stepping 9, GenuineIntel
+CPU cores   : 4
+Architecture: 64bit
+
+Hostname: PC-ROBERTO
+
+numpy : 2.4.4
+pandas: 3.0.2
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="6"><strong>Fim</strong></font></p>
+<p><font color="#66666" size="3"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">#!uv pip install nbconvert -U -q
+!jupyter nbconvert --to html --template-file my-template-html-v10.tpl 02_data_source_and_raw_layer_preparation.ipynb</code></pre>
+</div>
+</div>
+<div class="footer">
+<p>RobertoSSoares-LfLngLrnng — <span id="datetime"></span></p>
+</div>
+<script>
+            document.getElementById("datetime").innerText = new Date().toLocaleString('pt-BR');
+        </script>
+</div>
+</body>
+</html>

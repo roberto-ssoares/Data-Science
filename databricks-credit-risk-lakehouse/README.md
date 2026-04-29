@@ -54,11 +54,7 @@ Essa combinação é forte porque não fica só no certificado. Ela mostra:
 
 Para iniciar bem, eu começaria pela **Semana 0 + Semana 1**, e depois transformaria cada semana em uma entrega pequena no GitHub.
 
-
-
 ---
-
-
 
 Semana 1 — Fundamentos de Lakehouse e Databricks  
 
