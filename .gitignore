@@ -42,6 +42,22 @@ ENV/
 *.hdf5
 *.csv
 
+# Jupyter
+.ipynb_checkpoints/
+
+# Data (não subir)
+data/00-raw/*
+data/01-bronze/*
+data/02-interim/*
+data/03-feature-store/*
+data/04-model-output/*
+data/90-profiling/*
+data/99-audit/*
+
+# Permitir estrutura
+!data/**/.gitkeep
+notebooks/.dev*
+
 # Exception: keep raw examples if needed
 
 # Ignore processed data
@@ -76,3 +92,8 @@ dist/
 # UV / Python tooling
 # =============================
 .python-version
+
+# Trash Linux / Jupyter lixo
+.Trash-0/
+*.trashinfo.Trash-0/
+*.trashinfo

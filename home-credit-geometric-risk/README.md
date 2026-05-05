@@ -14,7 +14,25 @@ Investigar se **features geométricas derivadas de grafos** agregam valor ao pro
 
 ---  
 
+## 🚀 Destaques do Projeto
+
+- ✔ Engenharia de recursos baseada em grafos aplicada ao risco de crédito
+
+- ✔ Curvatura de Ollivier-Ricci para análise estrutural
+
+- ✔ Grafo de similaridade KNN entre clientes
+
+- ✔ Avaliação comparativa: recursos tabulares versus geométricos
+
+- ✔ Pipeline completo (dados brutos → modelagem)
+
+
+
+---
+
 ## 🧱 Arquitetura do Projeto
+
+
 
 data/  
 ├── 00-raw/  
@@ -158,5 +176,3 @@ Este projeto explora a interseção entre:
 - Geometria Discreta  
 
 Aplicada a um problema real de negócio: **risco de crédito**.
-
-

@@ -23,6 +23,7 @@ dependencies = [
     "streamlit",
     "ruff",
     "tabulate>=0.10.0",
+    "watermark>=2.6.0",
 ]
 
 [tool.ruff]

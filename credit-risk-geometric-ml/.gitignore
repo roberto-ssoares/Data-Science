@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+.venv/
+venv/
+env/
+.venv-wsl/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment
+.env
+
+# Data
+data/00-raw/*
+data/01-bronze/*
+data/02-silver/*
+data/03-gold/*
+data/synthetic/*
+!data/00-raw/.gitkeep
+!data/01-bronze/.gitkeep
+!data/02-silver/.gitkeep
+!data/03-gold/.gitkeep
+!data/synthetic/.gitkeep
+
+# Artifacts
+artifacts/reports/*
+artifacts/figures/*
+!artifacts/reports/.gitkeep
+!artifacts/figures/.gitkeep
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
