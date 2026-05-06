@@ -1,0 +1,3721 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>02_data_quality_and_preparation</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/jupyterlab/3.6.3/themes/JupyterLab-light-theme.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@300;400;600&amp;family=Reddit+Sans:wght@300;400;600&amp;family=Courier+Prime:wght@400;700&amp;family=Montserrat:wght@300;400;600;700&amp;family=Source+Code+Pro:wght@400&amp;family=Red+Hat+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['\\(', '\\)'], ['$', '$']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+          ignoreHtmlClass: 'tex2jax_ignore',
+          processHtmlClass: 'mathjax_process'
+        }
+      };
+    </script>
+<script async="" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+        :root{
+            --bg:#f5f5f5;
+            --paper:#ffffff;
+            --text:#1f2937;
+            --muted:#6b7280;
+            --border:#d9dde3;
+            --shadow:0 4px 12px rgba(0,0,0,.08);
+            --shadow-soft:0 2px 8px rgba(15,23,42,.06);
+            --md-bg:#f3f2ee;
+            --md-accent:#ff9800;
+            --code-bg:#f7f7f7;
+            --code-accent:#4caf50;
+            --out-bg:#f3f9fa;
+            --out-accent:#2196f3;
+            --stream-bg:#eef8ff;
+            --table-head:#f8fafc;
+            --table-zebra:#f6f8fa;
+            --exec-bg:#f7fbff;
+            --exec-border:#2E86C1;
+            --insight-bg:#f8fffb;
+            --insight-border:#22a06b;
+            --warning-bg:#fffaf2;
+            --warning-border:#f59e0b;
+            --danger-bg:#fff6f6;
+            --danger-border:#ef4444;
+            --metric-bg:#ffffff;
+            --metric-border:#d6e7f7;
+        }
+
+        *{ box-sizing:border-box; }
+
+        body{
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            background:var(--bg);
+            padding:40px 0;
+            color:var(--text);
+            line-height:1.55;
+        }
+
+        .container{
+            max-width:1550px;
+            margin:auto;
+            background:var(--paper);
+            padding:20px 30px 28px;
+            border-radius:8px;
+            box-shadow:var(--shadow);
+        }
+
+        .cell{ margin-bottom:10px; }
+
+        h1.title-header{
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            font-weight:700;
+            color:#8eb4c4;
+            text-transform:uppercase;
+            text-align:center;
+            margin:0 0 24px;
+            letter-spacing:.04em;
+        }
+
+        .markdown{
+            background:var(--md-bg);
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            padding:10px 15px;
+            border-left:5px solid var(--md-accent);
+            border-radius:4px;
+            margin:4px 0 8px;
+            line-height:1.6;
+        }
+        .markdown h1,.markdown h2,.markdown h3,.markdown h4,.markdown h5,.markdown h6{
+            margin-top:0;
+            color:#d64545;
+        }
+        .markdown p:last-child,
+        .markdown ul:last-child,
+        .markdown ol:last-child{ margin-bottom:0; }
+
+        img, svg, figure img{
+            max-width:100%;
+            height:auto;
+            display:block;
+            margin-left:auto;
+            margin-right:auto;
+            border:1px solid #ddd;
+            border-radius:6px;
+            box-shadow:0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        figure{ margin:20px auto; text-align:center; }
+        figure figcaption{ font-size:13px; color:#555; margin-top:6px; }
+
+        .cell-toolbar{
+            display:flex;
+            justify-content:flex-end;
+            margin:0 0 4px;
+            gap:6px;
+            flex-wrap:wrap;
+        }
+        .cell-badge{
+            display:inline-block;
+            background:#eef2f7;
+            border:1px solid #d7dee8;
+            color:#516072;
+            border-radius:999px;
+            font-size:11px;
+            font-weight:600;
+            padding:2px 8px;
+            letter-spacing:.02em;
+        }
+
+        .code_cell{
+            background:var(--code-bg);
+            border-left:5px solid var(--code-accent);
+            padding:6px 8px;
+            margin:4px 0;
+            overflow-x:auto;
+            border-radius:4px;
+        }
+        .code_cell pre,
+        .code_cell .hljs{
+            margin:0;
+            background:transparent !important;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+            white-space:pre;
+        }
+
+        .output-text,
+        .output-stream,
+        .output-error,
+        .output-image,
+        .output-html{
+            margin:4px 0;
+            border-radius:4px;
+            overflow-x:auto;
+        }
+
+        .output-text{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:10px 10px 10px 8px;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+        }
+        .output-text pre{
+            margin:0;
+            white-space:pre-wrap;
+            word-break:break-word;
+            font-family:inherit;
+            font-size:inherit;
+            line-height:inherit;
+        }
+
+        .output-stream{
+            background:var(--stream-bg);
+            border-left:5px solid var(--out-accent);
+            padding:8px 10px;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+        }
+        .output-stream pre{ margin:0; white-space:pre-wrap; word-break:break-word; }
+
+        .output-image{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:10px;
+        }
+
+        .output-html{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:8px 10px;
+            color:var(--text);
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            line-height:1.55;
+            white-space:normal;
+        }
+        .output-html *{ white-space:normal; word-break:normal; max-width:100%; }
+        .output-html p{ margin:0 0 10px; }
+        .output-html p:last-child{ margin-bottom:0; }
+        .output-html h1,.output-html h2,.output-html h3,.output-html h4,.output-html h5,.output-html h6{
+            margin:0 0 10px;
+            color:var(--text);
+            line-height:1.3;
+        }
+        .output-html ul,
+        .output-html ol{ margin:0 0 10px 20px; padding-left:12px; }
+        .output-html li{ margin-bottom:4px; }
+        .output-html li:last-child{ margin-bottom:0; }
+        .output-html code{ font-family:'Red Hat Mono','Noto Sans Mono',monospace; font-size:.95em; }
+        .output-html pre{
+            white-space:pre-wrap;
+            word-break:break-word;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.5;
+            margin:0;
+        }
+
+        .table-output{ padding:8px 10px; }
+        .table-output table,
+        .table-output table.dataframe{
+            border-collapse:collapse;
+            border-spacing:0;
+            width:auto;
+            max-width:100%;
+            margin:0;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.45;
+            color:#263238;
+            background:#fff;
+        }
+        .table-output table th,
+        .table-output table td,
+        .table-output table.dataframe th,
+        .table-output table.dataframe td{
+            padding:8px 10px;
+            border:1px solid var(--border);
+            vertical-align:top;
+            text-align:left;
+        }
+        .table-output table thead,
+        .table-output table.dataframe thead{ background:var(--table-head); font-weight:600; }
+        .table-output table tbody tr:nth-child(even),
+        .table-output table.dataframe tbody tr:nth-child(even){ background:var(--table-zebra); }
+        .table-output .dataframe tbody tr:hover,
+        .table-output table tbody tr:hover{ background:#eef6ff; }
+
+        /* Premium HTML blocks */
+        .output-html .executive-card,
+        .output-html .insight-card,
+        .output-html .warning-card,
+        .output-html .danger-card,
+        .output-html .summary-card{
+            border-radius:10px;
+            padding:14px 16px;
+            box-shadow:var(--shadow-soft);
+            border:1px solid #dbe5ef;
+            margin:4px 0;
+        }
+        .output-html .executive-card{
+            background:var(--exec-bg);
+            border-left:6px solid var(--exec-border);
+        }
+        .output-html .summary-card{
+            background:#f8fbff;
+            border-left:6px solid #64748b;
+        }
+        .output-html .insight-card{
+            background:var(--insight-bg);
+            border-left:6px solid var(--insight-border);
+        }
+        .output-html .warning-card{
+            background:var(--warning-bg);
+            border-left:6px solid var(--warning-border);
+        }
+        .output-html .danger-card{
+            background:var(--danger-bg);
+            border-left:6px solid var(--danger-border);
+        }
+        .output-html .card-title{
+            margin:0 0 10px;
+            font-size:20px;
+            font-weight:700;
+            color:#1f2937;
+            line-height:1.25;
+        }
+        .output-html .card-subtitle{
+            margin:0 0 12px;
+            font-size:13px;
+            font-weight:600;
+            color:#64748b;
+            text-transform:uppercase;
+            letter-spacing:.03em;
+        }
+        .output-html .card-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+            gap:10px;
+            margin:10px 0 12px;
+        }
+        .output-html .metric-card{
+            background:var(--metric-bg);
+            border:1px solid var(--metric-border);
+            border-radius:10px;
+            padding:10px 12px;
+            min-height:82px;
+            box-shadow:0 1px 3px rgba(15,23,42,.05);
+        }
+        .output-html .metric-label{
+            display:block;
+            margin:0 0 6px;
+            font-size:12px;
+            font-weight:700;
+            color:#64748b;
+            text-transform:uppercase;
+            letter-spacing:.03em;
+        }
+        .output-html .metric-value{
+            display:block;
+            font-size:24px;
+            font-weight:700;
+            line-height:1.15;
+            color:#0f172a;
+        }
+        .output-html .metric-note{
+            display:block;
+            margin-top:4px;
+            font-size:12px;
+            color:#6b7280;
+        }
+        .output-html .chip-row{
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px;
+            margin:8px 0 10px;
+        }
+        .output-html .chip{
+            display:inline-flex;
+            align-items:center;
+            background:#edf4ff;
+            border:1px solid #d8e6ff;
+            color:#2457a6;
+            border-radius:999px;
+            padding:4px 10px;
+            font-size:12px;
+            font-weight:600;
+        }
+        .output-html .callout-compact p{ margin-bottom:8px; }
+        .output-html .callout-compact ul,
+        .output-html .callout-compact ol{ margin-bottom:8px; }
+
+        .output-error{
+            background:#fff5f5;
+            border-left:5px solid #ef4444;
+            padding:10px 12px;
+            color:#7f1d1d;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.5;
+        }
+        .output-error pre{ margin:8px 0 0; white-space:pre-wrap; word-break:break-word; }
+
+        .hidden-note{
+            margin:4px 0;
+            padding:6px 10px;
+            border-radius:6px;
+            background:#f8fafc;
+            border:1px dashed #cbd5e1;
+            color:#64748b;
+            font-size:12px;
+            font-weight:600;
+        }
+
+        .footer{
+            text-align:right;
+            margin-top:30px;
+            padding:12px;
+            background:#e9ecef;
+            border-radius:4px;
+            font-size:14px;
+            color:#555;
+        }
+
+        @media (max-width: 768px) {
+            body{ padding:16px 0; }
+            .container{ max-width:100%; padding:14px 16px 20px; border-radius:0; }
+            .output-html,
+            .output-text,
+            .output-stream,
+            .output-image,
+            .output-error,
+            .markdown,
+            .code_cell{ padding-left:10px; padding-right:10px; }
+            .output-html .card-title{ font-size:18px; }
+            .output-html .metric-value{ font-size:20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<h1 class="title-header">02_data_quality_and_preparation</h1>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#F3F2EE">
+<br/><br/>
+<p style="text-align: center;">
+<font color="#0A1781" size="6">
+<strong>
+                    Spotify Global Music Intelligence - Data Science Projects
+                </strong>
+</font>
+</p>
+<p style="text-align: center;">
+<font color="#C58A1E" size="6">
+<strong>
+                    Data Quality and Preparation - Preparação controlada<br/>da base principal para EDA profissional
+                </strong>
+</font>
+</p>
+<p style="text-align: center;">
+<font color="#C58A1E" size="5">
+<strong>
+                    Apresentar a finalidade do Notebook 02 e estabelecer que a preparação dos dados<br/>será feita de forma controlada, documentada e alinhada aos guardrails do projeto.
+                </strong>
+</font>
+</p>
+<br/>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#F3F2EE">
+<p style="text-align: right;">
+<font color="#444444" size="4">
+            Roberto SSoares - LfLngLrnng
+      </font>
+</p>
+<p style="text-align: right;"><font color="#444444" size="2">
+<a href="https://www.linkedin.com/in/roberto-dos-santos-soares/">in/roberto-dos-santos-soares</a><br/><a href="https://roberto-ssoares.github.io/meu-portfolio/">Portifólio: roberto-ssoares</a>
+</font></p>
+<p style="text-align: right;">
+<font color="#444444" size="4">
+            Data Science = { "+"; "Faturamento", "-"; "Custo", "&gt;"; "Qualidade de vida" }
+        </font>
+<br/>
+<font color="#918e8e" size="2">"Mestre Bruno Jardim"
+        </font>
+</p>
+<p style="text-align: right;">
+<font color="#918e8e" size="2">
+</font>
+</p>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 Abertura executiva</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Este notebook dá continuidade ao projeto <strong>Spotify Global Music Intelligence</strong>, avançando da fase de <strong>Data Understanding</strong> para a fase de <strong>Data Quality and Preparation</strong>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>No Notebook 01, a base <code>spotify_data_clean.csv</code> foi definida como fonte principal da EDA. A análise inicial mostrou<ul>
+<li>que a base possui boa integridade estrutural, <code>track_id</code> único, ausência de duplicidade técnica direta,</li>
+<li>cobertura temporal ampla entre 1952 e 2025 e variável de popularidade completa.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Também foram identificados pontos de atenção que precisam ser tratados antes da EDA principal:<ul>
+<li>valores ausentes em <code>artist_genres</code>;</li>
+<li>poucos registros sem <code>artist_name</code>;</li>
+<li>possíveis duplicados textuais por música, artista e álbum;</li>
+<li>necessidade de conversão de datas;</li>
+<li>necessidade de criação de variáveis temporais;</li>
+<li>necessidade de classificação por período analítico;</li>
+<li>necessidade de decidir entre visão de catálogo e visão canônica.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Este notebook tem como objetivo transformar esses diagnósticos em uma base preparada, confiável e rastreável para a próxima etapa: <strong>Notebook 03 — Exploratory Data Analysis</strong>.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 1. Papel deste notebook no projeto</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>O <strong>Notebook 02 — Data Quality and Preparation</strong> atua como ponte entre o entendimento dos dados e a análise exploratória.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Seu papel é preparar a base principal para que a EDA seja feita sobre dados mais consistentes, sem alterar a camada Raw e sem aplicar tratamentos irreversíveis de forma prematura.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A preparação será conduzida com foco em:<ul>
+<li><em>rastreabilidade;</em></li>
+<li><em>controle de qualidade;</em></li>
+<li><em>documentação das decisões;</em></li>
+<li><em>preservação da informação original;</em></li>
+<li><em>criação de variáveis analíticas;</em></li>
+<li><em>geração da camada Silver;</em></li>
+<li><em>apoio à futura camada Gold.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Ao final deste notebook, espera-se gerar uma base Silver pronta para a EDA, contendo:<ul>
+<li><em>tipos de dados ajustados;</em></li>
+<li><em>datas convertidas;</em></li>
+<li><em>variáveis temporais criadas;</em></li>
+<li><em>valores ausentes tratados de forma explícita;</em></li>
+<li><em>possíveis duplicidades textuais marcadas;</em></li>
+<li><em>visão de catálogo preservada;</em></li>
+<li><em>visão canônica avaliada;</em></li>
+<li><em>artefatos de qualidade documentados;</em></li>
+<li><em>base preparada salva em Parquet.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 2. Guardrails do Notebook 02</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Definir os princípios que orientarão todas as decisões de preparação dos dados neste notebook.<ul>
+<li>Esses guardrails evitam tratamentos precipitados, perda de informação e inconsistências entre notebooks.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Guardrails metodológicos</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Guardrail | Aplicação prática |
+|---|---|
+| CRISP-DM+ | Toda transformação deve estar conectada ao problema, às hipóteses e à EDA futura |
+| Data Understanding antes de transformação | Nenhum tratamento será aplicado sem diagnóstico prévio |
+| Separação por fase | Este notebook prepara dados; a EDA principal ficará no Notebook 03 |
+| Decisões documentadas | Cada tratamento relevante terá justificativa técnica e analítica |
+| Sem causalidade prematura | A preparação não deve induzir conclusões antes da análise |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Guardrails de dados</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Guardrail | Aplicação prática |
+|---|---|
+| Raw é imutável | Os arquivos em <code>data/00_raw</code> não serão alterados |
+| Silver é preparada | A base tratada será salva em <code>data/02_silver</code> |
+| <code>track_id</code> é a chave técnica | A visão principal manterá uma linha por <code>track_id</code> |
+| Sem deduplicação automática | Possíveis duplicados textuais serão marcados, não removidos imediatamente |
+| Valores ausentes explícitos | Ausências relevantes serão tratadas como informação analítica |
+| Tipos controlados | Datas, categorias, textos e numéricos serão padronizados |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Guardrails analíticos</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Guardrail | Aplicação prática |
+|---|---|
+| Popularidade como eixo central | <code>track_popularity</code> será preservada como variável principal |
+| Gênero com cautela | <code>artist_genres</code> possui alta ausência e será interpretado com limitação |
+| Temporalidade explícita | Serão criadas variáveis como <code>release_year</code>, <code>release_month</code> e <code>periodo_analitico</code> |
+| Catálogo versus música canônica | A base poderá ter duas visões: por <code>track_id</code> e por combinação textual |
+| Dataset complementar fora da EDA atual | <code>spotify-tracks-dataset.csv</code> será preservado para etapa futura |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Guardrails de comunicação — 3C</strong><ul>
+<li>A comunicação deste notebook seguirá o padrão <strong>3C Data Communication Standard</strong>:</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Princípio | Aplicação |
+|---|---|
+| Clear | Cada etapa deve deixar claro o que será feito e por quê |
+| Concise | As conclusões serão objetivas, sem excesso de texto |
+| Consistent | A estrutura narrativa será mantida entre notebooks, README e portfólio |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li>A regra prática será:<ul>
+<li><strong>Achado → Evidência → Implicação → Próxima ação</strong></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Decisão inicial<ul>
+<li>A preparação será feita exclusivamente sobre a base principal:<ul>
+<li><code>spotify_data_clean.csv</code></li>
+</ul>
+</li>
+<li>O dataset complementar será mantido fora desta etapa para evitar complexidade prematura.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Configuração inicial do ambiente</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">#!uv pip install watermark -q -U</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">from pathlib import Path
+
+import numpy as np
+import pandas as pd</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Configurações de exibição do Pandas
+pd.set_option("display.max_columns", 120)
+pd.set_option("display.max_rows", 120)
+pd.set_option("display.width", 180)
+pd.set_option("display.max_colwidth", 250)
+pd.set_option("display.float_format", "{:,.2f}".format)</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Versões dos pacotes usados neste jupyter notebook
+%reload_ext watermark
+%watermark -a "RobertoSSoares-LfLngLrnng"</code></pre>
+</div>
+<div class="output-stream">
+<pre>Author: RobertoSSoares-LfLngLrnng
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Raiz do projeto
+PROJECT_ROOT = Path.cwd().parent if Path.cwd().name == "notebooks" else Path.cwd()
+
+# Diretórios principais
+DATA_DIR = PROJECT_ROOT / "data"
+RAW_DIR = DATA_DIR / "00_raw"
+BRONZE_DIR = DATA_DIR / "01_bronze"
+SILVER_DIR = DATA_DIR / "02_silver"
+GOLD_DIR = DATA_DIR / "03_gold"
+
+REPORTS_DIR = PROJECT_ROOT / "reports"
+TABLES_DIR = REPORTS_DIR / "tables"
+FIGURES_DIR = REPORTS_DIR / "figures"
+HTML_DIR = REPORTS_DIR / "html"
+
+# Garante existência dos diretórios de saída
+BRONZE_DIR.mkdir(parents=True, exist_ok=True)
+SILVER_DIR.mkdir(parents=True, exist_ok=True)
+GOLD_DIR.mkdir(parents=True, exist_ok=True)
+TABLES_DIR.mkdir(parents=True, exist_ok=True)
+
+# Arquivo principal da etapa
+SPOTIFY_MAIN_FILE = RAW_DIR / "spotify_data_clean.csv"
+
+PROJECT_ROOT</code></pre>
+</div>
+<div class="output-text">
+<pre>WindowsPath('D:/_DS-Projects/Data-Science/spotify-global-music-intelligence')</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 3. Validação da fonte principal</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Validar se a fonte principal definida no Notebook 01 está disponível na camada Raw.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Ações realizadas</strong><ul>
+<li><em>Nesta etapa será verificada a existência do arquivo:</em><ul>
+<li><em><code>data/00_raw/spotify_data_clean.csv</code></em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>A preparação dos dados deve partir sempre da fonte bruta original, sem alterar a camada Raw.<ul>
+<li>Essa validação garante que o pipeline do Notebook 02 começa de forma rastreável e reprodutível.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>Confirmar que a base principal está disponível para carregamento.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Validação da fonte principal</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">source_check = pd.DataFrame(
+    {
+        "arquivo": ["spotify_data_clean.csv"],
+        "caminho": [SPOTIFY_MAIN_FILE],
+        "existe": [SPOTIFY_MAIN_FILE.exists()],
+    }
+)
+
+source_check</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>arquivo</th>
+<th>caminho</th>
+<th>existe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>spotify_data_clean.csv</td>
+<td>D:\_DS-Projects\Data-Science\spotify-global-music-intelligence\data\00_raw\spotify_data_clean.csv</td>
+<td>True</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 4. Carregamento controlado da base principal</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Carregar a base principal <code>spotify_data_clean.csv</code> a partir da camada Raw.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Ações realizadas</strong><ul>
+<li><em>Nesta etapa será criada uma cópia de trabalho chamada <code>df_raw</code>.</em></li>
+<li><em>A base Raw será preservada e todas as transformações posteriores serão aplicadas em cópias controladas.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>Separar a base bruta da base de trabalho evita alterações acidentais e mantém rastreabilidade entre Raw, Bronze e Silver.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>Obter a base principal carregada em memória para iniciar a preparação.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Carregamento controlado da base principal</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">def read_csv_with_fallback(file_path: Path) -&gt; pd.DataFrame:
+    """
+    Lê um arquivo CSV usando tentativas de encoding e separador.
+    """
+    attempts = [
+        {"encoding": "utf-8", "sep": ","},
+        {"encoding": "utf-8-sig", "sep": ","},
+        {"encoding": "latin1", "sep": ","},
+        {"encoding": "utf-8", "sep": ";"},
+        {"encoding": "utf-8-sig", "sep": ";"},
+        {"encoding": "latin1", "sep": ";"},
+    ]
+
+    last_error = None
+
+    for params in attempts:
+        try:
+            return pd.read_csv(file_path, low_memory=False, **params)
+        except Exception as error:
+            last_error = error
+
+    raise RuntimeError(
+        f"Não foi possível ler o arquivo {file_path}. "
+        f"Último erro encontrado: {last_error}"
+    )
+
+
+df_raw = read_csv_with_fallback(SPOTIFY_MAIN_FILE)
+
+print("Base principal carregada com sucesso.")
+print(f"Linhas: {df_raw.shape[0]:,}")
+print(f"Colunas: {df_raw.shape[1]:,}")
+</code></pre>
+</div>
+<div class="output-stream">
+<pre>Base principal carregada com sucesso.
+Linhas: 8,582
+Colunas: 15
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 5. Criação da base Bronze de trabalho</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Criar uma cópia controlada da base principal para representar a camada Bronze do projeto.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Ações realizadas</strong><ul>
+<li><em>Nesta etapa será criada a base <code>df_bronze</code>, preservando a estrutura original da fonte, mas adicionando metadados mínimos de rastreabilidade.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>A camada Bronze representa os dados ingeridos com mínima intervenção.</li>
+<li>Ela serve como ponto intermediário entre a Raw imutável e a Silver tratada.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>Criar uma base Bronze com rastreabilidade de origem e data de processamento.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Criação da base Bronze de trabalho</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">df_bronze = df_raw.copy()
+
+df_bronze["data_source"] = "spotify_data_clean.csv"
+df_bronze["processing_layer"] = "bronze"
+df_bronze["processing_timestamp"] = pd.Timestamp.now()
+
+bronze_shape = pd.DataFrame(
+    {
+        "dataset": ["df_bronze"],
+        "rows": [df_bronze.shape[0]],
+        "columns": [df_bronze.shape[1]],
+        "total_cells": [df_bronze.shape[0] * df_bronze.shape[1]],
+    }
+)
+
+bronze_shape</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>dataset</th>
+<th>rows</th>
+<th>columns</th>
+<th>total_cells</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>df_bronze</td>
+<td>8582</td>
+<td>18</td>
+<td>154476</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 6. Plano de preparação da camada Silver</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Definir o plano de transformação da base Bronze para a base Silver.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Transformações planejadas</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Ordem | Transformação | Objetivo |
+|---|---|---|
+| 1 | Padronizar nomes e tipos | Garantir consistência técnica |
+| 2 | Converter <code>album_release_date</code> | Permitir análise temporal |
+| 3 | Criar <code>release_year</code> e <code>release_month</code> | Apoiar EDA temporal |
+| 4 | Criar <code>periodo_analitico</code> | Separar catálogo histórico e períodos modernos |
+| 5 | Tratar <code>artist_genres</code> ausente | Evitar nulos em análises categóricas |
+| 6 | Investigar <code>artist_name</code> ausente | Tratar poucos casos críticos |
+| 7 | Marcar duplicados textuais | Preservar catálogo sem remover informação |
+| 8 | Criar visão de catálogo | Manter uma linha por <code>track_id</code> |
+| 9 | Avaliar visão canônica | Reduzir possíveis distorções em rankings |
+| 10 | Salvar base Silver | Preparar entrada para o Notebook 03 |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Decisão operacional</strong><ul>
+<li>A próxima etapa será iniciar a criação da base <code>df_silver</code>, aplicando os tratamentos de forma incremental e documentada.</li>
+<li>Nenhuma linha será removida sem justificativa explícita.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 7. Criação da base Silver</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Criar a base <code>df_silver</code> a partir da camada Bronze, aplicando tratamentos controlados para preparar os dados para a EDA.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Ações realizadas</strong><ul>
+<li>Nesta etapa serão aplicadas transformações incrementais:<ul>
+<li><em>criação de uma cópia da base Bronze;</em></li>
+<li><em>conversão de tipos numéricos;</em></li>
+<li><em>conversão da coluna <code>album_release_date</code>;</em></li>
+<li><em>criação de variáveis temporais;</em></li>
+<li><em>tratamento explícito de valores ausentes;</em></li>
+<li><em>marcação de possíveis duplicidades textuais.</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>A camada Silver deve representar uma versão mais consistente, analítica e preparada dos dados, sem destruir a rastreabilidade da fonte original.</li>
+<li>Nesta etapa, nenhum registro será removido automaticamente.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>Obter uma base Silver preparada para análises exploratórias no Notebook 03.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Criação inicial da base Silver</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">df_silver = df_bronze.copy()
+
+df_silver["processing_layer"] = "silver"
+
+silver_initial_shape = pd.DataFrame(
+    {
+        "dataset": ["df_silver_initial"],
+        "rows": [df_silver.shape[0]],
+        "columns": [df_silver.shape[1]],
+        "total_cells": [df_silver.shape[0] * df_silver.shape[1]],
+    }
+)
+
+silver_initial_shape</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>dataset</th>
+<th>rows</th>
+<th>columns</th>
+<th>total_cells</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>df_silver_initial</td>
+<td>8582</td>
+<td>18</td>
+<td>154476</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 8. Padronização de tipos de dados</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Garantir que as principais variáveis da base estejam com tipos adequados para análise.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Ações realizadas</strong><ul>
+<li><em>Nesta etapa serão padronizadas variáveis numéricas, booleanas, textuais e temporais.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>Tipos incorretos podem gerar erros em agregações, filtros, visualizações e cálculos estatísticos.</li>
+<li>A padronização de tipos é uma etapa essencial antes da EDA.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>Obter uma base com tipos mais consistentes para análise temporal, análise de popularidade e análise categórica.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Padronização inicial de tipos</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Colunas numéricas esperadas
+numeric_columns = [
+    "track_number",
+    "track_popularity",
+    "artist_popularity",
+    "artist_followers",
+    "album_total_tracks",
+    "track_duration_min",
+]
+
+for col in numeric_columns:
+    if col in df_silver.columns:
+        df_silver[col] = pd.to_numeric(df_silver[col], errors="coerce")
+
+# Coluna booleana
+if "explicit" in df_silver.columns:
+    df_silver["explicit"] = df_silver["explicit"].astype("boolean")
+
+# Colunas textuais
+text_columns = [
+    "track_id",
+    "track_name",
+    "artist_name",
+    "artist_genres",
+    "album_id",
+    "album_name",
+    "album_type",
+    "data_source",
+    "processing_layer",
+]
+
+for col in text_columns:
+    if col in df_silver.columns:
+        df_silver[col] = df_silver[col].astype("string")
+
+# Relatório de tipos após padronização
+dtype_report = (
+    df_silver
+    .dtypes
+    .reset_index()
+    .rename(columns={"index": "column", 0: "dtype"})
+)
+
+dtype_report
+</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>column</th>
+<th>dtype</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>track_id</td>
+<td>string</td>
+</tr>
+<tr>
+<th>1</th>
+<td>track_name</td>
+<td>string</td>
+</tr>
+<tr>
+<th>2</th>
+<td>track_number</td>
+<td>int64</td>
+</tr>
+<tr>
+<th>3</th>
+<td>track_popularity</td>
+<td>int64</td>
+</tr>
+<tr>
+<th>4</th>
+<td>explicit</td>
+<td>boolean</td>
+</tr>
+<tr>
+<th>5</th>
+<td>artist_name</td>
+<td>string</td>
+</tr>
+<tr>
+<th>6</th>
+<td>artist_popularity</td>
+<td>int64</td>
+</tr>
+<tr>
+<th>7</th>
+<td>artist_followers</td>
+<td>int64</td>
+</tr>
+<tr>
+<th>8</th>
+<td>artist_genres</td>
+<td>string</td>
+</tr>
+<tr>
+<th>9</th>
+<td>album_id</td>
+<td>string</td>
+</tr>
+<tr>
+<th>10</th>
+<td>album_name</td>
+<td>string</td>
+</tr>
+<tr>
+<th>11</th>
+<td>album_release_date</td>
+<td>str</td>
+</tr>
+<tr>
+<th>12</th>
+<td>album_total_tracks</td>
+<td>int64</td>
+</tr>
+<tr>
+<th>13</th>
+<td>album_type</td>
+<td>string</td>
+</tr>
+<tr>
+<th>14</th>
+<td>track_duration_min</td>
+<td>float64</td>
+</tr>
+<tr>
+<th>15</th>
+<td>data_source</td>
+<td>string</td>
+</tr>
+<tr>
+<th>16</th>
+<td>processing_layer</td>
+<td>string</td>
+</tr>
+<tr>
+<th>17</th>
+<td>processing_timestamp</td>
+<td>datetime64[us]</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 9. Conversão de datas e criação de variáveis temporais</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Converter a coluna <code>album_release_date</code> para formato de data e criar variáveis auxiliares para análise temporal.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Ações realizadas</strong><ul>
+<li>Serão criadas as seguintes variáveis:<ul>
+<li><em><code>album_release_date_parsed</code>;</em></li>
+<li><em><code>release_year</code>;</em></li>
+<li><em><code>release_month</code>;</em></li>
+<li><em><code>release_decade</code>.</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>A análise temporal é uma das dimensões principais do projeto.</li>
+<li>Sem datas convertidas corretamente, não é possível analisar evolução por ano, período, década ou recorte histórico.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>Obter variáveis temporais prontas para a EDA.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Conversão de datas e criação de variáveis temporais</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">df_silver["album_release_date_parsed"] = pd.to_datetime(
+    df_silver["album_release_date"],
+    errors="coerce",
+)
+
+df_silver["release_year"] = df_silver["album_release_date_parsed"].dt.year
+df_silver["release_month"] = df_silver["album_release_date_parsed"].dt.month
+df_silver["release_decade"] = (df_silver["release_year"] // 10) * 10
+
+temporal_quality_report = pd.DataFrame(
+    {
+        "metric": [
+            "total_rows",
+            "valid_release_dates",
+            "invalid_release_dates",
+            "min_release_date",
+            "max_release_date",
+            "min_release_year",
+            "max_release_year",
+            "unique_release_years",
+        ],
+        "value": [
+            len(df_silver),
+            df_silver["album_release_date_parsed"].notna().sum(),
+            df_silver["album_release_date_parsed"].isna().sum(),
+            df_silver["album_release_date_parsed"].min(),
+            df_silver["album_release_date_parsed"].max(),
+            df_silver["release_year"].min(),
+            df_silver["release_year"].max(),
+            df_silver["release_year"].nunique(dropna=True),
+        ],
+    }
+)
+
+temporal_quality_report
+</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>metric</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>total_rows</td>
+<td>8582</td>
+</tr>
+<tr>
+<th>1</th>
+<td>valid_release_dates</td>
+<td>8582</td>
+</tr>
+<tr>
+<th>2</th>
+<td>invalid_release_dates</td>
+<td>0</td>
+</tr>
+<tr>
+<th>3</th>
+<td>min_release_date</td>
+<td>1952-09-12 00:00:00</td>
+</tr>
+<tr>
+<th>4</th>
+<td>max_release_date</td>
+<td>2025-10-31 00:00:00</td>
+</tr>
+<tr>
+<th>5</th>
+<td>min_release_year</td>
+<td>1952</td>
+</tr>
+<tr>
+<th>6</th>
+<td>max_release_year</td>
+<td>2025</td>
+</tr>
+<tr>
+<th>7</th>
+<td>unique_release_years</td>
+<td>68</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 10. Criação do período analítico</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Classificar as faixas em períodos analíticos para apoiar comparações temporais na EDA.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Ações realizadas</strong><ul>
+<li><em>Será criada a variável <code>periodo_analitico</code>, separando registros em grupos temporais.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>A base possui registros entre 1952 e 2025.</li>
+<li>Como o projeto tem foco em tendências musicais e popularidade, a criação de períodos ajuda a comparar:<ul>
+<li>catálogo histórico,</li>
+<li>fase inicial do streaming,</li>
+<li>crescimento,</li>
+<li>maturidade e</li>
+<li>lançamentos recentes.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>Obter uma variável temporal categórica para análises comparativas.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Classificação de períodos analíticos</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">def classify_release_period(year: float) -&gt; str:
+    """
+    Classifica o ano de lançamento em períodos analíticos.
+    """
+    if pd.isna(year):
+        return "unknown"
+
+    year = int(year)
+
+    if year &lt; 2009:
+        return "catalogo_historico_pre_2009"
+    if 2009 &lt;= year &lt;= 2015:
+        return "streaming_early_2009_2015"
+    if 2016 &lt;= year &lt;= 2020:
+        return "streaming_growth_2016_2020"
+    if 2021 &lt;= year &lt;= 2023:
+        return "streaming_mature_2021_2023"
+    if 2024 &lt;= year &lt;= 2025:
+        return "recent_releases_2024_2025"
+
+    return "out_of_scope"
+
+
+df_silver["periodo_analitico"] = df_silver["release_year"].apply(classify_release_period)
+
+period_summary = (
+    df_silver
+    .groupby("periodo_analitico", dropna=False)
+    .agg(
+        track_count=("track_id", "count"),
+        min_year=("release_year", "min"),
+        max_year=("release_year", "max"),
+        avg_track_popularity=("track_popularity", "mean"),
+        median_track_popularity=("track_popularity", "median"),
+    )
+    .reset_index()
+    .sort_values("min_year")
+)
+
+period_summary
+</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>periodo_analitico</th>
+<th>track_count</th>
+<th>min_year</th>
+<th>max_year</th>
+<th>avg_track_popularity</th>
+<th>median_track_popularity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>catalogo_historico_pre_2009</td>
+<td>1394</td>
+<td>1952</td>
+<td>2008</td>
+<td>54.07</td>
+<td>59.00</td>
+</tr>
+<tr>
+<th>2</th>
+<td>streaming_early_2009_2015</td>
+<td>2009</td>
+<td>2009</td>
+<td>2015</td>
+<td>51.44</td>
+<td>56.00</td>
+</tr>
+<tr>
+<th>3</th>
+<td>streaming_growth_2016_2020</td>
+<td>2332</td>
+<td>2016</td>
+<td>2020</td>
+<td>52.22</td>
+<td>59.00</td>
+</tr>
+<tr>
+<th>4</th>
+<td>streaming_mature_2021_2023</td>
+<td>1434</td>
+<td>2021</td>
+<td>2023</td>
+<td>51.90</td>
+<td>59.00</td>
+</tr>
+<tr>
+<th>1</th>
+<td>recent_releases_2024_2025</td>
+<td>1413</td>
+<td>2024</td>
+<td>2025</td>
+<td>52.66</td>
+<td>54.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 11. Tratamento controlado de valores ausentes</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Tratar valores ausentes de forma explícita e rastreável, sem remover registros automaticamente.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Ações realizadas</strong><ul>
+<li>Serão tratados dois pontos identificados no Notebook 01:<ul>
+<li><em><code>artist_genres</code> com alta ausência;</em></li>
+<li><em><code>artist_name</code> com poucos registros ausentes.</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>Valores ausentes precisam ser tratados antes da EDA para evitar erros em agrupamentos e interpretações incorretas.</li>
+<li>No caso de <code>artist_genres</code>, a ausência é relevante e será preservada como categoria analítica.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>Criar variáveis de controle e categorias explícitas para ausências relevantes.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Tratamento controlado de valores ausentes</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Flags de ausência
+df_silver["artist_genres_missing_flag"] = df_silver["artist_genres"].isna()
+df_silver["artist_name_missing_flag"] = df_silver["artist_name"].isna()
+
+# Tratamento explícito de gênero ausente
+df_silver["artist_genres_clean"] = (
+    df_silver["artist_genres"]
+    .fillna("sem_genero_informado")
+    .str.strip()
+)
+
+# Tratamento explícito de artista ausente
+df_silver["artist_name_clean"] = (
+    df_silver["artist_name"]
+    .fillna("artista_nao_informado")
+    .str.strip()
+)
+
+missing_treatment_report = pd.DataFrame(
+    {
+        "metric": [
+            "total_rows",
+            "artist_genres_missing_count",
+            "artist_genres_missing_pct",
+            "artist_name_missing_count",
+            "artist_name_missing_pct",
+            "artist_genres_clean_missing_count",
+            "artist_name_clean_missing_count",
+        ],
+        "value": [
+            len(df_silver),
+            df_silver["artist_genres_missing_flag"].sum(),
+            round(df_silver["artist_genres_missing_flag"].mean() * 100, 2),
+            df_silver["artist_name_missing_flag"].sum(),
+            round(df_silver["artist_name_missing_flag"].mean() * 100, 2),
+            df_silver["artist_genres_clean"].isna().sum(),
+            df_silver["artist_name_clean"].isna().sum(),
+        ],
+    }
+)
+
+missing_treatment_report
+</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>metric</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>total_rows</td>
+<td>8,582.00</td>
+</tr>
+<tr>
+<th>1</th>
+<td>artist_genres_missing_count</td>
+<td>3,361.00</td>
+</tr>
+<tr>
+<th>2</th>
+<td>artist_genres_missing_pct</td>
+<td>39.16</td>
+</tr>
+<tr>
+<th>3</th>
+<td>artist_name_missing_count</td>
+<td>3.00</td>
+</tr>
+<tr>
+<th>4</th>
+<td>artist_name_missing_pct</td>
+<td>0.03</td>
+</tr>
+<tr>
+<th>5</th>
+<td>artist_genres_clean_missing_count</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>6</th>
+<td>artist_name_clean_missing_count</td>
+<td>0.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 12. Marcação de possíveis duplicados textuais</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Marcar possíveis duplicidades textuais sem remover registros da base.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Ações realizadas</strong><ul>
+<li>Será criada uma chave textual baseada em:<ul>
+<li><em><code>track_name + artist_name_clean + album_name</code></em></li>
+<li><em>Também serão criadas variáveis auxiliares para identificar grupos com mais de um registro.</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>No Notebook 01 foram identificados casos em que músicas possuem o mesmo nome, artista e álbum, mas <code>track_id</code> diferente.</li>
+<li>Esses casos podem representar versões, relançamentos ou registros alternativos.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>Marcar os registros potencialmente duplicados para futura decisão sobre visão canônica.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Marcação de possíveis duplicados textuais</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">canonical_key_cols = ["track_name", "artist_name_clean", "album_name"]
+
+df_silver["canonical_track_key"] = (
+    df_silver["track_name"].fillna("").str.lower().str.strip()
+    + " | "
+    + df_silver["artist_name_clean"].fillna("").str.lower().str.strip()
+    + " | "
+    + df_silver["album_name"].fillna("").str.lower().str.strip()
+)
+
+canonical_group_size = (
+    df_silver
+    .groupby("canonical_track_key")["track_id"]
+    .transform("count")
+)
+
+df_silver["canonical_group_size"] = canonical_group_size
+df_silver["possible_text_duplicate_flag"] = df_silver["canonical_group_size"] &gt; 1
+
+duplicate_marking_report = pd.DataFrame(
+    {
+        "metric": [
+            "total_rows",
+            "rows_possible_text_duplicate",
+            "pct_rows_possible_text_duplicate",
+            "canonical_groups_total",
+            "canonical_groups_with_duplicates",
+        ],
+        "value": [
+            len(df_silver),
+            df_silver["possible_text_duplicate_flag"].sum(),
+            round(df_silver["possible_text_duplicate_flag"].mean() * 100, 2),
+            df_silver["canonical_track_key"].nunique(dropna=True),
+            df_silver.loc[
+                df_silver["possible_text_duplicate_flag"],
+                "canonical_track_key",
+            ].nunique(dropna=True),
+        ],
+    }
+)
+
+duplicate_marking_report
+</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>metric</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>total_rows</td>
+<td>8,582.00</td>
+</tr>
+<tr>
+<th>1</th>
+<td>rows_possible_text_duplicate</td>
+<td>234.00</td>
+</tr>
+<tr>
+<th>2</th>
+<td>pct_rows_possible_text_duplicate</td>
+<td>2.73</td>
+</tr>
+<tr>
+<th>3</th>
+<td>canonical_groups_total</td>
+<td>8,463.00</td>
+</tr>
+<tr>
+<th>4</th>
+<td>canonical_groups_with_duplicates</td>
+<td>115.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 13. Interpretação parcial da camada Silver</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li><strong>Achado</strong><ul>
+<li>A base Silver foi criada preservando todos os registros da camada Bronze.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Evidência</strong><ul>
+<li>Foram aplicadas transformações controladas, incluindo:<ul>
+<li>padronização de tipos;</li>
+<li>conversão de datas;</li>
+<li>criação de variáveis temporais;</li>
+<li>classificação por período analítico;</li>
+<li>tratamento explícito de gêneros ausentes;</li>
+<li>criação de flags de ausência;</li>
+<li>marcação de possíveis duplicados textuais.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Implicação</strong><ul>
+<li>A base passa a estar mais adequada para análises exploratórias, mantendo rastreabilidade e evitando remoções prematuras.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Próxima ação</strong><ul>
+<li>O próximo passo será avaliar a criação de duas visões analíticas:</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Visão | Descrição |
+|---|---|
+| <code>df_tracks_catalog</code> | Visão de catálogo, mantendo uma linha por <code>track_id</code> |
+| <code>df_tracks_canonical</code> | Visão canônica, mantendo uma linha por música, artista e álbum |</p>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 14. Leitura dos resultados</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li><ol>
+<li><strong>Qualidade temporal</strong></li>
+</ol>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A base está ótima para análise temporal:</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>|Métrica	|Resultado|
+|---|---|
+|Total de linhas	|8.582|
+|Datas válidas	|8.582|
+|Datas inválidas	|0|
+|Ano mínimo	|1952|
+|Ano máximo	|2025|
+|Anos únicos	|68|</p>
+</blockquote>
+<blockquote>
+<ul>
+<li>Conclusão: <em>podemos usar album_release_date_parsed, release_year, release_month, release_decade e periodo_analitico com confiança.</em></li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><ol start="2">
+<li><strong>Distribuição por período analítico</strong></li>
+</ol>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>|Período	                    |Registros	|Popularidade média	|Mediana|
+|---|---|---|---|
+|Catálogo histórico pré-2009	|1.394	    |54,07	            |59|
+|Streaming inicial 2009–2015	|2.009	    |51,44	            |56|
+|Crescimento 2016–2020	        |2.332	    |52,22	            |59|
+|Maturidade 2021–2023	        |1.434	    |51,90	            |59|
+|Lançamentos recentes 2024–2025	|1.413	    |52,66	            |54|</p>
+</blockquote>
+<blockquote>
+<ul>
+<li>Achado importante: o catálogo histórico pré-2009 tem a maior popularidade média.<ul>
+<li>Isso sugere que músicas antigas presentes na base provavelmente são faixas com relevância persistente.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><ol start="3">
+<li><strong>Valores ausentes</strong></li>
+</ol>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>|Variável	     |Ausentes	|Percentual	|Tratamento              |
+|---|---|---|---|
+|artist_genres  |	   3.361|     39,16%|  sem_genero_informado  |
+|artist_name	 |         3|      0,03%|   artista_nao_informado|</p>
+</blockquote>
+<blockquote>
+<ul>
+<li>Conclusão: o tratamento funcionou. As colunas limpas não possuem mais nulos.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><ol start="4">
+<li><strong>Duplicados textuais</strong></li>
+</ol>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>|Métrica	                                        |Resultado|
+|---|---|
+|Linhas marcadas como possível duplicidade textual	|234|
+|Percentual da base	                            |2,73%|
+|Grupos canônicos totais	                        |8.463|
+|Grupos com duplicidade	                        |115|</p>
+</blockquote>
+<blockquote>
+<ul>
+<li>Isso não contradiz os 117 anteriores. A diferença vem da forma de contagem:<ul>
+<li>antes: contávamos registros duplicados excedentes;</li>
+<li>agora: contamos todos os registros envolvidos em grupos duplicados.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Decisão: <em>seguimos sem remover nada da df_silver. A deduplicação fica em uma visão separada.</em></li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 15. Criação das visões analíticas</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Criar duas visões da base Silver para apoiar diferentes tipos de análise no projeto.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Visões criadas</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Visão | Unidade de análise | Uso recomendado |
+|---|---|---|
+| <code>df_tracks_catalog</code> | <code>track_id</code> | Preserva o catálogo completo do Spotify |
+| <code>df_tracks_canonical</code> | <code>canonical_track_key</code> | Reduz múltiplas versões textuais da mesma música |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>A base possui <code>track_id</code> único, portanto a visão de catálogo é tecnicamente íntegra.</li>
+<li>No entanto, foram identificados grupos textuais com mesma música, artista e álbum, mas diferentes <code>track_id</code>.<ul>
+<li>Para análises de ranking e comparação de músicas, uma visão canônica pode reduzir distorções.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Regra da visão canônica</strong><ul>
+<li>Para cada grupo canônico, será mantido o registro com:<ol>
+<li>maior <code>track_popularity</code>;</li>
+<li>em caso de empate, data de lançamento mais recente;</li>
+<li>em caso de novo empate, maior número de seguidores do artista.</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essa regra preserva a versão mais relevante analiticamente.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Criação das visões analíticas: catálogo e canônica</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Visão 1 — Catálogo completo por track_id
+df_tracks_catalog = df_silver.copy()
+
+# Visão 2 — Canônica por música/artista/álbum
+df_tracks_canonical = (
+    df_silver
+    .sort_values(
+        by=[
+            "canonical_track_key",
+            "track_popularity",
+            "album_release_date_parsed",
+            "artist_followers",
+        ],
+        ascending=[True, False, False, False],
+    )
+    .drop_duplicates(
+        subset=["canonical_track_key"],
+        keep="first",
+    )
+    .copy()
+)
+
+views_comparison_report = pd.DataFrame(
+    {
+        "view": [
+            "df_tracks_catalog",
+            "df_tracks_canonical",
+        ],
+        "unit_of_analysis": [
+            "track_id",
+            "canonical_track_key",
+        ],
+        "rows": [
+            df_tracks_catalog.shape[0],
+            df_tracks_canonical.shape[0],
+        ],
+        "columns": [
+            df_tracks_catalog.shape[1],
+            df_tracks_canonical.shape[1],
+        ],
+        "unique_track_ids": [
+            df_tracks_catalog["track_id"].nunique(),
+            df_tracks_canonical["track_id"].nunique(),
+        ],
+        "unique_canonical_keys": [
+            df_tracks_catalog["canonical_track_key"].nunique(),
+            df_tracks_canonical["canonical_track_key"].nunique(),
+        ],
+    }
+)
+
+views_comparison_report
+</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>view</th>
+<th>unit_of_analysis</th>
+<th>rows</th>
+<th>columns</th>
+<th>unique_track_ids</th>
+<th>unique_canonical_keys</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>df_tracks_catalog</td>
+<td>track_id</td>
+<td>8582</td>
+<td>30</td>
+<td>8582</td>
+<td>8463</td>
+</tr>
+<tr>
+<th>1</th>
+<td>df_tracks_canonical</td>
+<td>canonical_track_key</td>
+<td>8463</td>
+<td>30</td>
+<td>8463</td>
+<td>8463</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Registros preservados no catálogo, mas não selecionados na visão canônica</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">canonical_selected_track_ids = set(df_tracks_canonical["track_id"])
+
+df_canonical_excluded = df_tracks_catalog[
+    ~df_tracks_catalog["track_id"].isin(canonical_selected_track_ids)
+].copy()
+
+canonical_exclusion_report = pd.DataFrame(
+    {
+        "metric": [
+            "rows_catalog",
+            "rows_canonical",
+            "rows_excluded_from_canonical_view",
+            "pct_excluded_from_canonical_view",
+        ],
+        "value": [
+            len(df_tracks_catalog),
+            len(df_tracks_canonical),
+            len(df_canonical_excluded),
+            round(len(df_canonical_excluded) / len(df_tracks_catalog) * 100, 2),
+        ],
+    }
+)
+
+canonical_exclusion_report
+</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>metric</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>rows_catalog</td>
+<td>8,582.00</td>
+</tr>
+<tr>
+<th>1</th>
+<td>rows_canonical</td>
+<td>8,463.00</td>
+</tr>
+<tr>
+<th>2</th>
+<td>rows_excluded_from_canonical_view</td>
+<td>119.00</td>
+</tr>
+<tr>
+<th>3</th>
+<td>pct_excluded_from_canonical_view</td>
+<td>1.39</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Amostra dos registros não selecionados para a visão canônica</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">df_canonical_excluded[
+    [
+        "track_id",
+        "track_name",
+        "artist_name_clean",
+        "album_name",
+        "album_release_date",
+        "track_popularity",
+        "artist_followers",
+        "canonical_group_size",
+        "possible_text_duplicate_flag",
+    ]
+].sort_values(
+    ["artist_name_clean", "album_name", "track_name", "track_popularity"],
+    ascending=[True, True, True, False],
+).head(30)
+</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>track_id</th>
+<th>track_name</th>
+<th>artist_name_clean</th>
+<th>album_name</th>
+<th>album_release_date</th>
+<th>track_popularity</th>
+<th>artist_followers</th>
+<th>canonical_group_size</th>
+<th>possible_text_duplicate_flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>7804</th>
+<td>5IXk34xSm6rxNgXkCveC3r</td>
+<td>Here Without You</td>
+<td>3 Doors Down</td>
+<td>Away From The Sun</td>
+<td>2002-01-01</td>
+<td>54</td>
+<td>4909653</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>6720</th>
+<td>1CkvWZme3pRgbzaxZnTl5X</td>
+<td>Rolling in the Deep</td>
+<td>Adele</td>
+<td>21</td>
+<td>2011-01-19</td>
+<td>4</td>
+<td>66720643</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>6721</th>
+<td>3CKCZ9pfwAfoMZlMncA1Nc</td>
+<td>Set Fire to the Rain</td>
+<td>Adele</td>
+<td>21</td>
+<td>2011-01-19</td>
+<td>2</td>
+<td>66734917</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>6722</th>
+<td>4kflIGfjdZJW4ot2ioixTB</td>
+<td>Someone Like You</td>
+<td>Adele</td>
+<td>21</td>
+<td>2011-01-19</td>
+<td>2</td>
+<td>66720643</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>5011</th>
+<td>4sPmO7WMQUAf45kwMOtONw</td>
+<td>Hello</td>
+<td>Adele</td>
+<td>25</td>
+<td>2016-06-24</td>
+<td>0</td>
+<td>66705650</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>5007</th>
+<td>4BHzQ9C00ceJxfG16AlNWb</td>
+<td>Send My Love (To Your New Lover)</td>
+<td>Adele</td>
+<td>25</td>
+<td>2016-06-24</td>
+<td>1</td>
+<td>66734917</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>5261</th>
+<td>0prNGof3XqfTvNDxHonvdK</td>
+<td>Scars To Your Beautiful</td>
+<td>Alessia Cara</td>
+<td>Know-It-All (Deluxe)</td>
+<td>2015-11-13</td>
+<td>2</td>
+<td>12274170</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>5109</th>
+<td>6TOfPHF57Qhlbfm5lhZ9k1</td>
+<td>Be Alright</td>
+<td>Ariana Grande</td>
+<td>Dangerous Woman</td>
+<td>2016-04-01</td>
+<td>59</td>
+<td>107418606</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>5052</th>
+<td>2h1IPjP471JJRSShTHRUhi</td>
+<td>Dangerous Woman</td>
+<td>Ariana Grande</td>
+<td>Dangerous Woman</td>
+<td>2016-05-20</td>
+<td>0</td>
+<td>107389514</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>5053</th>
+<td>53SfB4huCgiRGmwzJdEo1u</td>
+<td>Everyday</td>
+<td>Ariana Grande</td>
+<td>Dangerous Woman</td>
+<td>2016-05-20</td>
+<td>62</td>
+<td>107418606</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>5118</th>
+<td>1QGiDkpRQGqvBdDOnbDimF</td>
+<td>I Don't Care</td>
+<td>Ariana Grande</td>
+<td>Dangerous Woman</td>
+<td>2016-04-01</td>
+<td>45</td>
+<td>107389514</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>5051</th>
+<td>2meEiZKWkiN28gITzFwQo5</td>
+<td>Into You</td>
+<td>Ariana Grande</td>
+<td>Dangerous Woman</td>
+<td>2016-05-20</td>
+<td>3</td>
+<td>107401919</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>5043</th>
+<td>4HeCFqiB1rBqGqvE10rF1a</td>
+<td>Side To Side</td>
+<td>Ariana Grande</td>
+<td>Dangerous Woman</td>
+<td>2016-05-20</td>
+<td>66</td>
+<td>107389514</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>2972</th>
+<td>7igeByaBM0MgGsgXtNxDJ7</td>
+<td>positions</td>
+<td>Ariana Grande</td>
+<td>positions</td>
+<td>2020-10-23</td>
+<td>0</td>
+<td>107374593</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>3899</th>
+<td>2rPE9A1vEgShuZxxzR2tZH</td>
+<td>thank u, next</td>
+<td>Ariana Grande</td>
+<td>thank u, next</td>
+<td>2018-11-03</td>
+<td>22</td>
+<td>107401919</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>6025</th>
+<td>4RXpgGM7A4Hg7cFBoH5KyF</td>
+<td>Hey Brother</td>
+<td>Avicii</td>
+<td>True</td>
+<td>2013-09-13</td>
+<td>4</td>
+<td>23434221</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>6026</th>
+<td>4h8VwCb1MTGoLKueQ1WgbD</td>
+<td>Wake Me Up</td>
+<td>Avicii</td>
+<td>True</td>
+<td>2013-09-13</td>
+<td>9</td>
+<td>23434999</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>7749</th>
+<td>2IiNA0s5eQBSjwK4iNeUvW</td>
+<td>Complicated</td>
+<td>Avril Lavigne</td>
+<td>Let Go</td>
+<td>2002-08-26</td>
+<td>0</td>
+<td>12008159</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>7750</th>
+<td>4omisSlTk6Dsq2iQD7MA07</td>
+<td>Sk8er Boi</td>
+<td>Avril Lavigne</td>
+<td>Let Go</td>
+<td>2002-08-26</td>
+<td>1</td>
+<td>12004691</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>1262</th>
+<td>6zuPQl2RVqQ4y5nAH61CFC</td>
+<td>II MOST WANTED</td>
+<td>Beyoncé</td>
+<td>COWBOY CARTER</td>
+<td>2024-03-27</td>
+<td>53</td>
+<td>41172203</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>7195</th>
+<td>5mMjkxGijQB4JZallYrkOW</td>
+<td>Single Ladies (Put a Ring on It)</td>
+<td>Beyoncé</td>
+<td>I AM...SASHA FIERCE</td>
+<td>2008-11-12</td>
+<td>62</td>
+<td>41172203</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>1366</th>
+<td>7AYmToZ5y67fBjq4RLFbuq</td>
+<td>TEXAS HOLD 'EM</td>
+<td>Beyoncé</td>
+<td>TEXAS HOLD 'EM</td>
+<td>2024-02-10</td>
+<td>58</td>
+<td>41172203</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>7714</th>
+<td>1FreAz1lmnDi5aKLB6GdFM</td>
+<td>Where Is The Love?</td>
+<td>Black Eyed Peas</td>
+<td>Elephunk</td>
+<td>2003-01-01</td>
+<td>3</td>
+<td>9556340</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>8166</th>
+<td>0kish3Tobj6Wq0we74343q</td>
+<td>Always</td>
+<td>Bon Jovi</td>
+<td>Cross Road</td>
+<td>1994-01-01</td>
+<td>0</td>
+<td>15810313</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>2461</th>
+<td>1LPSkqVhWVRUkKE03YUkpB</td>
+<td>Leave The Door Open</td>
+<td>Bruno Mars</td>
+<td>An Evening With Silk Sonic</td>
+<td>2021-11-11</td>
+<td>0</td>
+<td>75455093</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>6234</th>
+<td>5g7sDjBhZ4I3gcFIpkrLuI</td>
+<td>Locked out of Heaven</td>
+<td>Bruno Mars</td>
+<td>Unorthodox Jukebox</td>
+<td>2012-12-05</td>
+<td>54</td>
+<td>75474551</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>6233</th>
+<td>0B7wvvmu9EISAwZnOpjhNI</td>
+<td>When I Was Your Man</td>
+<td>Bruno Mars</td>
+<td>Unorthodox Jukebox</td>
+<td>2012-12-05</td>
+<td>54</td>
+<td>75492598</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>1554</th>
+<td>6393yGahSJ9slVdOwSxOVR</td>
+<td>Pink Pony Club</td>
+<td>Chappell Roan</td>
+<td>The Rise and Fall of a Midwest Princess</td>
+<td>2023-09-21</td>
+<td>83</td>
+<td>7299563</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>5782</th>
+<td>1x80xTzSL7pok3M5JC3oJz</td>
+<td>human</td>
+<td>Christina Perri</td>
+<td>head or heart</td>
+<td>2014-03-27</td>
+<td>60</td>
+<td>4307803</td>
+<td>2</td>
+<td>True</td>
+</tr>
+<tr>
+<th>4491</th>
+<td>1V27TTo9FI2sl8xzGr3sCg</td>
+<td>Gilded Lily</td>
+<td>Cults</td>
+<td>Offering</td>
+<td>2017-10-06</td>
+<td>0</td>
+<td>1254937</td>
+<td>2</td>
+<td>True</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 16. Interpretação das visões analíticas</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li><strong>Achado</strong><ul>
+<li>Foram criadas duas visões da base preparada:<ul>
+<li><code>df_tracks_catalog</code>;</li>
+<li><code>df_tracks_canonical</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Evidência</strong><ul>
+<li>A visão de catálogo preserva todos os registros da base Silver, mantendo uma linha por <code>track_id</code>.</li>
+<li>A visão canônica reduz múltiplas versões textuais de uma mesma música, mantendo apenas um registro por combinação normalizada de música, artista e álbum.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Implicação</strong><ul>
+<li>As duas visões atendem a necessidades analíticas diferentes.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Situação | Visão recomendada |
+|---|---|
+| Análise do catálogo Spotify | <code>df_tracks_catalog</code> |
+| Contagem técnica de faixas | <code>df_tracks_catalog</code> |
+| Ranking de músicas mais populares | <code>df_tracks_canonical</code> |
+| Comparação por música/artista/álbum | <code>df_tracks_canonical</code> |
+| Análise temporal ampla | <code>df_tracks_catalog</code>, com cautela |
+| EDA executiva para portfólio | Usar ambas conforme a pergunta |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Próxima ação</strong><ul>
+<li>A próxima etapa será validar a qualidade final das visões e salvar os arquivos preparados na camada Silver.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 17. Leitura dos outputs</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<p>|Visão	                                       |Linhas	 |Interpretação|
+|---|---|---|
+|df_tracks_catalog	                           |    8.582|Preserva o catálogo completo, uma linha por track_id|
+|df_tracks_canonical	                         |  8.463|Mantém uma linha por música/artista/álbum canônico|
+|Registros excluídos apenas da visão canônica |      119|Versões alternativas não selecionadas|
+|Percentual excluído	                         |  1,39%|Impacto baixo e controlado|</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Decisão</strong><ul>
+<li>A perda de 119 registros na visão ca|nônica |é pequena, apenas 1,39% da base. Isso confirma que podemos seguir com as duas visões:<ul>
+<li><em>df_tracks_catalog   → visão oficial do catálogo Spotify</em></li>
+<li><em>df_tracks_canonical → visão executiva para rankings e comparações por música</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A visão canônica não substitui a visão de catálogo.<ul>
+<li>Ela apenas cria uma leitura analítica mais limpa para perguntas em que múltiplas versões da mesma música poderiam distorcer rankings.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 18. Salvamento da camada Silver</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Salvar as visões preparadas da camada Silver para uso nos próximos notebooks.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Arquivos gerados</strong><ul>
+<li>Serão salvos dois arquivos principais em formato Parquet:</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Arquivo | Descrição |
+|---|---|
+| <code>spotify_tracks_catalog_silver.parquet</code> | Visão de catálogo, preservando uma linha por <code>track_id</code> |
+| <code>spotify_tracks_canonical_silver.parquet</code> | Visão canônica, preservando uma linha por música/artista/álbum |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li>Também serão salvos artefatos auxiliares em CSV para rastreabilidade:</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Arquivo | Descrição |
+|---|---|
+| <code>canonical_excluded_records.csv</code> | Registros preservados no catálogo, mas não selecionados na visão canônica |
+| <code>silver_views_comparison.csv</code> | Comparativo entre as visões Silver |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>O formato Parquet será utilizado para as bases analíticas por ser eficiente, colunar e adequado para pipelines de dados.</li>
+<li>Os arquivos CSV serão usados como artefatos de auditoria e documentação da preparação.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>Disponibilizar a camada Silver para o Notebook 03 — Exploratory Data Analysis.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Salvamento das visões Silver</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Caminhos de saída
+catalog_silver_path = SILVER_DIR / "spotify_tracks_catalog_silver.parquet"
+canonical_silver_path = SILVER_DIR / "spotify_tracks_canonical_silver.parquet"
+
+canonical_excluded_path = TABLES_DIR / "canonical_excluded_records.csv"
+views_comparison_path = TABLES_DIR / "silver_views_comparison.csv"
+canonical_exclusion_report_path = TABLES_DIR / "canonical_exclusion_report.csv"
+
+# Salvamento em Parquet
+df_tracks_catalog.to_parquet(catalog_silver_path, index=False)
+df_tracks_canonical.to_parquet(canonical_silver_path, index=False)
+
+# Salvamento dos artefatos de auditoria em CSV
+df_canonical_excluded.to_csv(
+    canonical_excluded_path,
+    index=False,
+    sep=";",
+    encoding="utf-8-sig",
+)
+
+views_comparison_report.to_csv(
+    views_comparison_path,
+    index=False,
+    sep=";",
+    encoding="utf-8-sig",
+)
+
+canonical_exclusion_report.to_csv(
+    canonical_exclusion_report_path,
+    index=False,
+    sep=";",
+    encoding="utf-8-sig",
+)
+
+print("Arquivos Silver salvos com sucesso:")
+print(f"- {catalog_silver_path}")
+print(f"- {canonical_silver_path}")
+print(f"- {canonical_excluded_path}")
+print(f"- {views_comparison_path}")
+print(f"- {canonical_exclusion_report_path}")
+</code></pre>
+</div>
+<div class="output-stream">
+<pre>Arquivos Silver salvos com sucesso:
+- D:\_DS-Projects\Data-Science\spotify-global-music-intelligence\data\02_silver\spotify_tracks_catalog_silver.parquet
+- D:\_DS-Projects\Data-Science\spotify-global-music-intelligence\data\02_silver\spotify_tracks_canonical_silver.parquet
+- D:\_DS-Projects\Data-Science\spotify-global-music-intelligence\reports\tables\canonical_excluded_records.csv
+- D:\_DS-Projects\Data-Science\spotify-global-music-intelligence\reports\tables\silver_views_comparison.csv
+- D:\_DS-Projects\Data-Science\spotify-global-music-intelligence\reports\tables\canonical_exclusion_report.csv
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Validação dos arquivos salvos na camada Silver</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">saved_silver_files_check = pd.DataFrame(
+    {
+        "artifact": [
+            "spotify_tracks_catalog_silver.parquet",
+            "spotify_tracks_canonical_silver.parquet",
+            "canonical_excluded_records.csv",
+            "silver_views_comparison.csv",
+            "canonical_exclusion_report.csv",
+        ],
+        "path": [
+            catalog_silver_path,
+            canonical_silver_path,
+            canonical_excluded_path,
+            views_comparison_path,
+            canonical_exclusion_report_path,
+        ],
+    }
+)
+
+saved_silver_files_check["exists"] = saved_silver_files_check["path"].apply(
+    lambda path: path.exists()
+)
+
+saved_silver_files_check["file_size_kb"] = saved_silver_files_check["path"].apply(
+    lambda path: round(path.stat().st_size / 1024, 2) if path.exists() else None
+)
+
+saved_silver_files_check
+</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>artifact</th>
+<th>path</th>
+<th>exists</th>
+<th>file_size_kb</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>spotify_tracks_catalog_silver.parquet</td>
+<td>D:\_DS-Projects\Data-Science\spotify-global-music-intelligence\data\02_silver\spotify_tracks_catalog_silver.parquet</td>
+<td>True</td>
+<td>1,063.47</td>
+</tr>
+<tr>
+<th>1</th>
+<td>spotify_tracks_canonical_silver.parquet</td>
+<td>D:\_DS-Projects\Data-Science\spotify-global-music-intelligence\data\02_silver\spotify_tracks_canonical_silver.parquet</td>
+<td>True</td>
+<td>1,114.59</td>
+</tr>
+<tr>
+<th>2</th>
+<td>canonical_excluded_records.csv</td>
+<td>D:\_DS-Projects\Data-Science\spotify-global-music-intelligence\reports\tables\canonical_excluded_records.csv</td>
+<td>True</td>
+<td>40.15</td>
+</tr>
+<tr>
+<th>3</th>
+<td>silver_views_comparison.csv</td>
+<td>D:\_DS-Projects\Data-Science\spotify-global-music-intelligence\reports\tables\silver_views_comparison.csv</td>
+<td>True</td>
+<td>0.18</td>
+</tr>
+<tr>
+<th>4</th>
+<td>canonical_exclusion_report.csv</td>
+<td>D:\_DS-Projects\Data-Science\spotify-global-music-intelligence\reports\tables\canonical_exclusion_report.csv</td>
+<td>True</td>
+<td>0.14</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Validação por recarga dos arquivos Parquet</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">df_catalog_validation = pd.read_parquet(catalog_silver_path)
+df_canonical_validation = pd.read_parquet(canonical_silver_path)
+
+parquet_reload_validation = pd.DataFrame(
+    {
+        "dataset": [
+            "catalog_silver_reloaded",
+            "canonical_silver_reloaded",
+        ],
+        "rows": [
+            df_catalog_validation.shape[0],
+            df_canonical_validation.shape[0],
+        ],
+        "columns": [
+            df_catalog_validation.shape[1],
+            df_canonical_validation.shape[1],
+        ],
+        "unique_track_ids": [
+            df_catalog_validation["track_id"].nunique(),
+            df_canonical_validation["track_id"].nunique(),
+        ],
+        "unique_canonical_keys": [
+            df_catalog_validation["canonical_track_key"].nunique(),
+            df_canonical_validation["canonical_track_key"].nunique(),
+        ],
+    }
+)
+
+parquet_reload_validation
+</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>dataset</th>
+<th>rows</th>
+<th>columns</th>
+<th>unique_track_ids</th>
+<th>unique_canonical_keys</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>catalog_silver_reloaded</td>
+<td>8582</td>
+<td>30</td>
+<td>8582</td>
+<td>8463</td>
+</tr>
+<tr>
+<th>1</th>
+<td>canonical_silver_reloaded</td>
+<td>8463</td>
+<td>30</td>
+<td>8463</td>
+<td>8463</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 19. Interpretação do salvamento da camada Silver</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li><strong>Achado</strong><ul>
+<li>A camada Silver foi salva com duas visões analíticas:<ul>
+<li>visão de catálogo;</li>
+<li>visão canônica.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Evidência</strong><ul>
+<li>A visão de catálogo preservou todos os 8.582 registros da base principal.</li>
+<li>A visão canônica manteve 8.463 registros, excluindo apenas 119 registros da visão canônica, o equivalente a 1,39% da base.</li>
+<li>Esses registros excluídos não foram removidos do projeto. Eles permanecem preservados na visão de catálogo e também foram exportados como artefato de auditoria.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Implicação</strong><ul>
+<li>O projeto passa a ter duas leituras complementares:</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Necessidade analítica | Visão recomendada |
+|---|---|
+| Preservar o catálogo Spotify completo | <code>spotify_tracks_catalog_silver.parquet</code> |
+| Criar rankings mais limpos por música | <code>spotify_tracks_canonical_silver.parquet</code> |
+| Auditar versões alternativas | <code>canonical_excluded_records.csv</code> |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Próxima ação</strong><ul>
+<li>A próxima etapa será fechar o Notebook 02 com:<ul>
+<li>relatório final de qualidade;</li>
+<li>critérios de passagem para o Notebook 03;</li>
+<li>definição de qual visão será usada em cada tipo de análise exploratória.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Relatório final de qualidade da camada Silver</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">silver_quality_summary = pd.DataFrame(
+    {
+        "dimensao": [
+            "base_principal",
+            "camada_catalog",
+            "camada_canonical",
+            "datas_validas",
+            "generos_ausentes_tratados",
+            "artistas_ausentes_tratados",
+            "duplicados_textuais_marcados",
+            "artefatos_auditoria",
+            "prontidao_para_eda",
+        ],
+        "status": [
+            "ok",
+            "ok",
+            "ok",
+            "ok",
+            "ok",
+            "ok",
+            "ok",
+            "ok",
+            "ok",
+        ],
+        "descricao": [
+            "spotify_data_clean.csv foi definida como fonte principal da EDA.",
+            "Visão de catálogo salva com 8.582 registros e uma linha por track_id.",
+            "Visão canônica salva com 8.463 registros e uma linha por canonical_track_key.",
+            "Todas as datas de lançamento foram convertidas com sucesso.",
+            "artist_genres ausente foi tratado como sem_genero_informado.",
+            "artist_name ausente foi tratado como artista_nao_informado.",
+            "Possíveis duplicados textuais foram marcados sem remoção da visão de catálogo.",
+            "Arquivos CSV de auditoria foram salvos em reports/tables.",
+            "As bases Silver estão prontas para o Notebook 03 — EDA.",
+        ],
+    }
+)
+
+silver_quality_summary
+</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>dimensao</th>
+<th>status</th>
+<th>descricao</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>base_principal</td>
+<td>ok</td>
+<td>spotify_data_clean.csv foi definida como fonte principal da EDA.</td>
+</tr>
+<tr>
+<th>1</th>
+<td>camada_catalog</td>
+<td>ok</td>
+<td>Visão de catálogo salva com 8.582 registros e uma linha por track_id.</td>
+</tr>
+<tr>
+<th>2</th>
+<td>camada_canonical</td>
+<td>ok</td>
+<td>Visão canônica salva com 8.463 registros e uma linha por canonical_track_key.</td>
+</tr>
+<tr>
+<th>3</th>
+<td>datas_validas</td>
+<td>ok</td>
+<td>Todas as datas de lançamento foram convertidas com sucesso.</td>
+</tr>
+<tr>
+<th>4</th>
+<td>generos_ausentes_tratados</td>
+<td>ok</td>
+<td>artist_genres ausente foi tratado como sem_genero_informado.</td>
+</tr>
+<tr>
+<th>5</th>
+<td>artistas_ausentes_tratados</td>
+<td>ok</td>
+<td>artist_name ausente foi tratado como artista_nao_informado.</td>
+</tr>
+<tr>
+<th>6</th>
+<td>duplicados_textuais_marcados</td>
+<td>ok</td>
+<td>Possíveis duplicados textuais foram marcados sem remoção da visão de catálogo.</td>
+</tr>
+<tr>
+<th>7</th>
+<td>artefatos_auditoria</td>
+<td>ok</td>
+<td>Arquivos CSV de auditoria foram salvos em reports/tables.</td>
+</tr>
+<tr>
+<th>8</th>
+<td>prontidao_para_eda</td>
+<td>ok</td>
+<td>As bases Silver estão prontas para o Notebook 03 — EDA.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Salvamento do relatório final de qualidade da camada Silver</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">silver_quality_summary_path = TABLES_DIR / "silver_quality_summary.csv"
+
+silver_quality_summary.to_csv(
+    silver_quality_summary_path,
+    index=False,
+    sep=";",
+    encoding="utf-8-sig",
+)
+
+print("Relatório final da Silver salvo com sucesso:")
+print(f"- {silver_quality_summary_path}")
+</code></pre>
+</div>
+<div class="output-stream">
+<pre>Relatório final da Silver salvo com sucesso:
+- D:\_DS-Projects\Data-Science\spotify-global-music-intelligence\reports\tables\silver_quality_summary.csv
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 20. Síntese executiva do Notebook 02</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Consolidar os principais resultados da fase de <strong>Data Quality and Preparation</strong> do projeto <strong>Spotify Global Music Intelligence</strong>.<ul>
+<li>Esta etapa teve como foco transformar o diagnóstico realizado no Notebook 01 em uma base preparada, rastreável e pronta para a análise exploratória.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Achado → Evidência → Implicação → Próxima ação</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Achado | Evidência | Implicação | Próxima ação |
+|---|---|---|---|
+| A base principal foi preparada com sucesso | <code>df_tracks_catalog</code> possui 8.582 registros | A visão de catálogo preserva a integridade da fonte principal | Usar em análises de catálogo e cobertura temporal |
+| A visão canônica foi criada | <code>df_tracks_canonical</code> possui 8.463 registros | Rankings por música podem ser analisados com menor risco de duplicidade textual | Usar em rankings de faixas e análises executivas |
+| A deduplicação canônica teve baixo impacto | 119 registros ficaram fora da visão canônica, 1,39% da base | A regra canônica reduziu ruído sem perda relevante de cobertura | Manter registros excluídos em artefato de auditoria |
+| As datas estão consistentes | 8.582 datas válidas e 0 inválidas | A análise temporal pode ser realizada com segurança | Explorar <code>release_year</code>, <code>release_month</code>, <code>release_decade</code> e <code>periodo_analitico</code> no Notebook 03 |
+| Gêneros ausentes foram tratados | 3.361 registros marcados como <code>sem_genero_informado</code> | Análises por gênero continuam possíveis, mas exigem cautela | Explicitar limitação nas análises de gênero |
+| Artistas ausentes foram tratados | 3 registros marcados como <code>artista_nao_informado</code> | O problema é pequeno e não impede a continuidade | Monitorar em análises por artista |
+| A camada Silver foi salva e validada | Parquets salvos e recarregados com sucesso | A base está pronta para consumo no Notebook 03 | Iniciar EDA com arquivos da camada Silver |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Decisões metodológicas consolidadas</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Decisão | Justificativa |
+|---|---|
+| Preservar a visão de catálogo | Mantém uma linha por <code>track_id</code>, respeitando a estrutura original do Spotify |
+| Criar visão canônica separada | Evita distorções em rankings causadas por múltiplas versões textuais da mesma música |
+| Não remover dados da visão principal | Mantém rastreabilidade e evita perda prematura de informação |
+| Tratar ausências como categorias explícitas | Evita nulos em agrupamentos e preserva informação sobre ausência |
+| Salvar artefatos de auditoria | Permite revisar decisões e justificar transformações |
+| Guardar dataset complementar para etapa futura | Evita complexidade prematura no Cap01 |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Bases geradas</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Camada | Arquivo | Uso recomendado |
+|---|---|---|
+| Silver | <code>spotify_tracks_catalog_silver.parquet</code> | Análise de catálogo, artistas, períodos e cobertura geral |
+| Silver | <code>spotify_tracks_canonical_silver.parquet</code> | Rankings de músicas, análises executivas e comparação canônica |
+| Auditoria | <code>canonical_excluded_records.csv</code> | Revisão dos registros não selecionados na visão canônica |
+| Auditoria | <code>silver_views_comparison.csv</code> | Comparação entre visão de catálogo e visão canônica |
+| Auditoria | <code>canonical_exclusion_report.csv</code> | Resumo da exclusão canônica |
+| Auditoria | <code>silver_quality_summary.csv</code> | Síntese final da qualidade da Silver |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Limitações preservadas para a EDA</strong><ul>
+<li>Mesmo após a preparação, algumas limitações devem ser consideradas no Notebook 03:<ul>
+<li><code>artist_genres</code> possui alta taxa original de ausência;</li>
+<li>a popularidade pode representar um snapshot específico da coleta;</li>
+<li>a base contém faixas históricas anteriores a 2009;</li>
+<li>múltiplas versões de uma mesma música podem existir na visão de catálogo;</li>
+<li>a visão canônica reduz ruído, mas também aplica uma regra analítica de seleção;</li>
+<li>atributos musicais detalhados, como energia e dançabilidade, não estão disponíveis na base principal.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Conclusão do Notebook 02</strong><ul>
+<li>O <strong>Notebook 02 — Data Quality and Preparation</strong> concluiu a preparação da base principal do projeto.</li>
+<li>A camada Silver foi criada, validada e salva com duas visões complementares:<ul>
+<li>uma visão completa de catálogo;</li>
+<li>uma visão canônica para análises mais limpas por música.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Com isso, o projeto está pronto para avançar para o <strong>Notebook 03 — Exploratory Data Analysis</strong>.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 21. Critérios de passagem para o Notebook 03</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Definir os critérios mínimos para avançar da preparação dos dados para a análise exploratória.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Checklist de passagem</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Critério | Status | Evidência |
+|---|---|---|
+| Fonte principal definida | Concluído | <code>spotify_data_clean.csv</code> |
+| Base carregada a partir da Raw | Concluído | <code>df_raw</code> criado |
+| Camada Bronze criada | Concluído | <code>df_bronze</code> com metadados |
+| Camada Silver criada | Concluído | <code>df_silver</code> com 30 colunas |
+| Datas convertidas | Concluído | 8.582 datas válidas |
+| Variáveis temporais criadas | Concluído | <code>release_year</code>, <code>release_month</code>, <code>release_decade</code>, <code>periodo_analitico</code> |
+| Ausências tratadas | Concluído | <code>artist_genres_clean</code> e <code>artist_name_clean</code> |
+| Duplicados textuais marcados | Concluído | <code>possible_text_duplicate_flag</code> |
+| Visão de catálogo criada | Concluído | 8.582 registros |
+| Visão canônica criada | Concluído | 8.463 registros |
+| Artefatos salvos | Concluído | Parquets e CSVs de auditoria |
+| Recarga dos Parquets validada | Concluído | Shapes e chaves consistentes |
+| Notebook 03 liberado | Concluído | Bases Silver prontas para EDA |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Decisão de passagem</strong><ul>
+<li>A fase de Data Quality and Preparation está concluída.</li>
+<li>O projeto pode avançar para o <strong>Notebook 03 — Exploratory Data Analysis</strong>, utilizando as bases preparadas na camada Silver.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Diretriz para o Notebook 03</strong><ul>
+<li>No Notebook 03, a escolha da visão deverá seguir a pergunta analítica:</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Pergunta analítica | Visão recomendada |
+|---|---|
+| Quantas faixas existem no catálogo? | <code>catalog_silver</code> |
+| Como a popularidade varia por período? | <code>catalog_silver</code> |
+| Quais são as músicas mais populares? | <code>canonical_silver</code> |
+| Quais artistas concentram maior popularidade? | <code>canonical_silver</code> ou <code>catalog_silver</code>, conforme objetivo |
+| Como se distribuem gêneros informados e ausentes? | <code>catalog_silver</code> |
+| Quais álbuns possuem maior presença? | <code>catalog_silver</code> |
+| Qual ranking executivo de faixas deve ir para portfólio? | <code>canonical_silver</code> |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Encerramento</strong><ul>
+<li>O Notebook 02 entrega a fundação técnica para uma EDA confiável.</li>
+<li>A próxima etapa será transformar a base preparada em análise, visualização, interpretação e insights.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">%reload_ext watermark 
+%watermark -a "Roberto-SSoares-LfLngLrnng" -d -t -u --iversions -v -m -h</code></pre>
+</div>
+<div class="output-stream">
+<pre>Author: Roberto-SSoares-LfLngLrnng
+
+Last updated: 2026-05-05 22:49:09
+
+Python implementation: CPython
+Python version       : 3.12.12
+IPython version      : 9.13.0
+
+Compiler    : MSC v.1944 64 bit (AMD64)
+OS          : Windows
+Release     : 11
+Machine     : AMD64
+Processor   : Intel64 Family 6 Model 158 Stepping 9, GenuineIntel
+CPU cores   : 4
+Architecture: 64bit
+
+Hostname: PC-ROBERTO
+
+numpy : 2.4.4
+pandas: 3.0.2
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="6"><strong>FIM</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="footer">
+<p>RobertoSSoares-LfLngLrnng — <span id="datetime"></span></p>
+</div>
+<script>
+            document.getElementById("datetime").innerText = new Date().toLocaleString('pt-BR');
+        </script>
+</div>
+</body>
+</html>

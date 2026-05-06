@@ -1,0 +1,5862 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>01_data_understanding</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/jupyterlab/3.6.3/themes/JupyterLab-light-theme.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@300;400;600&amp;family=Reddit+Sans:wght@300;400;600&amp;family=Courier+Prime:wght@400;700&amp;family=Montserrat:wght@300;400;600;700&amp;family=Source+Code+Pro:wght@400&amp;family=Red+Hat+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['\\(', '\\)'], ['$', '$']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+          ignoreHtmlClass: 'tex2jax_ignore',
+          processHtmlClass: 'mathjax_process'
+        }
+      };
+    </script>
+<script async="" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+        :root{
+            --bg:#f5f5f5;
+            --paper:#ffffff;
+            --text:#1f2937;
+            --muted:#6b7280;
+            --border:#d9dde3;
+            --shadow:0 4px 12px rgba(0,0,0,.08);
+            --shadow-soft:0 2px 8px rgba(15,23,42,.06);
+            --md-bg:#f3f2ee;
+            --md-accent:#ff9800;
+            --code-bg:#f7f7f7;
+            --code-accent:#4caf50;
+            --out-bg:#f3f9fa;
+            --out-accent:#2196f3;
+            --stream-bg:#eef8ff;
+            --table-head:#f8fafc;
+            --table-zebra:#f6f8fa;
+            --exec-bg:#f7fbff;
+            --exec-border:#2E86C1;
+            --insight-bg:#f8fffb;
+            --insight-border:#22a06b;
+            --warning-bg:#fffaf2;
+            --warning-border:#f59e0b;
+            --danger-bg:#fff6f6;
+            --danger-border:#ef4444;
+            --metric-bg:#ffffff;
+            --metric-border:#d6e7f7;
+        }
+
+        *{ box-sizing:border-box; }
+
+        body{
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            background:var(--bg);
+            padding:40px 0;
+            color:var(--text);
+            line-height:1.55;
+        }
+
+        .container{
+            max-width:1550px;
+            margin:auto;
+            background:var(--paper);
+            padding:20px 30px 28px;
+            border-radius:8px;
+            box-shadow:var(--shadow);
+        }
+
+        .cell{ margin-bottom:10px; }
+
+        h1.title-header{
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            font-weight:700;
+            color:#8eb4c4;
+            text-transform:uppercase;
+            text-align:center;
+            margin:0 0 24px;
+            letter-spacing:.04em;
+        }
+
+        .markdown{
+            background:var(--md-bg);
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            padding:10px 15px;
+            border-left:5px solid var(--md-accent);
+            border-radius:4px;
+            margin:4px 0 8px;
+            line-height:1.6;
+        }
+        .markdown h1,.markdown h2,.markdown h3,.markdown h4,.markdown h5,.markdown h6{
+            margin-top:0;
+            color:#d64545;
+        }
+        .markdown p:last-child,
+        .markdown ul:last-child,
+        .markdown ol:last-child{ margin-bottom:0; }
+
+        img, svg, figure img{
+            max-width:100%;
+            height:auto;
+            display:block;
+            margin-left:auto;
+            margin-right:auto;
+            border:1px solid #ddd;
+            border-radius:6px;
+            box-shadow:0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        figure{ margin:20px auto; text-align:center; }
+        figure figcaption{ font-size:13px; color:#555; margin-top:6px; }
+
+        .cell-toolbar{
+            display:flex;
+            justify-content:flex-end;
+            margin:0 0 4px;
+            gap:6px;
+            flex-wrap:wrap;
+        }
+        .cell-badge{
+            display:inline-block;
+            background:#eef2f7;
+            border:1px solid #d7dee8;
+            color:#516072;
+            border-radius:999px;
+            font-size:11px;
+            font-weight:600;
+            padding:2px 8px;
+            letter-spacing:.02em;
+        }
+
+        .code_cell{
+            background:var(--code-bg);
+            border-left:5px solid var(--code-accent);
+            padding:6px 8px;
+            margin:4px 0;
+            overflow-x:auto;
+            border-radius:4px;
+        }
+        .code_cell pre,
+        .code_cell .hljs{
+            margin:0;
+            background:transparent !important;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+            white-space:pre;
+        }
+
+        .output-text,
+        .output-stream,
+        .output-error,
+        .output-image,
+        .output-html{
+            margin:4px 0;
+            border-radius:4px;
+            overflow-x:auto;
+        }
+
+        .output-text{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:10px 10px 10px 8px;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+        }
+        .output-text pre{
+            margin:0;
+            white-space:pre-wrap;
+            word-break:break-word;
+            font-family:inherit;
+            font-size:inherit;
+            line-height:inherit;
+        }
+
+        .output-stream{
+            background:var(--stream-bg);
+            border-left:5px solid var(--out-accent);
+            padding:8px 10px;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+        }
+        .output-stream pre{ margin:0; white-space:pre-wrap; word-break:break-word; }
+
+        .output-image{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:10px;
+        }
+
+        .output-html{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:8px 10px;
+            color:var(--text);
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            line-height:1.55;
+            white-space:normal;
+        }
+        .output-html *{ white-space:normal; word-break:normal; max-width:100%; }
+        .output-html p{ margin:0 0 10px; }
+        .output-html p:last-child{ margin-bottom:0; }
+        .output-html h1,.output-html h2,.output-html h3,.output-html h4,.output-html h5,.output-html h6{
+            margin:0 0 10px;
+            color:var(--text);
+            line-height:1.3;
+        }
+        .output-html ul,
+        .output-html ol{ margin:0 0 10px 20px; padding-left:12px; }
+        .output-html li{ margin-bottom:4px; }
+        .output-html li:last-child{ margin-bottom:0; }
+        .output-html code{ font-family:'Red Hat Mono','Noto Sans Mono',monospace; font-size:.95em; }
+        .output-html pre{
+            white-space:pre-wrap;
+            word-break:break-word;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.5;
+            margin:0;
+        }
+
+        .table-output{ padding:8px 10px; }
+        .table-output table,
+        .table-output table.dataframe{
+            border-collapse:collapse;
+            border-spacing:0;
+            width:auto;
+            max-width:100%;
+            margin:0;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.45;
+            color:#263238;
+            background:#fff;
+        }
+        .table-output table th,
+        .table-output table td,
+        .table-output table.dataframe th,
+        .table-output table.dataframe td{
+            padding:8px 10px;
+            border:1px solid var(--border);
+            vertical-align:top;
+            text-align:left;
+        }
+        .table-output table thead,
+        .table-output table.dataframe thead{ background:var(--table-head); font-weight:600; }
+        .table-output table tbody tr:nth-child(even),
+        .table-output table.dataframe tbody tr:nth-child(even){ background:var(--table-zebra); }
+        .table-output .dataframe tbody tr:hover,
+        .table-output table tbody tr:hover{ background:#eef6ff; }
+
+        /* Premium HTML blocks */
+        .output-html .executive-card,
+        .output-html .insight-card,
+        .output-html .warning-card,
+        .output-html .danger-card,
+        .output-html .summary-card{
+            border-radius:10px;
+            padding:14px 16px;
+            box-shadow:var(--shadow-soft);
+            border:1px solid #dbe5ef;
+            margin:4px 0;
+        }
+        .output-html .executive-card{
+            background:var(--exec-bg);
+            border-left:6px solid var(--exec-border);
+        }
+        .output-html .summary-card{
+            background:#f8fbff;
+            border-left:6px solid #64748b;
+        }
+        .output-html .insight-card{
+            background:var(--insight-bg);
+            border-left:6px solid var(--insight-border);
+        }
+        .output-html .warning-card{
+            background:var(--warning-bg);
+            border-left:6px solid var(--warning-border);
+        }
+        .output-html .danger-card{
+            background:var(--danger-bg);
+            border-left:6px solid var(--danger-border);
+        }
+        .output-html .card-title{
+            margin:0 0 10px;
+            font-size:20px;
+            font-weight:700;
+            color:#1f2937;
+            line-height:1.25;
+        }
+        .output-html .card-subtitle{
+            margin:0 0 12px;
+            font-size:13px;
+            font-weight:600;
+            color:#64748b;
+            text-transform:uppercase;
+            letter-spacing:.03em;
+        }
+        .output-html .card-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+            gap:10px;
+            margin:10px 0 12px;
+        }
+        .output-html .metric-card{
+            background:var(--metric-bg);
+            border:1px solid var(--metric-border);
+            border-radius:10px;
+            padding:10px 12px;
+            min-height:82px;
+            box-shadow:0 1px 3px rgba(15,23,42,.05);
+        }
+        .output-html .metric-label{
+            display:block;
+            margin:0 0 6px;
+            font-size:12px;
+            font-weight:700;
+            color:#64748b;
+            text-transform:uppercase;
+            letter-spacing:.03em;
+        }
+        .output-html .metric-value{
+            display:block;
+            font-size:24px;
+            font-weight:700;
+            line-height:1.15;
+            color:#0f172a;
+        }
+        .output-html .metric-note{
+            display:block;
+            margin-top:4px;
+            font-size:12px;
+            color:#6b7280;
+        }
+        .output-html .chip-row{
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px;
+            margin:8px 0 10px;
+        }
+        .output-html .chip{
+            display:inline-flex;
+            align-items:center;
+            background:#edf4ff;
+            border:1px solid #d8e6ff;
+            color:#2457a6;
+            border-radius:999px;
+            padding:4px 10px;
+            font-size:12px;
+            font-weight:600;
+        }
+        .output-html .callout-compact p{ margin-bottom:8px; }
+        .output-html .callout-compact ul,
+        .output-html .callout-compact ol{ margin-bottom:8px; }
+
+        .output-error{
+            background:#fff5f5;
+            border-left:5px solid #ef4444;
+            padding:10px 12px;
+            color:#7f1d1d;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.5;
+        }
+        .output-error pre{ margin:8px 0 0; white-space:pre-wrap; word-break:break-word; }
+
+        .hidden-note{
+            margin:4px 0;
+            padding:6px 10px;
+            border-radius:6px;
+            background:#f8fafc;
+            border:1px dashed #cbd5e1;
+            color:#64748b;
+            font-size:12px;
+            font-weight:600;
+        }
+
+        .footer{
+            text-align:right;
+            margin-top:30px;
+            padding:12px;
+            background:#e9ecef;
+            border-radius:4px;
+            font-size:14px;
+            color:#555;
+        }
+
+        @media (max-width: 768px) {
+            body{ padding:16px 0; }
+            .container{ max-width:100%; padding:14px 16px 20px; border-radius:0; }
+            .output-html,
+            .output-text,
+            .output-stream,
+            .output-image,
+            .output-error,
+            .markdown,
+            .code_cell{ padding-left:10px; padding-right:10px; }
+            .output-html .card-title{ font-size:18px; }
+            .output-html .metric-value{ font-size:20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<h1 class="title-header">01_data_understanding</h1>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#F3F2EE">
+<br/><br/>
+<p style="text-align: center;">
+<font color="#0A1781" size="6">
+<strong>
+                    Spotify Global Music Intelligence - Data Science Projects
+                </strong>
+</font>
+</p>
+<p style="text-align: center;">
+<font color="#C58A1E" size="6">
+<strong>
+                    Data Understanding - Entendimento inicial dos dados,<br/>estrutura dos arquivos e viabilidade analítica
+                </strong>
+</font>
+</p>
+<p style="text-align: center;">
+<font color="#C58A1E" size="5">
+<strong>
+                    Apresentar a finalidade do Notebook 01 e posicionar a etapa de Data Understanding<br/>como uma fase essencial para validar a viabilidade analítica do projeto.
+                </strong>
+</font>
+</p>
+<br/>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#F3F2EE">
+<p style="text-align: right;">
+<font color="#444444" size="4">
+            Roberto SSoares - LfLngLrnng
+      </font>
+</p>
+<p style="text-align: right;"><font color="#444444" size="2">
+<a href="https://www.linkedin.com/in/roberto-dos-santos-soares/">in/roberto-dos-santos-soares</a><br/><a href="https://roberto-ssoares.github.io/meu-portfolio/">Portifólio: roberto-ssoares</a>
+</font></p>
+<p style="text-align: right;">
+<font color="#444444" size="4">
+            Data Science = { "+"; "Faturamento", "-"; "Custo", "&gt;"; "Qualidade de vida" }
+        </font>
+<br/>
+<font color="#918e8e" size="2">"Mestre Bruno Jardim"
+        </font>
+</p>
+<p style="text-align: right;">
+<font color="#918e8e" size="2">
+</font>
+</p>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 Abertura executiva</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Este notebook tem como objetivo iniciar a fase de <strong>Data Understanding</strong> do projeto <strong>Spotify Global Music Intelligence</strong>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Após a definição do problema de negócio, objetivos, stakeholders, perguntas analíticas, hipóteses e critérios de sucesso no Notebook 00,<ul>
+<li>esta etapa avança para a investigação prática dos dados disponíveis.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><em>O foco principal será compreender a estrutura dos arquivos originais, avaliar a granularidade dos dados, identificar colunas disponíveis,</em><ul>
+<li><em>verificar tipos de variáveis, analisar primeiras evidências de qualidade e avaliar se os datasets podem ser integrados para as próximas fases do projeto.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 1. Papel deste notebook no projeto</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>O <strong>Notebook 01 — Data Understanding</strong> funciona como uma ponte entre o entendimento de negócio e a preparação dos dados.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Antes de aplicar limpeza, transformação, visualizações ou modelagem, é necessário responder perguntas básicas, porém fundamentais:<ul>
+<li><em>quais arquivos estão disponíveis;</em></li>
+<li><em>quantas linhas e colunas existem em cada dataset;</em></li>
+<li><em>quais variáveis estão presentes;</em></li>
+<li><em>os arquivos possuem estrutura compatível;</em></li>
+<li><em>existem colunas comuns entre as bases;</em></li>
+<li><em>existem colunas exclusivas em cada arquivo;</em></li>
+<li><em>os tipos de dados fazem sentido;</em></li>
+<li><em>há sinais iniciais de valores ausentes;</em></li>
+<li><em>há possíveis registros duplicados;</em></li>
+<li><em>existe cobertura temporal coerente com o período 2009–2025;</em></li>
+<li><em>os dados sustentam as perguntas analíticas formuladas no Notebook 00.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Ações realizadas nesta célula</strong><ul>
+<li>Nesta etapa, será definida a função deste notebook dentro do projeto:<ul>
+<li><em>iniciar a análise técnica dos arquivos originais;</em></li>
+<li><em>validar a existência dos datasets na camada Raw;</em></li>
+<li><em>preparar o ambiente de leitura;</em></li>
+<li><em>organizar os primeiros diagnósticos;</em></li>
+<li><em>documentar decisões iniciais sobre integração e continuidade da análise.</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>A fase de entendimento dos dados reduz o risco de avançar para análises exploratórias com bases mal compreendidas, colunas inconsistentes, tipos incorretos, duplicidades ou problemas de granularidade.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>No contexto deste projeto, essa etapa é especialmente importante porque existem dois arquivos principais:<ul>
+<li><code>spotify_data_clean.csv</code></li>
+<li><code>track_data_final.csv</code></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Antes de unificar ou comparar essas bases, será necessário compreender se elas possuem estrutura compatível e se representam o mesmo nível de informação analítica.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultados esperados</strong><ul>
+<li>Ao final deste notebook, espera-se obter um diagnóstico inicial contendo:<ul>
+<li><em>arquivos localizados corretamente;</em></li>
+<li><em>dimensões dos datasets;</em></li>
+<li><em>primeiras amostras dos dados;</em></li>
+<li><em>lista de colunas disponíveis;</em></li>
+<li><em>comparação entre estruturas;</em></li>
+<li><em>tipos de dados identificados;</em></li>
+<li><em>primeiros sinais de valores ausentes;</em></li>
+<li><em>primeiros sinais de duplicidade;</em></li>
+<li><em>avaliação preliminar da cobertura temporal;</em></li>
+<li><em>recomendação sobre integração ou análise separada dos arquivos.</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Configuração inicial do ambiente</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">#!uv pip install watermark -q -U</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+print("Bibliotecas importadas com sucesso.")</code></pre>
+</div>
+<div class="output-stream">
+<pre>Bibliotecas importadas com sucesso.
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Configurações de exibição do Pandas</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Configurações gerais
+pd.set_option("display.max_columns", 200)
+pd.set_option("display.max_rows", 200)
+pd.set_option("display.max_colwidth", 250)
+pd.set_option("display.float_format", "{:,.2f}".format)</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Versões dos pacotes usados neste jupyter notebook
+%reload_ext watermark
+%watermark -a "RobertoSSoares-LfLngLrnng"</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Diretório e Pastas</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Identifica a raiz do projeto
+PROJECT_ROOT = Path.cwd().parent if Path.cwd().name == "notebooks" else Path.cwd()
+
+# Diretórios principais
+DATA_DIR = PROJECT_ROOT / "data"
+RAW_DIR = DATA_DIR / "00_raw"
+BRONZE_DIR = DATA_DIR / "01_bronze"
+SILVER_DIR = DATA_DIR / "02_silver"
+GOLD_DIR = DATA_DIR / "03_gold"
+
+REPORTS_DIR = PROJECT_ROOT / "reports"
+FIGURES_DIR = REPORTS_DIR / "figures"
+HTML_DIR = REPORTS_DIR / "html"
+
+# Arquivos esperados na camada Raw
+SPOTIFY_MODERN_FILE = RAW_DIR / "spotify_data_clean.csv"
+#SPOTIFY_TRACKS_FILE = RAW_DIR / "track_data_final.csv"
+SPOTIFY_TRACKS_FILE = RAW_DIR / "spotify-tracks-dataset.csv"
+
+
+PROJECT_ROOT</code></pre>
+</div>
+<div class="output-text">
+<pre>WindowsPath('D:/_DS-Projects/Data-Science/spotify-global-music-intelligence')</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 2. Validação dos arquivos na camada Raw</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Validar se os arquivos originais do projeto estão disponíveis no diretório <code>data/00_raw</code>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Ações realizadas</strong><ul>
+<li>Nesta etapa serão verificados:<ul>
+<li><em>existência do arquivo <code>spotify_data_clean.csv</code>;</em></li>
+<li><em>existência do arquivo <code>track_data_final.csv</code>;</em></li>
+<li><em>caminho completo de cada arquivo;</em></li>
+<li><em>status inicial de disponibilidade dos dados.</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>Antes de carregar os dados em memória, é necessário garantir que os arquivos esperados estejam corretamente posicionados na camada Raw.</li>
+<li>Essa validação evita erros posteriores de leitura e ajuda a documentar o ponto de partida do pipeline analítico.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>Ao final desta célula, espera-se confirmar se os dois arquivos principais do projeto estão disponíveis para leitura.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Validação da existência dos arquivos na camada Raw</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">raw_files_check = pd.DataFrame(
+    {
+        "arquivo_esperado": [
+            "spotify_data_clean.csv",
+            "spotify-tracks-dataset.csv",
+        ],
+        "caminho": [
+            
+            SPOTIFY_MODERN_FILE,
+            SPOTIFY_TRACKS_FILE,
+        ],
+        "existe": [
+            SPOTIFY_MODERN_FILE.exists(),
+            SPOTIFY_TRACKS_FILE.exists(),
+        ],
+    }
+)
+
+raw_files_check</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>arquivo_esperado</th>
+<th>caminho</th>
+<th>existe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>spotify_data_clean.csv</td>
+<td>D:\_DS-Projects\Data-Science\spotify-global-music-intelligence\data\00_raw\spotify_data_clean.csv</td>
+<td>True</td>
+</tr>
+<tr>
+<th>1</th>
+<td>spotify-tracks-dataset.csv</td>
+<td>D:\_DS-Projects\Data-Science\spotify-global-music-intelligence\data\00_raw\spotify-tracks-dataset.csv</td>
+<td>True</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 3. Carregamento inicial dos datasets</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Carregar os arquivos CSV originais disponíveis na camada <code>data/00_raw</code> para iniciar o entendimento técnico dos dados.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Ações realizadas</strong><ul>
+<li>Nesta etapa serão carregados os seguintes arquivos:<ul>
+<li><code>spotify_data_clean.csv</code></li>
+<li><code>track_data_final.csv</code></li>
+</ul>
+</li>
+<li>Cada arquivo será lido como um DataFrame Pandas independente, preservando inicialmente sua estrutura original.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>Antes de realizar qualquer limpeza, padronização ou integração, é necessário carregar os dados em seu formato bruto e observar como eles estão estruturados.</li>
+<li>Essa prática preserva a rastreabilidade entre a camada Raw e as próximas etapas do projeto.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>Ao final desta célula, espera-se ter dois DataFrames carregados:<ul>
+<li><code>df_spotify_modern</code></li>
+<li><code>df_spotify_tracks</code></li>
+</ul>
+</li>
+<li>Esses DataFrames serão usados nas próximas células para análise de dimensões, colunas, tipos de dados e primeiras amostras.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Carregamento inicial dos arquivos CSV</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">def read_csv_with_fallback(file_path: Path) -&gt; pd.DataFrame:
+    """
+    Lê um arquivo CSV usando tentativas de encoding e separador.
+
+    A função tenta combinações comuns para reduzir erros de leitura,
+    especialmente em datasets públicos baixados de plataformas externas.
+    """
+    attempts = [
+        {"encoding": "utf-8", "sep": ","},
+        {"encoding": "utf-8-sig", "sep": ","},
+        {"encoding": "latin1", "sep": ","},
+        {"encoding": "utf-8", "sep": ";"},
+        {"encoding": "utf-8-sig", "sep": ";"},
+        {"encoding": "latin1", "sep": ";"},
+    ]
+
+    last_error = None
+
+    for params in attempts:
+        try:
+            return pd.read_csv(file_path, low_memory=False, **params)
+        except Exception as error:
+            last_error = error
+
+    raise RuntimeError(
+        f"Não foi possível ler o arquivo {file_path}. "
+        f"Último erro encontrado: {last_error}"
+    )
+    </code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">df_spotify_modern = read_csv_with_fallback(SPOTIFY_MODERN_FILE)
+df_spotify_tracks = read_csv_with_fallback(SPOTIFY_TRACKS_FILE)
+
+print("Datasets carregados com sucesso.")</code></pre>
+</div>
+<div class="output-stream">
+<pre>Datasets carregados com sucesso.
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 4. Diagnóstico inicial de volume</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Verificar o tamanho inicial de cada dataset carregado.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Ações realizadas</strong><ul>
+<li>Nesta etapa serão analisadas:<ul>
+<li><em>quantidade de linhas;</em></li>
+<li><em>quantidade de colunas;</em></li>
+<li><em>quantidade total de células;</em></li>
+<li><em>nome lógico de cada dataset.</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>O volume inicial dos dados ajuda a entender a escala do projeto, avaliar o esforço de preparação e identificar possíveis diferenças relevantes entre os arquivos.</li>
+<li>Essa análise também permite verificar se os arquivos foram carregados corretamente.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>Ao final desta célula, espera-se obter uma tabela comparativa com as dimensões iniciais dos dois datasets.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Diagnóstico inicial de volume dos datasets</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">volume_report = pd.DataFrame(
+    {
+        "dataset": [
+            "spotify_data_clean",
+            "track_data_final",
+        ],
+        "rows": [
+            df_spotify_modern.shape[0],
+            df_spotify_tracks.shape[0],
+        ],
+        "columns": [
+            df_spotify_modern.shape[1],
+            df_spotify_tracks.shape[1],
+        ],
+    }
+)
+
+volume_report["total_cells"] = volume_report["rows"] * volume_report["columns"]
+
+volume_report</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>dataset</th>
+<th>rows</th>
+<th>columns</th>
+<th>total_cells</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>spotify_data_clean</td>
+<td>8582</td>
+<td>15</td>
+<td>128730</td>
+</tr>
+<tr>
+<th>1</th>
+<td>track_data_final</td>
+<td>114000</td>
+<td>21</td>
+<td>2394000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 5. Primeiras amostras dos dados</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Visualizar os primeiros registros de cada dataset para compreender sua estrutura inicial.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Ações realizadas</strong><ul>
+<li>Nesta etapa serão exibidas amostras dos dois DataFrames:<ul>
+<li><em>primeiras linhas de <code>df_spotify_modern</code>;</em></li>
+<li><em>primeiras linhas de <code>df_spotify_tracks</code>.</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>A visualização inicial das linhas permite identificar rapidamente nomes de colunas, formatos de valores,<ul>
+<li>possíveis problemas de separador, presença de campos textuais e variáveis candidatas para análise.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>Ao final desta célula, espera-se obter uma primeira leitura visual da estrutura dos dados.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Primeiras linhas dos datasets</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">df_spotify_modern.head()</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>track_id</th>
+<th>track_name</th>
+<th>track_number</th>
+<th>track_popularity</th>
+<th>explicit</th>
+<th>artist_name</th>
+<th>artist_popularity</th>
+<th>artist_followers</th>
+<th>artist_genres</th>
+<th>album_id</th>
+<th>album_name</th>
+<th>album_release_date</th>
+<th>album_total_tracks</th>
+<th>album_type</th>
+<th>track_duration_min</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>3EJS5LyekDim1Tf5rBFmZl</td>
+<td>Trippy Mane (ft. Project Pat)</td>
+<td>4</td>
+<td>0</td>
+<td>True</td>
+<td>Diplo</td>
+<td>77</td>
+<td>2812821</td>
+<td>moombahton</td>
+<td>5QRFnGnBeMGePBKF2xTz5z</td>
+<td>d00mscrvll, Vol. 1</td>
+<td>2025-10-31</td>
+<td>9</td>
+<td>album</td>
+<td>1.55</td>
+</tr>
+<tr>
+<th>1</th>
+<td>1oQW6G2ZiwMuHqlPpP27DB</td>
+<td>OMG!</td>
+<td>1</td>
+<td>0</td>
+<td>True</td>
+<td>Yelawolf</td>
+<td>64</td>
+<td>2363438</td>
+<td>country hip hop, southern hip hop</td>
+<td>4SUmmwnv0xTjRcLdjczGg2</td>
+<td>OMG!</td>
+<td>2025-10-31</td>
+<td>1</td>
+<td>single</td>
+<td>3.07</td>
+</tr>
+<tr>
+<th>2</th>
+<td>7mdkjzoIYlf1rx9EtBpGmU</td>
+<td>Hard 2 Find</td>
+<td>1</td>
+<td>4</td>
+<td>True</td>
+<td>Riff Raff</td>
+<td>48</td>
+<td>193302</td>
+<td>NaN</td>
+<td>3E3zEAL8gUYWaLYB9L7gbp</td>
+<td>Hard 2 Find</td>
+<td>2025-10-31</td>
+<td>1</td>
+<td>single</td>
+<td>2.55</td>
+</tr>
+<tr>
+<th>3</th>
+<td>67rW0Zl7oB3qEpD5YWWE5w</td>
+<td>Still Get Like That (ft. Project Pat &amp; Starrah)</td>
+<td>8</td>
+<td>30</td>
+<td>True</td>
+<td>Diplo</td>
+<td>77</td>
+<td>2813710</td>
+<td>moombahton</td>
+<td>5QRFnGnBeMGePBKF2xTz5z</td>
+<td>d00mscrvll, Vol. 1</td>
+<td>2025-10-31</td>
+<td>9</td>
+<td>album</td>
+<td>1.69</td>
+</tr>
+<tr>
+<th>4</th>
+<td>15xptTfRBrjsppW0INUZjf</td>
+<td>ride me like a harley</td>
+<td>2</td>
+<td>0</td>
+<td>True</td>
+<td>Rumelis</td>
+<td>48</td>
+<td>8682</td>
+<td>dark r&amp;b</td>
+<td>06FDIpSHYmZAZoyuYtc7kd</td>
+<td>come closer / ride me like a harley</td>
+<td>2025-10-30</td>
+<td>2</td>
+<td>single</td>
+<td>2.39</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">df_spotify_tracks.head()</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Unnamed: 0</th>
+<th>track_id</th>
+<th>artists</th>
+<th>album_name</th>
+<th>track_name</th>
+<th>popularity</th>
+<th>duration_ms</th>
+<th>explicit</th>
+<th>danceability</th>
+<th>energy</th>
+<th>key</th>
+<th>loudness</th>
+<th>mode</th>
+<th>speechiness</th>
+<th>acousticness</th>
+<th>instrumentalness</th>
+<th>liveness</th>
+<th>valence</th>
+<th>tempo</th>
+<th>time_signature</th>
+<th>track_genre</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>0</td>
+<td>5SuOikwiRyPMVoIQDJUgSV</td>
+<td>Gen Hoshino</td>
+<td>Comedy</td>
+<td>Comedy</td>
+<td>73</td>
+<td>230666</td>
+<td>False</td>
+<td>0.68</td>
+<td>0.46</td>
+<td>1</td>
+<td>-6.75</td>
+<td>0</td>
+<td>0.14</td>
+<td>0.03</td>
+<td>0.00</td>
+<td>0.36</td>
+<td>0.71</td>
+<td>87.92</td>
+<td>4</td>
+<td>acoustic</td>
+</tr>
+<tr>
+<th>1</th>
+<td>1</td>
+<td>4qPNDBW1i3p13qLCt0Ki3A</td>
+<td>Ben Woodward</td>
+<td>Ghost (Acoustic)</td>
+<td>Ghost - Acoustic</td>
+<td>55</td>
+<td>149610</td>
+<td>False</td>
+<td>0.42</td>
+<td>0.17</td>
+<td>1</td>
+<td>-17.23</td>
+<td>1</td>
+<td>0.08</td>
+<td>0.92</td>
+<td>0.00</td>
+<td>0.10</td>
+<td>0.27</td>
+<td>77.49</td>
+<td>4</td>
+<td>acoustic</td>
+</tr>
+<tr>
+<th>2</th>
+<td>2</td>
+<td>1iJBSr7s7jYXzM8EGcbK5b</td>
+<td>Ingrid Michaelson;ZAYN</td>
+<td>To Begin Again</td>
+<td>To Begin Again</td>
+<td>57</td>
+<td>210826</td>
+<td>False</td>
+<td>0.44</td>
+<td>0.36</td>
+<td>0</td>
+<td>-9.73</td>
+<td>1</td>
+<td>0.06</td>
+<td>0.21</td>
+<td>0.00</td>
+<td>0.12</td>
+<td>0.12</td>
+<td>76.33</td>
+<td>4</td>
+<td>acoustic</td>
+</tr>
+<tr>
+<th>3</th>
+<td>3</td>
+<td>6lfxq3CG4xtTiEg7opyCyx</td>
+<td>Kina Grannis</td>
+<td>Crazy Rich Asians (Original Motion Picture Soundtrack)</td>
+<td>Can't Help Falling In Love</td>
+<td>71</td>
+<td>201933</td>
+<td>False</td>
+<td>0.27</td>
+<td>0.06</td>
+<td>0</td>
+<td>-18.52</td>
+<td>1</td>
+<td>0.04</td>
+<td>0.91</td>
+<td>0.00</td>
+<td>0.13</td>
+<td>0.14</td>
+<td>181.74</td>
+<td>3</td>
+<td>acoustic</td>
+</tr>
+<tr>
+<th>4</th>
+<td>4</td>
+<td>5vjLSffimiIP26QG5WcN2K</td>
+<td>Chord Overstreet</td>
+<td>Hold On</td>
+<td>Hold On</td>
+<td>82</td>
+<td>198853</td>
+<td>False</td>
+<td>0.62</td>
+<td>0.44</td>
+<td>2</td>
+<td>-9.68</td>
+<td>1</td>
+<td>0.05</td>
+<td>0.47</td>
+<td>0.00</td>
+<td>0.08</td>
+<td>0.17</td>
+<td>119.95</td>
+<td>4</td>
+<td>acoustic</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Comparação inicial das colunas dos dois datasets</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">modern_columns = set(df_spotify_modern.columns)
+tracks_columns = set(df_spotify_tracks.columns)
+
+common_columns = sorted(modern_columns.intersection(tracks_columns))
+only_modern_columns = sorted(modern_columns.difference(tracks_columns))
+only_tracks_columns = sorted(tracks_columns.difference(modern_columns))
+
+schema_comparison = pd.DataFrame(
+    {
+        "categoria": [
+            "colunas_em_comum",
+            "somente_spotify_data_clean",
+            "somente_spotify_tracks_dataset",
+        ],
+        "quantidade": [
+            len(common_columns),
+            len(only_modern_columns),
+            len(only_tracks_columns),
+        ],
+        "colunas": [
+            common_columns,
+            only_modern_columns,
+            only_tracks_columns,
+        ],
+    }
+)
+
+schema_comparison</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>categoria</th>
+<th>quantidade</th>
+<th>colunas</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>colunas_em_comum</td>
+<td>4</td>
+<td>[album_name, explicit, track_id, track_name]</td>
+</tr>
+<tr>
+<th>1</th>
+<td>somente_spotify_data_clean</td>
+<td>11</td>
+<td>[album_id, album_release_date, album_total_tracks, album_type, artist_followers, artist_genres, artist_name, artist_popularity, track_duration_min, track_number, track_popularity]</td>
+</tr>
+<tr>
+<th>2</th>
+<td>somente_spotify_tracks_dataset</td>
+<td>17</td>
+<td>[Unnamed: 0, acousticness, artists, danceability, duration_ms, energy, instrumentalness, key, liveness, loudness, mode, popularity, speechiness, tempo, time_signature, track_genre, valence]</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Resumo das colunas em comum e exclusivas</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">print("Colunas em comum:")
+print(common_columns)
+
+print("\nColunas somente em spotify_data_clean:")
+print(only_modern_columns)
+
+print("\nColunas somente em spotify_tracks_dataset:")
+print(only_tracks_columns)
+print(" ")
+print("==="*30)
+print(" ")
+print(df_spotify_modern.info())
+print(" ")
+print("==="*30)
+print(" ")
+print(df_spotify_tracks.info())</code></pre>
+</div>
+<div class="output-stream">
+<pre>Colunas em comum:
+['album_name', 'explicit', 'track_id', 'track_name']
+
+Colunas somente em spotify_data_clean:
+['album_id', 'album_release_date', 'album_total_tracks', 'album_type', 'artist_followers', 'artist_genres', 'artist_name', 'artist_popularity', 'track_duration_min', 'track_number', 'track_popularity']
+
+Colunas somente em spotify_tracks_dataset:
+['Unnamed: 0', 'acousticness', 'artists', 'danceability', 'duration_ms', 'energy', 'instrumentalness', 'key', 'liveness', 'loudness', 'mode', 'popularity', 'speechiness', 'tempo', 'time_signature', 'track_genre', 'valence']
+ 
+==========================================================================================
+ 
+<class 'pandas.dataframe'="">
+RangeIndex: 8582 entries, 0 to 8581
+Data columns (total 15 columns):
+ #   Column              Non-Null Count  Dtype  
+---  ------              --------------  -----  
+ 0   track_id            8582 non-null   str    
+ 1   track_name          8582 non-null   str    
+ 2   track_number        8582 non-null   int64  
+ 3   track_popularity    8582 non-null   int64  
+ 4   explicit            8582 non-null   bool   
+ 5   artist_name         8579 non-null   str    
+ 6   artist_popularity   8582 non-null   int64  
+ 7   artist_followers    8582 non-null   int64  
+ 8   artist_genres       5221 non-null   str    
+ 9   album_id            8582 non-null   str    
+ 10  album_name          8582 non-null   str    
+ 11  album_release_date  8582 non-null   str    
+ 12  album_total_tracks  8582 non-null   int64  
+ 13  album_type          8582 non-null   str    
+ 14  track_duration_min  8582 non-null   float64
+dtypes: bool(1), float64(1), int64(5), str(8)
+memory usage: 1.9 MB
+None
+ 
+==========================================================================================
+ 
+<class 'pandas.dataframe'="">
+RangeIndex: 114000 entries, 0 to 113999
+Data columns (total 21 columns):
+ #   Column            Non-Null Count   Dtype  
+---  ------            --------------   -----  
+ 0   Unnamed: 0        114000 non-null  int64  
+ 1   track_id          114000 non-null  str    
+ 2   artists           113999 non-null  str    
+ 3   album_name        113999 non-null  str    
+ 4   track_name        113999 non-null  str    
+ 5   popularity        114000 non-null  int64  
+ 6   duration_ms       114000 non-null  int64  
+ 7   explicit          114000 non-null  bool   
+ 8   danceability      114000 non-null  float64
+ 9   energy            114000 non-null  float64
+ 10  key               114000 non-null  int64  
+ 11  loudness          114000 non-null  float64
+ 12  mode              114000 non-null  int64  
+ 13  speechiness       114000 non-null  float64
+ 14  acousticness      114000 non-null  float64
+ 15  instrumentalness  114000 non-null  float64
+ 16  liveness          114000 non-null  float64
+ 17  valence           114000 non-null  float64
+ 18  tempo             114000 non-null  float64
+ 19  time_signature    114000 non-null  int64  
+ 20  track_genre       114000 non-null  str    
+dtypes: bool(1), float64(9), int64(6), str(5)
+memory usage: 26.8 MB
+None
+</class></class></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 6. Interpretação da comparação inicial de schema</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Registrar a interpretação técnica inicial sobre a compatibilidade e complementaridade entre os datasets selecionados para continuidade do projeto:<ul>
+<li><code>spotify_data_clean.csv</code></li>
+<li><code>spotify-tracks-dataset.csv</code></li>
+<li>Após a análise preliminar, foi tomada a decisão de seguir com essas duas fontes principais, deixando o arquivo <code>track_data_final.csv</code> fora do escopo imediato desta etapa.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Decisão metodológica tomada</strong><ul>
+<li>A partir deste ponto, o projeto utilizará como fontes principais:</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Papel no projeto | Arquivo | Descrição |
+|---|---|---|
+| Fonte temporal e contextual | <code>spotify_data_clean.csv</code> | Dataset com informações de faixa, artista, álbum, popularidade, data de lançamento e metadados contextuais |
+| Fonte musical e comportamental | <code>spotify-tracks-dataset.csv</code> | Dataset mais amplo, com atributos musicais, gênero, características sonoras e popularidade |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li>A decisão foi tomada porque os dois datasets possuem estruturas diferentes e complementares, o que cria uma oportunidade mais rica para análise exploratória, engenharia de atributos e futura construção de uma ABT.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado observado na comparação de colunas</strong><ul>
+<li>A comparação de schema indica que os datasets não são apenas variações um do outro.</li>
+<li>O arquivo <code>spotify_data_clean.csv</code> possui colunas mais voltadas a contexto de artista, álbum, lançamento e popularidade no recorte original do projeto.</li>
+<li>Já o arquivo <code>spotify-tracks-dataset.csv</code> possui variáveis musicais mais detalhadas, especialmente atributos sonoros e gênero.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Colunas exclusivas de <code>spotify_data_clean.csv</code></strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Grupo | Colunas |
+|---|---|
+| Álbum | <code>album_id</code>, <code>album_release_date</code>, <code>album_total_tracks</code>, <code>album_type</code> |
+| Artista | <code>artist_name</code>, <code>artist_popularity</code>, <code>artist_followers</code>, <code>artist_genres</code> |
+| Faixa | <code>track_number</code>, <code>track_popularity</code>, <code>track_duration_min</code> |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Colunas exclusivas de <code>spotify-tracks-dataset.csv</code></strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Grupo | Colunas |
+|---|---|
+| Atributos musicais | <code>danceability</code>, <code>energy</code>, <code>loudness</code>, <code>speechiness</code>, <code>acousticness</code>, <code>instrumentalness</code>, <code>liveness</code>, <code>valence</code>, <code>tempo</code> |
+| Estrutura musical | <code>key</code>, <code>mode</code>, <code>time_signature</code>, <code>duration_ms</code> |
+| Gênero | <code>track_genre</code> |
+| Popularidade | <code>popularity</code> |
+| Artistas | <code>artists</code> |
+| Controle técnico | <code>Unnamed: 0</code> |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Interpretação técnica</strong><ul>
+<li>Os dois datasets parecem representar a mesma entidade analítica principal: a faixa musical.</li>
+<li>No entanto, eles possuem perspectivas diferentes sobre essa entidade.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Dataset | Perspectiva predominante | Valor analítico |
+|---|---|---|
+| <code>spotify_data_clean.csv</code> | Contexto de faixa, artista, álbum e lançamento | Apoia análise temporal, análise por artista e contexto de popularidade |
+| <code>spotify-tracks-dataset.csv</code> | Características musicais e gênero | Apoia análise sonora, segmentação, clustering e modelagem futura |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essa diferença é positiva para o projeto, pois permite construir uma análise mais rica do que seria possível com apenas uma das fontes.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Complementaridade analítica</strong><ul>
+<li>A principal vantagem de utilizar os dois datasets é combinar duas dimensões importantes:<ol>
+<li><strong>Dimensão contextual</strong><ul>
+<li>artista;</li>
+<li>popularidade do artista;</li>
+<li>seguidores;</li>
+<li>álbum;</li>
+<li>data de lançamento;</li>
+<li>tipo de álbum;</li>
+<li>número da faixa;</li>
+<li>popularidade da faixa.</li>
+</ul>
+</li>
+<li><strong>Dimensão musical</strong><ul>
+<li>dançabilidade;</li>
+<li>energia;</li>
+<li>acústica;</li>
+<li>instrumentalidade;</li>
+<li>vivacidade;</li>
+<li>valência;</li>
+<li>tempo;</li>
+<li>intensidade sonora;</li>
+<li>gênero musical;</li>
+<li>assinatura de tempo;</li>
+<li>tonalidade e modo.</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essa combinação pode apoiar uma futura ABT com variáveis explicativas mais completas.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Diferenças semânticas importantes</strong><ul>
+<li>Algumas colunas possuem nomes diferentes, mas representam conceitos próximos.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Conceito | <code>spotify_data_clean.csv</code> | <code>spotify-tracks-dataset.csv</code> | Ação necessária |
+|---|---|---|---|
+| Popularidade da faixa | <code>track_popularity</code> | <code>popularity</code> | Padronizar nome e avaliar escala |
+| Duração da faixa | <code>track_duration_min</code> | <code>duration_ms</code> | Converter para uma unidade comum |
+| Artista | <code>artist_name</code> | <code>artists</code> | Avaliar formato e padronizar |
+| Gênero | <code>artist_genres</code> | <code>track_genre</code> | Tratar como perspectivas diferentes |
+| Nome da faixa | <code>track_name</code> | <code>track_name</code> | Usar como possível chave auxiliar |
+| Nome do álbum | <code>album_name</code> | <code>album_name</code> | Usar como possível chave auxiliar |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essas diferenças precisam ser tratadas antes de qualquer integração definitiva.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Risco de integração direta</strong><ul>
+<li>Apesar da complementaridade, não é recomendável integrar os datasets imediatamente sem validação.</li>
+<li>Os principais riscos são:<ul>
+<li><code>track_id</code> pode não ter interseção suficiente entre as bases;</li>
+<li>a mesma música pode aparecer com identificadores diferentes;</li>
+<li>nomes de artistas podem ter formatos distintos;</li>
+<li>a coluna <code>artists</code> pode conter múltiplos artistas em uma única string;</li>
+<li><code>artist_genres</code> e <code>track_genre</code> podem representar conceitos diferentes;</li>
+<li><code>track_popularity</code> e <code>popularity</code> podem ter sido coletadas em momentos diferentes;</li>
+<li>duplicidades podem surgir ao unir bases com granularidade semelhante;</li>
+<li>a coluna <code>Unnamed: 0</code> deve ser avaliada e provavelmente removida.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Decisão preliminar</strong><ul>
+<li>A decisão preliminar é utilizar os dois datasets de forma complementar, mas com cautela.</li>
+<li>Nesta fase de Data Understanding, os datasets serão analisados separadamente para compreender:<ul>
+<li>estrutura;</li>
+<li>volume;</li>
+<li>tipos de dados;</li>
+<li>valores ausentes;</li>
+<li>duplicidades;</li>
+<li>cobertura temporal;</li>
+<li>colunas em comum;</li>
+<li>colunas exclusivas;</li>
+<li>possibilidade real de integração.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A integração será considerada apenas depois de avaliar a interseção por <code>track_id</code> e, se necessário, por chaves auxiliares como <code>track_name</code>, <code>album_name</code> e artista.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Estratégia recomendada para a ABT</strong><ul>
+<li>A estratégia recomendada para uma futura ABT é:<ol>
+<li>manter <code>spotify_data_clean.csv</code> como fonte contextual;</li>
+<li>manter <code>spotify-tracks-dataset.csv</code> como fonte de atributos musicais;</li>
+<li>padronizar nomes de colunas;</li>
+<li>converter duração para uma unidade comum;</li>
+<li>harmonizar popularidade como variável analítica;</li>
+<li>avaliar interseção por <code>track_id</code>;</li>
+<li>avaliar chaves alternativas com cautela;</li>
+<li>criar uma base enriquecida apenas com registros confiáveis;</li>
+<li>preservar uma coluna de origem dos dados;</li>
+<li>documentar perdas, duplicidades e limitações da integração.</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Papel de cada dataset no projeto</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Dataset | Uso recomendado nesta fase |
+|---|---|
+| <code>spotify_data_clean.csv</code> | Análise temporal, análise de artistas, álbuns, popularidade e contexto de lançamento |
+| <code>spotify-tracks-dataset.csv</code> | Análise de atributos musicais, gêneros, segmentação, correlação e preparação para modelagem |
+| Base ABT futura | Combinação controlada das duas fontes, caso a integração seja tecnicamente confiável |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>Esta interpretação orienta a próxima etapa do Data Understanding.</li>
+<li>A partir deste ponto, o projeto deixa de tratar os arquivos como bases redundantes e passa a tratá-los como fontes complementares.</li>
+<li>Essa decisão fortalece o projeto porque permite construir uma análise mais completa, conectando:<ul>
+<li>contexto musical;</li>
+<li>dados de artista;</li>
+<li>dados de álbum;</li>
+<li>popularidade;</li>
+<li>atributos sonoros;</li>
+<li>gênero musical;</li>
+<li>potencial de segmentação;</li>
+<li>preparação para machine learning.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A próxima etapa será avaliar a interseção entre os datasets por <code>track_id</code> e diagnosticar se existe viabilidade real para enriquecimento entre as fontes.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 7. Decisão metodológica: foco na base principal</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Registrar a decisão metodológica de seguir, nesta etapa do projeto, com o dataset <code>spotify_data_clean.csv</code> como fonte principal da análise exploratória.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Contexto da decisão</strong><ul>
+<li>Durante o Data Understanding, foram avaliadas outras fontes possíveis, incluindo datasets complementares com atributos musicais mais detalhados.</li>
+<li>No entanto, para manter o projeto alinhado ao planejamento inicial do Cap01 — EDA, a decisão tomada foi concentrar a primeira fase analítica na base <code>spotify_data_clean.csv</code>.</li>
+<li>Essa decisão evita dispersão, reduz complexidade prematura e permite construir uma EDA mais controlada, clara e bem documentada.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Papel da base <code>spotify_data_clean.csv</code></strong><ul>
+<li>A base principal contém informações relevantes para uma análise exploratória inicial, incluindo:<ul>
+<li>identificação da faixa;</li>
+<li>nome da música;</li>
+<li>popularidade da faixa;</li>
+<li>artista;</li>
+<li>popularidade do artista;</li>
+<li>seguidores do artista;</li>
+<li>gêneros do artista;</li>
+<li>álbum;</li>
+<li>data de lançamento;</li>
+<li>tipo de álbum;</li>
+<li>duração da faixa.</li>
+</ul>
+</li>
+<li>Essas variáveis são suficientes para investigar popularidade, artistas, álbuns, lançamentos, gêneros e evolução temporal.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Fonte complementar futura</strong><ul>
+<li>O arquivo <code>spotify-tracks-dataset.csv</code> será preservado para uma etapa futura.</li>
+<li>Seu uso potencial inclui:<ul>
+<li>enriquecimento da base principal;</li>
+<li>criação de uma ABT;</li>
+<li>análise de atributos musicais;</li>
+<li>segmentação;</li>
+<li>clusterização;</li>
+<li>modelagem preditiva;</li>
+<li>classificação de potencial de popularidade.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Decisão final desta fase</strong><ul>
+<li>Nesta fase do projeto, a EDA será conduzida exclusivamente sobre:</li>
+<li><code>spotify_data_clean.csv</code></li>
+<li>A base complementar será retomada somente após a conclusão da análise exploratória principal.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>A partir desta decisão, o Notebook 01 seguirá com o entendimento aprofundado da base principal, avaliando estrutura, tipos, nulos,<ul>
+<li>duplicidades, cardinalidade, cobertura temporal e primeiras estatísticas descritivas.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Perfil técnico inicial da base principal</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">df_main = df_spotify_modern.copy()
+
+profile_columns = pd.DataFrame(
+    {
+        "column": df_main.columns,
+        "dtype": [df_main[col].dtype for col in df_main.columns],
+        "non_null_count": [df_main[col].notna().sum() for col in df_main.columns],
+        "null_count": [df_main[col].isna().sum() for col in df_main.columns],
+        "null_pct": [df_main[col].isna().mean() * 100 for col in df_main.columns],
+        "unique_count": [df_main[col].nunique(dropna=True) for col in df_main.columns],
+        "unique_pct": [
+            df_main[col].nunique(dropna=True) / len(df_main) * 100
+            for col in df_main.columns
+        ],
+    }
+)
+
+profile_columns.sort_values(["null_pct", "unique_count"], ascending=[False, False])</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>column</th>
+<th>dtype</th>
+<th>non_null_count</th>
+<th>null_count</th>
+<th>null_pct</th>
+<th>unique_count</th>
+<th>unique_pct</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>8</th>
+<td>artist_genres</td>
+<td>str</td>
+<td>5221</td>
+<td>3361</td>
+<td>39.16</td>
+<td>661</td>
+<td>7.70</td>
+</tr>
+<tr>
+<th>5</th>
+<td>artist_name</td>
+<td>str</td>
+<td>8579</td>
+<td>3</td>
+<td>0.03</td>
+<td>2547</td>
+<td>29.68</td>
+</tr>
+<tr>
+<th>0</th>
+<td>track_id</td>
+<td>str</td>
+<td>8582</td>
+<td>0</td>
+<td>0.00</td>
+<td>8582</td>
+<td>100.00</td>
+</tr>
+<tr>
+<th>1</th>
+<td>track_name</td>
+<td>str</td>
+<td>8582</td>
+<td>0</td>
+<td>0.00</td>
+<td>7462</td>
+<td>86.95</td>
+</tr>
+<tr>
+<th>9</th>
+<td>album_id</td>
+<td>str</td>
+<td>8582</td>
+<td>0</td>
+<td>0.00</td>
+<td>5205</td>
+<td>60.65</td>
+</tr>
+<tr>
+<th>10</th>
+<td>album_name</td>
+<td>str</td>
+<td>8582</td>
+<td>0</td>
+<td>0.00</td>
+<td>4870</td>
+<td>56.75</td>
+</tr>
+<tr>
+<th>7</th>
+<td>artist_followers</td>
+<td>int64</td>
+<td>8582</td>
+<td>0</td>
+<td>0.00</td>
+<td>3740</td>
+<td>43.58</td>
+</tr>
+<tr>
+<th>11</th>
+<td>album_release_date</td>
+<td>str</td>
+<td>8582</td>
+<td>0</td>
+<td>0.00</td>
+<td>2384</td>
+<td>27.78</td>
+</tr>
+<tr>
+<th>14</th>
+<td>track_duration_min</td>
+<td>float64</td>
+<td>8582</td>
+<td>0</td>
+<td>0.00</td>
+<td>647</td>
+<td>7.54</td>
+</tr>
+<tr>
+<th>3</th>
+<td>track_popularity</td>
+<td>int64</td>
+<td>8582</td>
+<td>0</td>
+<td>0.00</td>
+<td>98</td>
+<td>1.14</td>
+</tr>
+<tr>
+<th>6</th>
+<td>artist_popularity</td>
+<td>int64</td>
+<td>8582</td>
+<td>0</td>
+<td>0.00</td>
+<td>96</td>
+<td>1.12</td>
+</tr>
+<tr>
+<th>12</th>
+<td>album_total_tracks</td>
+<td>int64</td>
+<td>8582</td>
+<td>0</td>
+<td>0.00</td>
+<td>82</td>
+<td>0.96</td>
+</tr>
+<tr>
+<th>2</th>
+<td>track_number</td>
+<td>int64</td>
+<td>8582</td>
+<td>0</td>
+<td>0.00</td>
+<td>54</td>
+<td>0.63</td>
+</tr>
+<tr>
+<th>13</th>
+<td>album_type</td>
+<td>str</td>
+<td>8582</td>
+<td>0</td>
+<td>0.00</td>
+<td>3</td>
+<td>0.03</td>
+</tr>
+<tr>
+<th>4</th>
+<td>explicit</td>
+<td>bool</td>
+<td>8582</td>
+<td>0</td>
+<td>0.00</td>
+<td>2</td>
+<td>0.02</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 8. Interpretação do perfil técnico das colunas</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Registrar a interpretação inicial sobre tipos de dados, completude, cardinalidade e qualidade das variáveis da base <code>spotify_data_clean.csv</code>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado observado</strong><ul>
+<li>A base principal possui 8.582 registros e 15 colunas.</li>
+<li>De forma geral, a estrutura dos dados é adequada para continuidade da análise exploratória. A variável <code>track_id</code> apresenta 8.582 valores únicos,<ul>
+<li>indicando que cada linha possui um identificador técnico único de faixa musical.</li>
+</ul>
+</li>
+<li>Também não foram identificados valores ausentes nas principais variáveis de análise, como:<ul>
+<li><code>track_name</code>;</li>
+<li><code>track_popularity</code>;</li>
+<li><code>artist_popularity</code>;</li>
+<li><code>artist_followers</code>;</li>
+<li><code>album_name</code>;</li>
+<li><code>album_release_date</code>;</li>
+<li><code>track_duration_min</code>;</li>
+<li><code>explicit</code>;</li>
+<li><code>album_type</code>.</li>
+</ul>
+</li>
+<li>Esse resultado é positivo, pois indica que a base possui boa completude nas variáveis centrais do projeto.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Pontos positivos identificados</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Aspecto | Interpretação |
+|---|---|
+| <code>track_id</code> 100% único | Indica boa chave técnica para análise por faixa |
+| <code>track_popularity</code> sem nulos | Permite usar popularidade como eixo central da EDA |
+| <code>artist_popularity</code> sem nulos | Permite comparar força do artista com desempenho da faixa |
+| <code>artist_followers</code> sem nulos | Permite avaliar relação entre base de fãs e popularidade |
+| <code>album_release_date</code> sem nulos | Permite análise temporal |
+| <code>track_duration_min</code> sem nulos | Permite análise de duração das faixas |
+| <code>explicit</code> sem nulos | Permite análise entre faixas explícitas e não explícitas |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Pontos de atenção identificados</strong><ul>
+<li>O principal ponto de atenção está na coluna <code>artist_genres</code>, que apresenta 3.361 registros ausentes, correspondendo a aproximadamente 39,16% da base.</li>
+<li>Esse percentual é relevante e exige cuidado nas análises por gênero.</li>
+<li>Também foram identificados 3 registros sem <code>artist_name</code>, um volume muito baixo, mas que será investigado antes de qualquer tratamento.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Decisão metodológica</strong><ul>
+<li>Nesta etapa, nenhuma linha será removida automaticamente.</li>
+<li>As decisões preliminares são:<ul>
+<li>manter todos os registros nesta fase de Data Understanding;</li>
+<li>investigar os 3 registros sem <code>artist_name</code>;</li>
+<li>tratar <code>artist_genres</code> ausente como informação não disponível;</li>
+<li>converter <code>album_release_date</code> para data;</li>
+<li>criar variáveis temporais auxiliares, como <code>release_year</code>;</li>
+<li>documentar limitações antes de análises por gênero.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>A base <code>spotify_data_clean.csv</code> será mantida como fonte principal da EDA.</li>
+<li>Os próximos passos serão investigar valores ausentes, duplicidades textuais e cobertura temporal antes de avançar para a preparação formal dos dados no Notebook 02.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Investigação dos registros sem artist_name</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">missing_artist_name = df_main[df_main["artist_name"].isna()]
+
+missing_artist_name[
+    [
+        "track_id",
+        "track_name",
+        "track_popularity",
+        "artist_name",
+        "artist_popularity",
+        "artist_followers",
+        "artist_genres",
+        "album_name",
+        "album_release_date",
+        "album_type",
+    ]
+]
+</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>track_id</th>
+<th>track_name</th>
+<th>track_popularity</th>
+<th>artist_name</th>
+<th>artist_popularity</th>
+<th>artist_followers</th>
+<th>artist_genres</th>
+<th>album_name</th>
+<th>album_release_date</th>
+<th>album_type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>1807</th>
+<td>2NbsBSshscKIPRG3kwBbfo</td>
+<td>Never Felt So Alone</td>
+<td>68</td>
+<td>NaN</td>
+<td>0</td>
+<td>0</td>
+<td>NaN</td>
+<td>Never Felt So Alone</td>
+<td>2023-04-07</td>
+<td>single</td>
+</tr>
+<tr>
+<th>6517</th>
+<td>3QhfFRPkhPCR1RMJWV1gde</td>
+<td>Radio</td>
+<td>65</td>
+<td>NaN</td>
+<td>0</td>
+<td>0</td>
+<td>NaN</td>
+<td>Born To Die – Paradise Edition (Special Version)</td>
+<td>2012-01-01</td>
+<td>album</td>
+</tr>
+<tr>
+<th>6679</th>
+<td>5EhZC8GFOVXrpiUW22jncE</td>
+<td>Urban Twilight</td>
+<td>30</td>
+<td>NaN</td>
+<td>0</td>
+<td>0</td>
+<td>NaN</td>
+<td>Darkbloom</td>
+<td>2011-04-18</td>
+<td>single</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Diagnóstico dos registros sem artist_genres</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">genre_missing_summary = pd.DataFrame(
+    {
+        "metric": [
+            "total_rows",
+            "rows_with_artist_genres",
+            "rows_without_artist_genres",
+            "artist_genres_missing_pct",
+            "unique_artists_without_genres",
+            "avg_track_popularity_without_genres",
+            "avg_track_popularity_with_genres",
+        ],
+        "value": [
+            len(df_main),
+            df_main["artist_genres"].notna().sum(),
+            df_main["artist_genres"].isna().sum(),
+            round(df_main["artist_genres"].isna().mean() * 100, 2),
+            df_main.loc[df_main["artist_genres"].isna(), "artist_name"].nunique(dropna=True),
+            round(df_main.loc[df_main["artist_genres"].isna(), "track_popularity"].mean(), 2),
+            round(df_main.loc[df_main["artist_genres"].notna(), "track_popularity"].mean(), 2),
+        ],
+    }
+)
+
+genre_missing_summary</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>metric</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>total_rows</td>
+<td>8,582.00</td>
+</tr>
+<tr>
+<th>1</th>
+<td>rows_with_artist_genres</td>
+<td>5,221.00</td>
+</tr>
+<tr>
+<th>2</th>
+<td>rows_without_artist_genres</td>
+<td>3,361.00</td>
+</tr>
+<tr>
+<th>3</th>
+<td>artist_genres_missing_pct</td>
+<td>39.16</td>
+</tr>
+<tr>
+<th>4</th>
+<td>unique_artists_without_genres</td>
+<td>1,336.00</td>
+</tr>
+<tr>
+<th>5</th>
+<td>avg_track_popularity_without_genres</td>
+<td>50.49</td>
+</tr>
+<tr>
+<th>6</th>
+<td>avg_track_popularity_with_genres</td>
+<td>53.56</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Amostra de registros sem artist_genres</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">df_main.loc[
+    df_main["artist_genres"].isna(),
+    [
+        "track_id",
+        "track_name",
+        "artist_name",
+        "track_popularity",
+        "artist_popularity",
+        "artist_followers",
+        "album_name",
+        "album_release_date",
+    ],
+].head(20)</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>track_id</th>
+<th>track_name</th>
+<th>artist_name</th>
+<th>track_popularity</th>
+<th>artist_popularity</th>
+<th>artist_followers</th>
+<th>album_name</th>
+<th>album_release_date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>2</th>
+<td>7mdkjzoIYlf1rx9EtBpGmU</td>
+<td>Hard 2 Find</td>
+<td>Riff Raff</td>
+<td>4</td>
+<td>48</td>
+<td>193302</td>
+<td>Hard 2 Find</td>
+<td>2025-10-31</td>
+</tr>
+<tr>
+<th>6</th>
+<td>3QoQ3HqXTAjgEl9LbNMbYp</td>
+<td>Te Procuro na Cidade</td>
+<td>AZERDK</td>
+<td>20</td>
+<td>30</td>
+<td>1657</td>
+<td>Te Procuro na Cidade</td>
+<td>2025-10-30</td>
+</tr>
+<tr>
+<th>8</th>
+<td>4pZ949nFW5SurwzE0TSe7I</td>
+<td>Cupido Vagabundo</td>
+<td>Toni dos Anjos</td>
+<td>16</td>
+<td>6</td>
+<td>475</td>
+<td>Cupido Vagabundo</td>
+<td>2025-10-30</td>
+</tr>
+<tr>
+<th>10</th>
+<td>5mfAZwEr4jAVDnSY0HHuyH</td>
+<td>Stray</td>
+<td>What Matters The Most</td>
+<td>30</td>
+<td>25</td>
+<td>814</td>
+<td>Stray</td>
+<td>2025-10-25</td>
+</tr>
+<tr>
+<th>12</th>
+<td>0NZKfcua68wuZePhjp8N2I</td>
+<td>Root of all Evil</td>
+<td>Daniel Caesar</td>
+<td>65</td>
+<td>85</td>
+<td>11137714</td>
+<td>Son Of Spergy</td>
+<td>2025-10-24</td>
+</tr>
+<tr>
+<th>13</th>
+<td>6zFWxD9hkOPAIlgWAGyQGQ</td>
+<td>Let’s Go!!</td>
+<td>Ovi Jozi</td>
+<td>0</td>
+<td>17</td>
+<td>3567</td>
+<td>High Risk, High Reward</td>
+<td>2025-10-24</td>
+</tr>
+<tr>
+<th>15</th>
+<td>22c6Yop5YVEAhw8UG6O1W1</td>
+<td>My Muse</td>
+<td>Leon Thomas</td>
+<td>67</td>
+<td>74</td>
+<td>735818</td>
+<td>PHOLKS</td>
+<td>2025-10-24</td>
+</tr>
+<tr>
+<th>16</th>
+<td>0SoYN9bRGPj7qV6loQKCTO</td>
+<td>A Real Good Bad One</td>
+<td>Joe Hermes</td>
+<td>31</td>
+<td>23</td>
+<td>1518</td>
+<td>A Real Good Bad One</td>
+<td>2025-10-24</td>
+</tr>
+<tr>
+<th>18</th>
+<td>0XQQpq855N5rnUsFBXo2ml</td>
+<td>Bridges</td>
+<td>Scarlett Butler</td>
+<td>11</td>
+<td>3</td>
+<td>364</td>
+<td>Bridges</td>
+<td>2025-10-24</td>
+</tr>
+<tr>
+<th>19</th>
+<td>0nBPI5KxKOeOtr24sdGpE6</td>
+<td>Can't Go Back</td>
+<td>LEROCQUE</td>
+<td>30</td>
+<td>23</td>
+<td>13770</td>
+<td>Can't Go Back</td>
+<td>2025-10-24</td>
+</tr>
+<tr>
+<th>20</th>
+<td>2aMZEJZwWouRzOw2aSfKV9</td>
+<td>Deeply Still</td>
+<td>Xander Ward</td>
+<td>35</td>
+<td>35</td>
+<td>729</td>
+<td>Deeply Still</td>
+<td>2025-10-24</td>
+</tr>
+<tr>
+<th>22</th>
+<td>2MbsC60IxeyJNVRRgeqH4w</td>
+<td>Eyes on You</td>
+<td>Smith &amp; Liddle</td>
+<td>22</td>
+<td>17</td>
+<td>543</td>
+<td>Eyes on You</td>
+<td>2025-10-24</td>
+</tr>
+<tr>
+<th>23</th>
+<td>2Zq3Trov36G0TtrUt4ZklL</td>
+<td>superstar</td>
+<td>Artemas</td>
+<td>59</td>
+<td>74</td>
+<td>1378935</td>
+<td>LOVERCORE</td>
+<td>2025-10-24</td>
+</tr>
+<tr>
+<th>24</th>
+<td>7rdHxPQimXkOcmUmsfGhxY</td>
+<td>Trim</td>
+<td>YUNG ALPO</td>
+<td>1</td>
+<td>24</td>
+<td>166</td>
+<td>Trim</td>
+<td>2025-10-24</td>
+</tr>
+<tr>
+<th>26</th>
+<td>6DIrsJFPypT0Z3emDKnXYd</td>
+<td>HEARTBREAK SZN</td>
+<td>PRAX</td>
+<td>32</td>
+<td>23</td>
+<td>1982</td>
+<td>HEARTBREAK SZN</td>
+<td>2025-10-24</td>
+</tr>
+<tr>
+<th>27</th>
+<td>05aYqGC8NNxr4jiHbQXLG3</td>
+<td>Higher Vibration</td>
+<td>Mark II</td>
+<td>35</td>
+<td>25</td>
+<td>722</td>
+<td>Higher Vibration (feat. Aleesia)</td>
+<td>2025-10-24</td>
+</tr>
+<tr>
+<th>28</th>
+<td>0C42YiaJQyb0OExJ89bRbs</td>
+<td>Hold On (We Are Going Home)</td>
+<td>Suark</td>
+<td>34</td>
+<td>32</td>
+<td>1496</td>
+<td>Hold On (We Are Going Home)</td>
+<td>2025-10-24</td>
+</tr>
+<tr>
+<th>29</th>
+<td>1yLkASt2rIp9W5t3NuZrwQ</td>
+<td>Kay</td>
+<td>Vince Bello</td>
+<td>2</td>
+<td>6</td>
+<td>84</td>
+<td>Kay</td>
+<td>2025-10-24</td>
+</tr>
+<tr>
+<th>30</th>
+<td>2zLnwikuCxJwMkEI8tqDN4</td>
+<td>you never really cared</td>
+<td>Anna Marx</td>
+<td>31</td>
+<td>34</td>
+<td>1693</td>
+<td>you never really cared</td>
+<td>2025-10-24</td>
+</tr>
+<tr>
+<th>31</th>
+<td>0kWQFzHzEPtvrKnwngvWyb</td>
+<td>Master of the Kill</td>
+<td>Ana Shine</td>
+<td>42</td>
+<td>45</td>
+<td>27570</td>
+<td>Master of the Kill</td>
+<td>2025-10-23</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 9. Diagnóstico inicial de duplicidade</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Avaliar se a base principal possui registros duplicados que possam distorcer análises de popularidade, artistas, álbuns e faixas.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Ações realizadas</strong><ul>
+<li>Nesta etapa serão verificados:<ul>
+<li><em>registros completamente duplicados;</em></li>
+<li><em>duplicidade por <code>track_id</code>;</em></li>
+<li><em>duplicidade por combinação de <code>track_name</code>, <code>artist_name</code> e <code>album_name</code>.</em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>Duplicidades podem inflar contagens, alterar médias de popularidade e comprometer rankings.</li>
+<li>Antes de avançar para a EDA, é necessário entender se cada linha representa uma faixa única ou se existem repetições relevantes.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>Obter um diagnóstico inicial sobre a unicidade dos registros da base principal.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Diagnóstico de duplicidade da base principal</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">duplicate_summary = pd.DataFrame(
+    {
+        "metric": [
+            "total_rows",
+            "unique_track_id",
+            "duplicated_full_rows",
+            "duplicated_track_id",
+            "duplicated_track_artist_album",
+        ],
+        "value": [
+            len(df_main),
+            df_main["track_id"].nunique(dropna=True),
+            df_main.duplicated().sum(),
+            df_main["track_id"].duplicated().sum(),
+            df_main.duplicated(
+                subset=["track_name", "artist_name", "album_name"]
+            ).sum(),
+        ],
+    }
+)
+
+duplicate_summary</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>metric</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>total_rows</td>
+<td>8582</td>
+</tr>
+<tr>
+<th>1</th>
+<td>unique_track_id</td>
+<td>8582</td>
+</tr>
+<tr>
+<th>2</th>
+<td>duplicated_full_rows</td>
+<td>0</td>
+</tr>
+<tr>
+<th>3</th>
+<td>duplicated_track_id</td>
+<td>0</td>
+</tr>
+<tr>
+<th>4</th>
+<td>duplicated_track_artist_album</td>
+<td>117</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Cobertura temporal inicial da base principal</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">df_main["album_release_date_parsed"] = pd.to_datetime(
+    df_main["album_release_date"],
+    errors="coerce"
+)
+
+df_main["release_year"] = df_main["album_release_date_parsed"].dt.year
+
+temporal_summary = pd.DataFrame(
+    {
+        "metric": [
+            "min_release_date",
+            "max_release_date",
+            "min_release_year",
+            "max_release_year",
+            "records_with_invalid_release_date",
+            "unique_release_years",
+        ],
+        "value": [
+            df_main["album_release_date_parsed"].min(),
+            df_main["album_release_date_parsed"].max(),
+            df_main["release_year"].min(),
+            df_main["release_year"].max(),
+            df_main["album_release_date_parsed"].isna().sum(),
+            df_main["release_year"].nunique(dropna=True),
+        ],
+    }
+)
+
+temporal_summary</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>metric</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>min_release_date</td>
+<td>1952-09-12 00:00:00</td>
+</tr>
+<tr>
+<th>1</th>
+<td>max_release_date</td>
+<td>2025-10-31 00:00:00</td>
+</tr>
+<tr>
+<th>2</th>
+<td>min_release_year</td>
+<td>1952</td>
+</tr>
+<tr>
+<th>3</th>
+<td>max_release_year</td>
+<td>2025</td>
+</tr>
+<tr>
+<th>4</th>
+<td>records_with_invalid_release_date</td>
+<td>0</td>
+</tr>
+<tr>
+<th>5</th>
+<td>unique_release_years</td>
+<td>68</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Quantidade de registros por ano de lançamento</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">tracks_by_year = (
+    df_main
+    .groupby("release_year", dropna=False)
+    .size()
+    .reset_index(name="track_count")
+    .sort_values("release_year")
+)
+
+tracks_by_year</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>release_year</th>
+<th>track_count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>1952</td>
+<td>1</td>
+</tr>
+<tr>
+<th>1</th>
+<td>1958</td>
+<td>1</td>
+</tr>
+<tr>
+<th>2</th>
+<td>1959</td>
+<td>5</td>
+</tr>
+<tr>
+<th>3</th>
+<td>1960</td>
+<td>1</td>
+</tr>
+<tr>
+<th>4</th>
+<td>1962</td>
+<td>5</td>
+</tr>
+<tr>
+<th>5</th>
+<td>1963</td>
+<td>1</td>
+</tr>
+<tr>
+<th>6</th>
+<td>1964</td>
+<td>1</td>
+</tr>
+<tr>
+<th>7</th>
+<td>1965</td>
+<td>3</td>
+</tr>
+<tr>
+<th>8</th>
+<td>1966</td>
+<td>8</td>
+</tr>
+<tr>
+<th>9</th>
+<td>1967</td>
+<td>11</td>
+</tr>
+<tr>
+<th>10</th>
+<td>1968</td>
+<td>3</td>
+</tr>
+<tr>
+<th>11</th>
+<td>1969</td>
+<td>17</td>
+</tr>
+<tr>
+<th>12</th>
+<td>1970</td>
+<td>9</td>
+</tr>
+<tr>
+<th>13</th>
+<td>1971</td>
+<td>7</td>
+</tr>
+<tr>
+<th>14</th>
+<td>1972</td>
+<td>4</td>
+</tr>
+<tr>
+<th>15</th>
+<td>1973</td>
+<td>16</td>
+</tr>
+<tr>
+<th>16</th>
+<td>1974</td>
+<td>2</td>
+</tr>
+<tr>
+<th>17</th>
+<td>1975</td>
+<td>10</td>
+</tr>
+<tr>
+<th>18</th>
+<td>1976</td>
+<td>7</td>
+</tr>
+<tr>
+<th>19</th>
+<td>1977</td>
+<td>9</td>
+</tr>
+<tr>
+<th>20</th>
+<td>1978</td>
+<td>10</td>
+</tr>
+<tr>
+<th>21</th>
+<td>1979</td>
+<td>5</td>
+</tr>
+<tr>
+<th>22</th>
+<td>1980</td>
+<td>9</td>
+</tr>
+<tr>
+<th>23</th>
+<td>1981</td>
+<td>5</td>
+</tr>
+<tr>
+<th>24</th>
+<td>1982</td>
+<td>3</td>
+</tr>
+<tr>
+<th>25</th>
+<td>1983</td>
+<td>5</td>
+</tr>
+<tr>
+<th>26</th>
+<td>1984</td>
+<td>8</td>
+</tr>
+<tr>
+<th>27</th>
+<td>1985</td>
+<td>8</td>
+</tr>
+<tr>
+<th>28</th>
+<td>1986</td>
+<td>12</td>
+</tr>
+<tr>
+<th>29</th>
+<td>1987</td>
+<td>34</td>
+</tr>
+<tr>
+<th>30</th>
+<td>1988</td>
+<td>7</td>
+</tr>
+<tr>
+<th>31</th>
+<td>1989</td>
+<td>7</td>
+</tr>
+<tr>
+<th>32</th>
+<td>1990</td>
+<td>8</td>
+</tr>
+<tr>
+<th>33</th>
+<td>1991</td>
+<td>94</td>
+</tr>
+<tr>
+<th>34</th>
+<td>1992</td>
+<td>15</td>
+</tr>
+<tr>
+<th>35</th>
+<td>1993</td>
+<td>52</td>
+</tr>
+<tr>
+<th>36</th>
+<td>1994</td>
+<td>51</td>
+</tr>
+<tr>
+<th>37</th>
+<td>1995</td>
+<td>27</td>
+</tr>
+<tr>
+<th>38</th>
+<td>1996</td>
+<td>27</td>
+</tr>
+<tr>
+<th>39</th>
+<td>1997</td>
+<td>30</td>
+</tr>
+<tr>
+<th>40</th>
+<td>1998</td>
+<td>36</td>
+</tr>
+<tr>
+<th>41</th>
+<td>1999</td>
+<td>64</td>
+</tr>
+<tr>
+<th>42</th>
+<td>2000</td>
+<td>59</td>
+</tr>
+<tr>
+<th>43</th>
+<td>2001</td>
+<td>75</td>
+</tr>
+<tr>
+<th>44</th>
+<td>2002</td>
+<td>81</td>
+</tr>
+<tr>
+<th>45</th>
+<td>2003</td>
+<td>101</td>
+</tr>
+<tr>
+<th>46</th>
+<td>2004</td>
+<td>56</td>
+</tr>
+<tr>
+<th>47</th>
+<td>2005</td>
+<td>88</td>
+</tr>
+<tr>
+<th>48</th>
+<td>2006</td>
+<td>92</td>
+</tr>
+<tr>
+<th>49</th>
+<td>2007</td>
+<td>109</td>
+</tr>
+<tr>
+<th>50</th>
+<td>2008</td>
+<td>95</td>
+</tr>
+<tr>
+<th>51</th>
+<td>2009</td>
+<td>157</td>
+</tr>
+<tr>
+<th>52</th>
+<td>2010</td>
+<td>240</td>
+</tr>
+<tr>
+<th>53</th>
+<td>2011</td>
+<td>258</td>
+</tr>
+<tr>
+<th>54</th>
+<td>2012</td>
+<td>315</td>
+</tr>
+<tr>
+<th>55</th>
+<td>2013</td>
+<td>308</td>
+</tr>
+<tr>
+<th>56</th>
+<td>2014</td>
+<td>348</td>
+</tr>
+<tr>
+<th>57</th>
+<td>2015</td>
+<td>383</td>
+</tr>
+<tr>
+<th>58</th>
+<td>2016</td>
+<td>376</td>
+</tr>
+<tr>
+<th>59</th>
+<td>2017</td>
+<td>458</td>
+</tr>
+<tr>
+<th>60</th>
+<td>2018</td>
+<td>522</td>
+</tr>
+<tr>
+<th>61</th>
+<td>2019</td>
+<td>496</td>
+</tr>
+<tr>
+<th>62</th>
+<td>2020</td>
+<td>480</td>
+</tr>
+<tr>
+<th>63</th>
+<td>2021</td>
+<td>443</td>
+</tr>
+<tr>
+<th>64</th>
+<td>2022</td>
+<td>468</td>
+</tr>
+<tr>
+<th>65</th>
+<td>2023</td>
+<td>523</td>
+</tr>
+<tr>
+<th>66</th>
+<td>2024</td>
+<td>648</td>
+</tr>
+<tr>
+<th>67</th>
+<td>2025</td>
+<td>765</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 10. Interpretação inicial de unicidade e cobertura temporal</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li><strong>Diagnóstico de duplicidade</strong><ul>
+<li>A análise inicial de duplicidade da base <code>spotify_data_clean.csv</code> indicou que o dataset possui 8.582 registros e 8.582 valores únicos para <code>track_id</code>.</li>
+<li>Esse resultado sugere que cada linha representa uma faixa musical única do ponto de vista do identificador técnico fornecido pela base.</li>
+<li>Também não foram identificadas linhas completamente duplicadas nem duplicidade direta por <code>track_id</code>.</li>
+<li>No entanto, foram encontrados 117 casos de duplicidade considerando a combinação:<ul>
+<li><code>track_name + artist_name + album_name</code></li>
+</ul>
+</li>
+<li>Esses casos não serão removidos automaticamente nesta etapa, pois podem representar versões diferentes da mesma música,<ul>
+<li>relançamentos, singles, faixas explícitas ou limpas, variações de álbum ou diferenças reais de catálogo.</li>
+</ul>
+</li>
+<li>A decisão inicial é manter esses registros e investigá-los antes de qualquer regra de deduplicação.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Diagnóstico temporal</strong><ul>
+<li>A conversão da coluna <code>album_release_date</code> para formato de data foi realizada com sucesso, sem registros inválidos.</li>
+<li>A base apresenta cobertura temporal entre 1952 e 2025, totalizando 68 anos distintos de lançamento.</li>
+<li>Embora o projeto tenha sido inicialmente posicionado com foco em 2009–2025, a presença de faixas anteriores a 2009 indica que o dataset contém também músicas de catálogo histórico.</li>
+<li>Esse achado é relevante porque permite diferenciar:<ul>
+<li>faixas históricas ou clássicas;</li>
+<li>músicas do período moderno do streaming;</li>
+<li>lançamentos recentes de 2024 e 2025.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Decisão metodológica</strong><ul>
+<li>A decisão metodológica nesta etapa é não descartar automaticamente os registros anteriores a 2009.</li>
+<li>Em vez disso, será criada uma variável de período analítico para classificar as faixas em grupos temporais.</li>
+<li>Essa abordagem preserva informação histórica, mantém rastreabilidade e permite comparar o comportamento de músicas antigas e recentes durante a EDA.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Implicações para as próximas etapas</strong><ul>
+<li>Os próximos passos serão:<ol>
+<li>investigar os 117 casos de possível duplicidade textual;</li>
+<li>criar uma variável <code>periodo_analitico</code>;</li>
+<li>avaliar a concentração de registros por período;</li>
+<li>decidir se a EDA principal usará todos os registros ou apenas o recorte 2009–2025;</li>
+<li>documentar essa decisão antes do Notebook 02.</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Criação de período analítico para análise temporal</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">def classify_release_period(year: float) -&gt; str:
+    """
+    Classifica o ano de lançamento em períodos analíticos.
+    """
+    if pd.isna(year):
+        return "unknown"
+
+    year = int(year)
+
+    if year &lt; 2009:
+        return "catalogo_historico_pre_2009"
+    if 2009 &lt;= year &lt;= 2015:
+        return "streaming_early_2009_2015"
+    if 2016 &lt;= year &lt;= 2020:
+        return "streaming_growth_2016_2020"
+    if 2021 &lt;= year &lt;= 2023:
+        return "streaming_mature_2021_2023"
+    if 2024 &lt;= year &lt;= 2025:
+        return "recent_releases_2024_2025"
+
+    return "out_of_scope"
+
+
+df_main["periodo_analitico"] = df_main["release_year"].apply(classify_release_period)
+
+period_summary = (
+    df_main
+    .groupby("periodo_analitico", dropna=False)
+    .agg(
+        track_count=("track_id", "count"),
+        min_year=("release_year", "min"),
+        max_year=("release_year", "max"),
+        avg_track_popularity=("track_popularity", "mean"),
+        median_track_popularity=("track_popularity", "median"),
+    )
+    .reset_index()
+    .sort_values("min_year")
+)
+
+period_summary</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>periodo_analitico</th>
+<th>track_count</th>
+<th>min_year</th>
+<th>max_year</th>
+<th>avg_track_popularity</th>
+<th>median_track_popularity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>catalogo_historico_pre_2009</td>
+<td>1394</td>
+<td>1952</td>
+<td>2008</td>
+<td>54.07</td>
+<td>59.00</td>
+</tr>
+<tr>
+<th>2</th>
+<td>streaming_early_2009_2015</td>
+<td>2009</td>
+<td>2009</td>
+<td>2015</td>
+<td>51.44</td>
+<td>56.00</td>
+</tr>
+<tr>
+<th>3</th>
+<td>streaming_growth_2016_2020</td>
+<td>2332</td>
+<td>2016</td>
+<td>2020</td>
+<td>52.22</td>
+<td>59.00</td>
+</tr>
+<tr>
+<th>4</th>
+<td>streaming_mature_2021_2023</td>
+<td>1434</td>
+<td>2021</td>
+<td>2023</td>
+<td>51.90</td>
+<td>59.00</td>
+</tr>
+<tr>
+<th>1</th>
+<td>recent_releases_2024_2025</td>
+<td>1413</td>
+<td>2024</td>
+<td>2025</td>
+<td>52.66</td>
+<td>54.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Investigação de possíveis duplicidades textuais na base principal</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">possible_text_duplicates = (
+    df_main[
+        df_main.duplicated(
+            subset=["track_name", "artist_name", "album_name"],
+            keep=False,
+        )
+    ]
+    .sort_values(["artist_name", "album_name", "track_name", "track_number"])
+)
+
+possible_text_duplicates[
+    [
+        "track_id",
+        "track_name",
+        "artist_name",
+        "album_name",
+        "album_release_date",
+        "track_number",
+        "track_popularity",
+        "explicit",
+        "track_duration_min",
+    ]
+].head(50)</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>track_id</th>
+<th>track_name</th>
+<th>artist_name</th>
+<th>album_name</th>
+<th>album_release_date</th>
+<th>track_number</th>
+<th>track_popularity</th>
+<th>explicit</th>
+<th>track_duration_min</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>7734</th>
+<td>3NLrRZoMF0Lx6zTlYqeIo4</td>
+<td>Here Without You</td>
+<td>3 Doors Down</td>
+<td>Away From The Sun</td>
+<td>2002-11-12</td>
+<td>6</td>
+<td>79</td>
+<td>False</td>
+<td>3.97</td>
+</tr>
+<tr>
+<th>7804</th>
+<td>5IXk34xSm6rxNgXkCveC3r</td>
+<td>Here Without You</td>
+<td>3 Doors Down</td>
+<td>Away From The Sun</td>
+<td>2002-01-01</td>
+<td>6</td>
+<td>54</td>
+<td>False</td>
+<td>3.97</td>
+</tr>
+<tr>
+<th>6716</th>
+<td>4OSBTYWVwsQhGLF9NHvIbR</td>
+<td>Rolling in the Deep</td>
+<td>Adele</td>
+<td>21</td>
+<td>2011-01-24</td>
+<td>1</td>
+<td>79</td>
+<td>False</td>
+<td>3.80</td>
+</tr>
+<tr>
+<th>6720</th>
+<td>1CkvWZme3pRgbzaxZnTl5X</td>
+<td>Rolling in the Deep</td>
+<td>Adele</td>
+<td>21</td>
+<td>2011-01-19</td>
+<td>1</td>
+<td>4</td>
+<td>False</td>
+<td>3.80</td>
+</tr>
+<tr>
+<th>6718</th>
+<td>3di5hcvxxciiqwMH1jarhY</td>
+<td>Set Fire to the Rain</td>
+<td>Adele</td>
+<td>21</td>
+<td>2011-01-24</td>
+<td>5</td>
+<td>82</td>
+<td>False</td>
+<td>4.04</td>
+</tr>
+<tr>
+<th>6721</th>
+<td>3CKCZ9pfwAfoMZlMncA1Nc</td>
+<td>Set Fire to the Rain</td>
+<td>Adele</td>
+<td>21</td>
+<td>2011-01-19</td>
+<td>5</td>
+<td>2</td>
+<td>False</td>
+<td>4.02</td>
+</tr>
+<tr>
+<th>6719</th>
+<td>3bNv3VuUOKgrf5hu3YcuRo</td>
+<td>Someone Like You</td>
+<td>Adele</td>
+<td>21</td>
+<td>2011-01-24</td>
+<td>11</td>
+<td>81</td>
+<td>False</td>
+<td>4.75</td>
+</tr>
+<tr>
+<th>6722</th>
+<td>4kflIGfjdZJW4ot2ioixTB</td>
+<td>Someone Like You</td>
+<td>Adele</td>
+<td>21</td>
+<td>2011-01-19</td>
+<td>11</td>
+<td>2</td>
+<td>False</td>
+<td>4.75</td>
+</tr>
+<tr>
+<th>5011</th>
+<td>4sPmO7WMQUAf45kwMOtONw</td>
+<td>Hello</td>
+<td>Adele</td>
+<td>25</td>
+<td>2016-06-24</td>
+<td>1</td>
+<td>0</td>
+<td>False</td>
+<td>4.92</td>
+</tr>
+<tr>
+<th>5229</th>
+<td>62PaSfnXSMyLshYJrlTuL3</td>
+<td>Hello</td>
+<td>Adele</td>
+<td>25</td>
+<td>2015-11-20</td>
+<td>1</td>
+<td>72</td>
+<td>False</td>
+<td>4.92</td>
+</tr>
+<tr>
+<th>5007</th>
+<td>4BHzQ9C00ceJxfG16AlNWb</td>
+<td>Send My Love (To Your New Lover)</td>
+<td>Adele</td>
+<td>25</td>
+<td>2016-06-24</td>
+<td>2</td>
+<td>1</td>
+<td>False</td>
+<td>3.71</td>
+</tr>
+<tr>
+<th>5226</th>
+<td>563SfWAHJs4FBZMkRN0IFN</td>
+<td>Send My Love (To Your New Lover)</td>
+<td>Adele</td>
+<td>25</td>
+<td>2015-11-20</td>
+<td>2</td>
+<td>71</td>
+<td>False</td>
+<td>3.71</td>
+</tr>
+<tr>
+<th>5133</th>
+<td>42ydLwx4i5V49RXHOozJZq</td>
+<td>Scars To Your Beautiful</td>
+<td>Alessia Cara</td>
+<td>Know-It-All (Deluxe)</td>
+<td>2016-03-11</td>
+<td>10</td>
+<td>70</td>
+<td>False</td>
+<td>3.83</td>
+</tr>
+<tr>
+<th>5261</th>
+<td>0prNGof3XqfTvNDxHonvdK</td>
+<td>Scars To Your Beautiful</td>
+<td>Alessia Cara</td>
+<td>Know-It-All (Deluxe)</td>
+<td>2015-11-13</td>
+<td>10</td>
+<td>2</td>
+<td>False</td>
+<td>3.83</td>
+</tr>
+<tr>
+<th>5046</th>
+<td>1MkFj1ThZZxjYMNkczx9mk</td>
+<td>Be Alright</td>
+<td>Ariana Grande</td>
+<td>Dangerous Woman</td>
+<td>2016-05-20</td>
+<td>3</td>
+<td>61</td>
+<td>False</td>
+<td>2.98</td>
+</tr>
+<tr>
+<th>5109</th>
+<td>6TOfPHF57Qhlbfm5lhZ9k1</td>
+<td>Be Alright</td>
+<td>Ariana Grande</td>
+<td>Dangerous Woman</td>
+<td>2016-04-01</td>
+<td>3</td>
+<td>59</td>
+<td>False</td>
+<td>2.98</td>
+</tr>
+<tr>
+<th>5052</th>
+<td>2h1IPjP471JJRSShTHRUhi</td>
+<td>Dangerous Woman</td>
+<td>Ariana Grande</td>
+<td>Dangerous Woman</td>
+<td>2016-05-20</td>
+<td>2</td>
+<td>0</td>
+<td>False</td>
+<td>3.93</td>
+</tr>
+<tr>
+<th>5112</th>
+<td>3nef5W8jTkXrOKgCu4kmq7</td>
+<td>Dangerous Woman</td>
+<td>Ariana Grande</td>
+<td>Dangerous Woman</td>
+<td>2016-04-01</td>
+<td>2</td>
+<td>80</td>
+<td>False</td>
+<td>3.93</td>
+</tr>
+<tr>
+<th>5053</th>
+<td>53SfB4huCgiRGmwzJdEo1u</td>
+<td>Everyday</td>
+<td>Ariana Grande</td>
+<td>Dangerous Woman</td>
+<td>2016-05-20</td>
+<td>9</td>
+<td>62</td>
+<td>True</td>
+<td>3.24</td>
+</tr>
+<tr>
+<th>5113</th>
+<td>30TmLgK0ja5O8q9l4BShIX</td>
+<td>Everyday</td>
+<td>Ariana Grande</td>
+<td>Dangerous Woman</td>
+<td>2016-04-01</td>
+<td>9</td>
+<td>78</td>
+<td>True</td>
+<td>3.24</td>
+</tr>
+<tr>
+<th>5050</th>
+<td>7xagQoIf776ukUlgH4TyyB</td>
+<td>I Don't Care</td>
+<td>Ariana Grande</td>
+<td>Dangerous Woman</td>
+<td>2016-05-20</td>
+<td>11</td>
+<td>53</td>
+<td>True</td>
+<td>2.96</td>
+</tr>
+<tr>
+<th>5118</th>
+<td>1QGiDkpRQGqvBdDOnbDimF</td>
+<td>I Don't Care</td>
+<td>Ariana Grande</td>
+<td>Dangerous Woman</td>
+<td>2016-04-01</td>
+<td>11</td>
+<td>45</td>
+<td>True</td>
+<td>2.96</td>
+</tr>
+<tr>
+<th>5051</th>
+<td>2meEiZKWkiN28gITzFwQo5</td>
+<td>Into You</td>
+<td>Ariana Grande</td>
+<td>Dangerous Woman</td>
+<td>2016-05-20</td>
+<td>4</td>
+<td>3</td>
+<td>False</td>
+<td>4.07</td>
+</tr>
+<tr>
+<th>5119</th>
+<td>76FZM38RC8XaAjJ77CVTNe</td>
+<td>Into You</td>
+<td>Ariana Grande</td>
+<td>Dangerous Woman</td>
+<td>2016-04-01</td>
+<td>4</td>
+<td>82</td>
+<td>False</td>
+<td>4.07</td>
+</tr>
+<tr>
+<th>5043</th>
+<td>4HeCFqiB1rBqGqvE10rF1a</td>
+<td>Side To Side</td>
+<td>Ariana Grande</td>
+<td>Dangerous Woman</td>
+<td>2016-05-20</td>
+<td>5</td>
+<td>66</td>
+<td>True</td>
+<td>3.76</td>
+</tr>
+<tr>
+<th>5115</th>
+<td>44ONERBHALxftQNWq6dmyd</td>
+<td>Side To Side</td>
+<td>Ariana Grande</td>
+<td>Dangerous Woman</td>
+<td>2016-04-01</td>
+<td>5</td>
+<td>81</td>
+<td>True</td>
+<td>3.76</td>
+</tr>
+<tr>
+<th>3899</th>
+<td>2rPE9A1vEgShuZxxzR2tZH</td>
+<td>thank u, next</td>
+<td>Ariana Grande</td>
+<td>thank u, next</td>
+<td>2018-11-03</td>
+<td>1</td>
+<td>22</td>
+<td>True</td>
+<td>3.45</td>
+</tr>
+<tr>
+<th>3773</th>
+<td>3e9HZxeyfWwjeyPAMmWSSQ</td>
+<td>thank u, next</td>
+<td>Ariana Grande</td>
+<td>thank u, next</td>
+<td>2019-02-08</td>
+<td>11</td>
+<td>81</td>
+<td>True</td>
+<td>3.45</td>
+</tr>
+<tr>
+<th>6020</th>
+<td>4lhqb6JvbHId48OUJGwymk</td>
+<td>Hey Brother</td>
+<td>Avicii</td>
+<td>True</td>
+<td>2013-09-16</td>
+<td>3</td>
+<td>78</td>
+<td>False</td>
+<td>4.25</td>
+</tr>
+<tr>
+<th>6025</th>
+<td>4RXpgGM7A4Hg7cFBoH5KyF</td>
+<td>Hey Brother</td>
+<td>Avicii</td>
+<td>True</td>
+<td>2013-09-13</td>
+<td>3</td>
+<td>4</td>
+<td>False</td>
+<td>4.25</td>
+</tr>
+<tr>
+<th>6019</th>
+<td>0nrRP2bk19rLc0orkWPQk2</td>
+<td>Wake Me Up</td>
+<td>Avicii</td>
+<td>True</td>
+<td>2013-09-16</td>
+<td>1</td>
+<td>85</td>
+<td>False</td>
+<td>4.12</td>
+</tr>
+<tr>
+<th>6026</th>
+<td>4h8VwCb1MTGoLKueQ1WgbD</td>
+<td>Wake Me Up</td>
+<td>Avicii</td>
+<td>True</td>
+<td>2013-09-13</td>
+<td>1</td>
+<td>9</td>
+<td>False</td>
+<td>4.12</td>
+</tr>
+<tr>
+<th>7749</th>
+<td>2IiNA0s5eQBSjwK4iNeUvW</td>
+<td>Complicated</td>
+<td>Avril Lavigne</td>
+<td>Let Go</td>
+<td>2002-08-26</td>
+<td>2</td>
+<td>0</td>
+<td>False</td>
+<td>4.07</td>
+</tr>
+<tr>
+<th>7769</th>
+<td>5xEM5hIgJ1jjgcEBfpkt2F</td>
+<td>Complicated</td>
+<td>Avril Lavigne</td>
+<td>Let Go</td>
+<td>2002-06-04</td>
+<td>2</td>
+<td>83</td>
+<td>False</td>
+<td>4.07</td>
+</tr>
+<tr>
+<th>7750</th>
+<td>4omisSlTk6Dsq2iQD7MA07</td>
+<td>Sk8er Boi</td>
+<td>Avril Lavigne</td>
+<td>Let Go</td>
+<td>2002-08-26</td>
+<td>3</td>
+<td>1</td>
+<td>False</td>
+<td>3.40</td>
+</tr>
+<tr>
+<th>7768</th>
+<td>00Mb3DuaIH1kjrwOku9CGU</td>
+<td>Sk8er Boi</td>
+<td>Avril Lavigne</td>
+<td>Let Go</td>
+<td>2002-06-04</td>
+<td>3</td>
+<td>78</td>
+<td>False</td>
+<td>3.40</td>
+</tr>
+<tr>
+<th>1257</th>
+<td>1UP7PXne1lIYZB5G5aiRGL</td>
+<td>II MOST WANTED</td>
+<td>Beyoncé</td>
+<td>COWBOY CARTER</td>
+<td>2024-03-29</td>
+<td>16</td>
+<td>62</td>
+<td>False</td>
+<td>3.47</td>
+</tr>
+<tr>
+<th>1262</th>
+<td>6zuPQl2RVqQ4y5nAH61CFC</td>
+<td>II MOST WANTED</td>
+<td>Beyoncé</td>
+<td>COWBOY CARTER</td>
+<td>2024-03-27</td>
+<td>16</td>
+<td>53</td>
+<td>False</td>
+<td>3.47</td>
+</tr>
+<tr>
+<th>7193</th>
+<td>5R9a4t5t5O0IsznsrKPVro</td>
+<td>Single Ladies (Put a Ring on It)</td>
+<td>Beyoncé</td>
+<td>I AM...SASHA FIERCE</td>
+<td>2008-11-17</td>
+<td>1</td>
+<td>67</td>
+<td>False</td>
+<td>3.22</td>
+</tr>
+<tr>
+<th>7195</th>
+<td>5mMjkxGijQB4JZallYrkOW</td>
+<td>Single Ladies (Put a Ring on It)</td>
+<td>Beyoncé</td>
+<td>I AM...SASHA FIERCE</td>
+<td>2008-11-12</td>
+<td>1</td>
+<td>62</td>
+<td>False</td>
+<td>3.22</td>
+</tr>
+<tr>
+<th>1365</th>
+<td>0Z7nGFVCLfixWctgePsRk9</td>
+<td>TEXAS HOLD 'EM</td>
+<td>Beyoncé</td>
+<td>TEXAS HOLD 'EM</td>
+<td>2024-02-11</td>
+<td>1</td>
+<td>73</td>
+<td>True</td>
+<td>3.89</td>
+</tr>
+<tr>
+<th>1366</th>
+<td>7AYmToZ5y67fBjq4RLFbuq</td>
+<td>TEXAS HOLD 'EM</td>
+<td>Beyoncé</td>
+<td>TEXAS HOLD 'EM</td>
+<td>2024-02-10</td>
+<td>1</td>
+<td>58</td>
+<td>True</td>
+<td>3.89</td>
+</tr>
+<tr>
+<th>7672</th>
+<td>0xmjwnQ3FNE6HuWCt2nHdZ</td>
+<td>Where Is The Love?</td>
+<td>Black Eyed Peas</td>
+<td>Elephunk</td>
+<td>2003-06-24</td>
+<td>13</td>
+<td>81</td>
+<td>False</td>
+<td>4.54</td>
+</tr>
+<tr>
+<th>7714</th>
+<td>1FreAz1lmnDi5aKLB6GdFM</td>
+<td>Where Is The Love?</td>
+<td>Black Eyed Peas</td>
+<td>Elephunk</td>
+<td>2003-01-01</td>
+<td>13</td>
+<td>3</td>
+<td>False</td>
+<td>4.54</td>
+</tr>
+<tr>
+<th>8149</th>
+<td>2RChe0r2cMoyOvuKobZy44</td>
+<td>Always</td>
+<td>Bon Jovi</td>
+<td>Cross Road</td>
+<td>1994-10-18</td>
+<td>4</td>
+<td>78</td>
+<td>False</td>
+<td>5.88</td>
+</tr>
+<tr>
+<th>8166</th>
+<td>0kish3Tobj6Wq0we74343q</td>
+<td>Always</td>
+<td>Bon Jovi</td>
+<td>Cross Road</td>
+<td>1994-01-01</td>
+<td>4</td>
+<td>0</td>
+<td>False</td>
+<td>5.88</td>
+</tr>
+<tr>
+<th>2455</th>
+<td>4pryE6cN2gFL1FVF5fYINl</td>
+<td>Leave The Door Open</td>
+<td>Bruno Mars</td>
+<td>An Evening With Silk Sonic</td>
+<td>2021-11-12</td>
+<td>2</td>
+<td>69</td>
+<td>False</td>
+<td>4.03</td>
+</tr>
+<tr>
+<th>2461</th>
+<td>1LPSkqVhWVRUkKE03YUkpB</td>
+<td>Leave The Door Open</td>
+<td>Bruno Mars</td>
+<td>An Evening With Silk Sonic</td>
+<td>2021-11-11</td>
+<td>2</td>
+<td>0</td>
+<td>False</td>
+<td>4.03</td>
+</tr>
+<tr>
+<th>6231</th>
+<td>3w3y8KPTfNeOKPiqUTakBh</td>
+<td>Locked out of Heaven</td>
+<td>Bruno Mars</td>
+<td>Unorthodox Jukebox</td>
+<td>2012-12-07</td>
+<td>2</td>
+<td>88</td>
+<td>False</td>
+<td>3.89</td>
+</tr>
+<tr>
+<th>6234</th>
+<td>5g7sDjBhZ4I3gcFIpkrLuI</td>
+<td>Locked out of Heaven</td>
+<td>Bruno Mars</td>
+<td>Unorthodox Jukebox</td>
+<td>2012-12-05</td>
+<td>2</td>
+<td>54</td>
+<td>False</td>
+<td>3.89</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 10. Interpretação dos possíveis duplicados textuais</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Registrar a interpretação técnica dos registros identificados como possíveis duplicidades textuais na base <code>spotify_data_clean.csv</code>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado observado</strong><ul>
+<li>A análise identificou registros repetidos considerando a combinação:<ul>
+<li><code>track_name + artist_name + album_name</code></li>
+</ul>
+</li>
+<li>No entanto, esses registros possuem <code>track_id</code> diferentes, o que indica que não se tratam de duplicidades técnicas diretas.</li>
+<li>A inspeção visual mostrou casos em que a mesma música aparece mais de uma vez com:<ul>
+<li>mesmo nome de faixa;</li>
+<li>mesmo artista;</li>
+<li>mesmo álbum;</li>
+<li>mesmo número de faixa;</li>
+<li>duração igual ou muito próxima;</li>
+<li>datas de lançamento diferentes;</li>
+<li>popularidades muito diferentes;</li>
+<li>identificadores <code>track_id</code> distintos.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Interpretação técnica</strong><ul>
+<li>Esses registros parecem representar múltiplas versões catalogadas da mesma música dentro do ecossistema Spotify.<ul>
+<li>Possíveis explicações incluem:<ul>
+<li>relançamentos;</li>
+<li>edições de álbum;</li>
+<li>versões regionais;</li>
+<li>versões explícitas ou limpas;</li>
+<li>reprocessamentos de catálogo;</li>
+<li>duplicações provenientes da distribuição musical;</li>
+<li>diferenças de popularidade entre versões antigas e atuais.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Portanto, não é adequado remover esses registros automaticamente nesta etapa.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Risco analítico</strong><ul>
+<li>Apesar de não serem duplicidades técnicas por <code>track_id</code>, esses registros podem gerar distorções em algumas análises.</li>
+<li>Possíveis impactos:</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Análise | Risco |
+|---|---|
+| Ranking de músicas | A mesma música pode aparecer mais de uma vez |
+| Contagem de faixas por artista | O catálogo pode parecer maior do que é em termos canônicos |
+| Média de popularidade | Versões com popularidade zero ou muito baixa podem distorcer resultados |
+| Análise temporal | Datas alternativas podem criar ruído em séries históricas |
+| Análise por álbum | O mesmo álbum pode conter versões repetidas de faixas |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Decisão metodológica</strong><ul>
+<li>A decisão nesta etapa é manter todos os registros na base principal, pois cada linha possui um <code>track_id</code> único.</li>
+<li>No entanto, será criada uma marcação auxiliar para identificar possíveis duplicidades textuais.</li>
+<li>A deduplicação definitiva, caso necessária, será tratada no Notebook 02 — Data Quality and Preparation.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Estratégia futura</strong><ul>
+<li>No Notebook 02, poderão ser criadas duas visões da base:</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Visão | Descrição |
+|---|---|
+| <code>df_tracks_catalog</code> | Mantém uma linha por <code>track_id</code>, preservando o catálogo Spotify |
+| <code>df_tracks_canonical</code> | Mantém uma linha por combinação canônica de música, artista e álbum |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li>Para a visão canônica, uma regra possível será manter o registro com maior <code>track_popularity</code> dentro de cada grupo textual.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>A base continuará íntegra para o Data Understanding, mas os possíveis duplicados textuais serão documentados como ponto de atenção para a preparação dos dados.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Resumo dos grupos de possíveis duplicidades textuais</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">duplicate_key = ["track_name", "artist_name", "album_name"]
+
+text_duplicate_groups = (
+    df_main
+    .groupby(duplicate_key, dropna=False)
+    .agg(
+        group_size=("track_id", "count"),
+        unique_track_ids=("track_id", "nunique"),
+        min_release_date=("album_release_date_parsed", "min"),
+        max_release_date=("album_release_date_parsed", "max"),
+        min_popularity=("track_popularity", "min"),
+        max_popularity=("track_popularity", "max"),
+        avg_popularity=("track_popularity", "mean"),
+        min_duration=("track_duration_min", "min"),
+        max_duration=("track_duration_min", "max"),
+    )
+    .reset_index()
+)
+
+text_duplicate_groups = text_duplicate_groups[text_duplicate_groups["group_size"] &gt; 1].copy()
+
+text_duplicate_groups["popularity_range"] = (
+    text_duplicate_groups["max_popularity"] - text_duplicate_groups["min_popularity"]
+)
+
+text_duplicate_groups["duration_range"] = (
+    text_duplicate_groups["max_duration"] - text_duplicate_groups["min_duration"]
+)
+
+text_duplicate_groups.sort_values(
+    ["group_size", "popularity_range"],
+    ascending=[False, False]
+).head(30)</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>track_name</th>
+<th>artist_name</th>
+<th>album_name</th>
+<th>group_size</th>
+<th>unique_track_ids</th>
+<th>min_release_date</th>
+<th>max_release_date</th>
+<th>min_popularity</th>
+<th>max_popularity</th>
+<th>avg_popularity</th>
+<th>min_duration</th>
+<th>max_duration</th>
+<th>popularity_range</th>
+<th>duration_range</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>5642</th>
+<td>S&amp;M</td>
+<td>Rihanna</td>
+<td>Loud</td>
+<td>3</td>
+<td>3</td>
+<td>2010-01-01</td>
+<td>2010-11-16</td>
+<td>55</td>
+<td>84</td>
+<td>70.33</td>
+<td>4.05</td>
+<td>4.06</td>
+<td>29</td>
+<td>0.01</td>
+</tr>
+<tr>
+<th>7534</th>
+<td>What's My Name?</td>
+<td>Rihanna</td>
+<td>Loud</td>
+<td>3</td>
+<td>3</td>
+<td>2010-01-01</td>
+<td>2010-11-16</td>
+<td>49</td>
+<td>76</td>
+<td>64.00</td>
+<td>4.38</td>
+<td>4.38</td>
+<td>27</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>6188</th>
+<td>Sports car</td>
+<td>Tate McRae</td>
+<td>So Close To What</td>
+<td>3</td>
+<td>3</td>
+<td>2025-02-20</td>
+<td>2025-02-24</td>
+<td>66</td>
+<td>86</td>
+<td>73.67</td>
+<td>2.75</td>
+<td>2.75</td>
+<td>20</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>3303</th>
+<td>I'm Not The Only One</td>
+<td>Sam Smith</td>
+<td>In The Lonely Hour</td>
+<td>2</td>
+<td>2</td>
+<td>2014-01-01</td>
+<td>2014-05-26</td>
+<td>0</td>
+<td>85</td>
+<td>42.50</td>
+<td>3.98</td>
+<td>3.98</td>
+<td>85</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>1010</th>
+<td>Bring Me To Life</td>
+<td>Evanescence</td>
+<td>Fallen</td>
+<td>2</td>
+<td>2</td>
+<td>2003-01-01</td>
+<td>2003-03-04</td>
+<td>3</td>
+<td>87</td>
+<td>45.00</td>
+<td>3.93</td>
+<td>3.93</td>
+<td>84</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>1387</th>
+<td>Complicated</td>
+<td>Avril Lavigne</td>
+<td>Let Go</td>
+<td>2</td>
+<td>2</td>
+<td>2002-06-04</td>
+<td>2002-08-26</td>
+<td>0</td>
+<td>83</td>
+<td>41.50</td>
+<td>4.07</td>
+<td>4.07</td>
+<td>83</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>6249</th>
+<td>Stay With Me</td>
+<td>Sam Smith</td>
+<td>In The Lonely Hour</td>
+<td>2</td>
+<td>2</td>
+<td>2014-01-01</td>
+<td>2014-05-26</td>
+<td>0</td>
+<td>82</td>
+<td>41.00</td>
+<td>2.87</td>
+<td>2.87</td>
+<td>82</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>6085</th>
+<td>Somebody That I Used To Know</td>
+<td>Gotye</td>
+<td>Making Mirrors</td>
+<td>2</td>
+<td>2</td>
+<td>2011-01-01</td>
+<td>2011-08-19</td>
+<td>0</td>
+<td>81</td>
+<td>40.50</td>
+<td>4.08</td>
+<td>4.09</td>
+<td>81</td>
+<td>0.01</td>
+</tr>
+<tr>
+<th>230</th>
+<td>After Hours</td>
+<td>The Weeknd</td>
+<td>After Hours</td>
+<td>2</td>
+<td>2</td>
+<td>2020-02-19</td>
+<td>2020-03-20</td>
+<td>1</td>
+<td>81</td>
+<td>41.00</td>
+<td>6.01</td>
+<td>6.03</td>
+<td>80</td>
+<td>0.02</td>
+</tr>
+<tr>
+<th>1274</th>
+<td>Chop Suey!</td>
+<td>System Of A Down</td>
+<td>Toxicity</td>
+<td>2</td>
+<td>2</td>
+<td>2001-01-01</td>
+<td>2001-09-04</td>
+<td>5</td>
+<td>85</td>
+<td>45.00</td>
+<td>3.50</td>
+<td>3.50</td>
+<td>80</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>1570</th>
+<td>Dangerous Woman</td>
+<td>Ariana Grande</td>
+<td>Dangerous Woman</td>
+<td>2</td>
+<td>2</td>
+<td>2016-04-01</td>
+<td>2016-05-20</td>
+<td>0</td>
+<td>80</td>
+<td>40.00</td>
+<td>3.93</td>
+<td>3.93</td>
+<td>80</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>3013</th>
+<td>Hotline Bling</td>
+<td>Drake</td>
+<td>Views</td>
+<td>2</td>
+<td>2</td>
+<td>2016-05-06</td>
+<td>2016-05-13</td>
+<td>0</td>
+<td>80</td>
+<td>40.00</td>
+<td>4.45</td>
+<td>4.45</td>
+<td>80</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>5793</th>
+<td>See You Again (feat. Charlie Puth)</td>
+<td>Wiz Khalifa</td>
+<td>See You Again (feat. Charlie Puth)</td>
+<td>2</td>
+<td>2</td>
+<td>2015-03-10</td>
+<td>2015-06-30</td>
+<td>2</td>
+<td>82</td>
+<td>42.00</td>
+<td>3.82</td>
+<td>3.82</td>
+<td>80</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>5812</th>
+<td>Set Fire to the Rain</td>
+<td>Adele</td>
+<td>21</td>
+<td>2</td>
+<td>2</td>
+<td>2011-01-19</td>
+<td>2011-01-24</td>
+<td>2</td>
+<td>82</td>
+<td>42.00</td>
+<td>4.02</td>
+<td>4.04</td>
+<td>80</td>
+<td>0.02</td>
+</tr>
+<tr>
+<th>7114</th>
+<td>Toxicity</td>
+<td>System Of A Down</td>
+<td>Toxicity</td>
+<td>2</td>
+<td>2</td>
+<td>2001-01-01</td>
+<td>2001-09-04</td>
+<td>4</td>
+<td>84</td>
+<td>44.00</td>
+<td>3.64</td>
+<td>3.64</td>
+<td>80</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>3447</th>
+<td>Into You</td>
+<td>Ariana Grande</td>
+<td>Dangerous Woman</td>
+<td>2</td>
+<td>2</td>
+<td>2016-04-01</td>
+<td>2016-05-20</td>
+<td>3</td>
+<td>82</td>
+<td>42.50</td>
+<td>4.07</td>
+<td>4.07</td>
+<td>79</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>4498</th>
+<td>Mr. Brightside</td>
+<td>The Killers</td>
+<td>Hot Fuss</td>
+<td>2</td>
+<td>2</td>
+<td>2004-06-15</td>
+<td>2004-06-30</td>
+<td>9</td>
+<td>88</td>
+<td>48.50</td>
+<td>3.70</td>
+<td>3.71</td>
+<td>79</td>
+<td>0.01</td>
+</tr>
+<tr>
+<th>6094</th>
+<td>Someone Like You</td>
+<td>Adele</td>
+<td>21</td>
+<td>2</td>
+<td>2</td>
+<td>2011-01-19</td>
+<td>2011-01-24</td>
+<td>2</td>
+<td>81</td>
+<td>41.50</td>
+<td>4.75</td>
+<td>4.75</td>
+<td>79</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>356</th>
+<td>Always</td>
+<td>Bon Jovi</td>
+<td>Cross Road</td>
+<td>2</td>
+<td>2</td>
+<td>1994-01-01</td>
+<td>1994-10-18</td>
+<td>0</td>
+<td>78</td>
+<td>39.00</td>
+<td>5.88</td>
+<td>5.88</td>
+<td>78</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>2305</th>
+<td>Flowers</td>
+<td>Miley Cyrus</td>
+<td>Endless Summer Vacation</td>
+<td>2</td>
+<td>2</td>
+<td>2023-03-10</td>
+<td>2023-08-18</td>
+<td>6</td>
+<td>84</td>
+<td>45.00</td>
+<td>3.34</td>
+<td>3.34</td>
+<td>78</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>5592</th>
+<td>Royals</td>
+<td>Lorde</td>
+<td>Pure Heroine</td>
+<td>2</td>
+<td>2</td>
+<td>2013-01-01</td>
+<td>2013-09-27</td>
+<td>1</td>
+<td>79</td>
+<td>40.00</td>
+<td>3.16</td>
+<td>3.16</td>
+<td>78</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>6205</th>
+<td>Star Shopping</td>
+<td>Lil Peep</td>
+<td>Star Shopping</td>
+<td>2</td>
+<td>2</td>
+<td>2015-06-30</td>
+<td>2015-08-17</td>
+<td>4</td>
+<td>82</td>
+<td>43.00</td>
+<td>2.36</td>
+<td>2.36</td>
+<td>78</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>7584</th>
+<td>Where Is The Love?</td>
+<td>Black Eyed Peas</td>
+<td>Elephunk</td>
+<td>2</td>
+<td>2</td>
+<td>2003-01-01</td>
+<td>2003-06-24</td>
+<td>3</td>
+<td>81</td>
+<td>42.00</td>
+<td>4.54</td>
+<td>4.54</td>
+<td>78</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>2585</th>
+<td>Gold Digger</td>
+<td>Kanye West</td>
+<td>Late Registration</td>
+<td>2</td>
+<td>2</td>
+<td>2005-01-01</td>
+<td>2005-08-30</td>
+<td>2</td>
+<td>79</td>
+<td>40.50</td>
+<td>3.46</td>
+<td>3.46</td>
+<td>77</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>5981</th>
+<td>Sk8er Boi</td>
+<td>Avril Lavigne</td>
+<td>Let Go</td>
+<td>2</td>
+<td>2</td>
+<td>2002-06-04</td>
+<td>2002-08-26</td>
+<td>1</td>
+<td>78</td>
+<td>39.50</td>
+<td>3.40</td>
+<td>3.40</td>
+<td>77</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>3983</th>
+<td>Looking Out for You</td>
+<td>Joy Again</td>
+<td>Looking Out for You</td>
+<td>2</td>
+<td>2</td>
+<td>2015-11-06</td>
+<td>2016-01-15</td>
+<td>0</td>
+<td>76</td>
+<td>38.00</td>
+<td>2.99</td>
+<td>2.99</td>
+<td>76</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>7374</th>
+<td>Wake Me Up</td>
+<td>Avicii</td>
+<td>True</td>
+<td>2</td>
+<td>2</td>
+<td>2013-09-13</td>
+<td>2013-09-16</td>
+<td>9</td>
+<td>85</td>
+<td>47.00</td>
+<td>4.12</td>
+<td>4.12</td>
+<td>76</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>5571</th>
+<td>Rolling in the Deep</td>
+<td>Adele</td>
+<td>21</td>
+<td>2</td>
+<td>2</td>
+<td>2011-01-19</td>
+<td>2011-01-24</td>
+<td>4</td>
+<td>79</td>
+<td>41.50</td>
+<td>3.80</td>
+<td>3.80</td>
+<td>75</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>7009</th>
+<td>Thrift Shop (feat. Wanz)</td>
+<td>Macklemore &amp; Ryan Lewis</td>
+<td>The Heist</td>
+<td>2</td>
+<td>2</td>
+<td>2012-10-09</td>
+<td>2012-10-10</td>
+<td>2</td>
+<td>77</td>
+<td>39.50</td>
+<td>3.92</td>
+<td>3.92</td>
+<td>75</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>2888</th>
+<td>Hey Brother</td>
+<td>Avicii</td>
+<td>True</td>
+<td>2</td>
+<td>2</td>
+<td>2013-09-13</td>
+<td>2013-09-16</td>
+<td>4</td>
+<td>78</td>
+<td>41.00</td>
+<td>4.25</td>
+<td>4.25</td>
+<td>74</td>
+<td>0.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Grupos duplicados com maior diferença de popularidade</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">text_duplicate_groups.sort_values(
+    "popularity_range",
+    ascending=False
+)[
+    [
+        "track_name",
+        "artist_name",
+        "album_name",
+        "group_size",
+        "min_release_date",
+        "max_release_date",
+        "min_popularity",
+        "max_popularity",
+        "popularity_range",
+        "min_duration",
+        "max_duration",
+        "duration_range",
+    ]
+].head(30)</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>track_name</th>
+<th>artist_name</th>
+<th>album_name</th>
+<th>group_size</th>
+<th>min_release_date</th>
+<th>max_release_date</th>
+<th>min_popularity</th>
+<th>max_popularity</th>
+<th>popularity_range</th>
+<th>min_duration</th>
+<th>max_duration</th>
+<th>duration_range</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>3303</th>
+<td>I'm Not The Only One</td>
+<td>Sam Smith</td>
+<td>In The Lonely Hour</td>
+<td>2</td>
+<td>2014-01-01</td>
+<td>2014-05-26</td>
+<td>0</td>
+<td>85</td>
+<td>85</td>
+<td>3.98</td>
+<td>3.98</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>1010</th>
+<td>Bring Me To Life</td>
+<td>Evanescence</td>
+<td>Fallen</td>
+<td>2</td>
+<td>2003-01-01</td>
+<td>2003-03-04</td>
+<td>3</td>
+<td>87</td>
+<td>84</td>
+<td>3.93</td>
+<td>3.93</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>1387</th>
+<td>Complicated</td>
+<td>Avril Lavigne</td>
+<td>Let Go</td>
+<td>2</td>
+<td>2002-06-04</td>
+<td>2002-08-26</td>
+<td>0</td>
+<td>83</td>
+<td>83</td>
+<td>4.07</td>
+<td>4.07</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>6249</th>
+<td>Stay With Me</td>
+<td>Sam Smith</td>
+<td>In The Lonely Hour</td>
+<td>2</td>
+<td>2014-01-01</td>
+<td>2014-05-26</td>
+<td>0</td>
+<td>82</td>
+<td>82</td>
+<td>2.87</td>
+<td>2.87</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>6085</th>
+<td>Somebody That I Used To Know</td>
+<td>Gotye</td>
+<td>Making Mirrors</td>
+<td>2</td>
+<td>2011-01-01</td>
+<td>2011-08-19</td>
+<td>0</td>
+<td>81</td>
+<td>81</td>
+<td>4.08</td>
+<td>4.09</td>
+<td>0.01</td>
+</tr>
+<tr>
+<th>1274</th>
+<td>Chop Suey!</td>
+<td>System Of A Down</td>
+<td>Toxicity</td>
+<td>2</td>
+<td>2001-01-01</td>
+<td>2001-09-04</td>
+<td>5</td>
+<td>85</td>
+<td>80</td>
+<td>3.50</td>
+<td>3.50</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>3013</th>
+<td>Hotline Bling</td>
+<td>Drake</td>
+<td>Views</td>
+<td>2</td>
+<td>2016-05-06</td>
+<td>2016-05-13</td>
+<td>0</td>
+<td>80</td>
+<td>80</td>
+<td>4.45</td>
+<td>4.45</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>5812</th>
+<td>Set Fire to the Rain</td>
+<td>Adele</td>
+<td>21</td>
+<td>2</td>
+<td>2011-01-19</td>
+<td>2011-01-24</td>
+<td>2</td>
+<td>82</td>
+<td>80</td>
+<td>4.02</td>
+<td>4.04</td>
+<td>0.02</td>
+</tr>
+<tr>
+<th>1570</th>
+<td>Dangerous Woman</td>
+<td>Ariana Grande</td>
+<td>Dangerous Woman</td>
+<td>2</td>
+<td>2016-04-01</td>
+<td>2016-05-20</td>
+<td>0</td>
+<td>80</td>
+<td>80</td>
+<td>3.93</td>
+<td>3.93</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>230</th>
+<td>After Hours</td>
+<td>The Weeknd</td>
+<td>After Hours</td>
+<td>2</td>
+<td>2020-02-19</td>
+<td>2020-03-20</td>
+<td>1</td>
+<td>81</td>
+<td>80</td>
+<td>6.01</td>
+<td>6.03</td>
+<td>0.02</td>
+</tr>
+<tr>
+<th>5793</th>
+<td>See You Again (feat. Charlie Puth)</td>
+<td>Wiz Khalifa</td>
+<td>See You Again (feat. Charlie Puth)</td>
+<td>2</td>
+<td>2015-03-10</td>
+<td>2015-06-30</td>
+<td>2</td>
+<td>82</td>
+<td>80</td>
+<td>3.82</td>
+<td>3.82</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>7114</th>
+<td>Toxicity</td>
+<td>System Of A Down</td>
+<td>Toxicity</td>
+<td>2</td>
+<td>2001-01-01</td>
+<td>2001-09-04</td>
+<td>4</td>
+<td>84</td>
+<td>80</td>
+<td>3.64</td>
+<td>3.64</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>6094</th>
+<td>Someone Like You</td>
+<td>Adele</td>
+<td>21</td>
+<td>2</td>
+<td>2011-01-19</td>
+<td>2011-01-24</td>
+<td>2</td>
+<td>81</td>
+<td>79</td>
+<td>4.75</td>
+<td>4.75</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>4498</th>
+<td>Mr. Brightside</td>
+<td>The Killers</td>
+<td>Hot Fuss</td>
+<td>2</td>
+<td>2004-06-15</td>
+<td>2004-06-30</td>
+<td>9</td>
+<td>88</td>
+<td>79</td>
+<td>3.70</td>
+<td>3.71</td>
+<td>0.01</td>
+</tr>
+<tr>
+<th>3447</th>
+<td>Into You</td>
+<td>Ariana Grande</td>
+<td>Dangerous Woman</td>
+<td>2</td>
+<td>2016-04-01</td>
+<td>2016-05-20</td>
+<td>3</td>
+<td>82</td>
+<td>79</td>
+<td>4.07</td>
+<td>4.07</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>5592</th>
+<td>Royals</td>
+<td>Lorde</td>
+<td>Pure Heroine</td>
+<td>2</td>
+<td>2013-01-01</td>
+<td>2013-09-27</td>
+<td>1</td>
+<td>79</td>
+<td>78</td>
+<td>3.16</td>
+<td>3.16</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>356</th>
+<td>Always</td>
+<td>Bon Jovi</td>
+<td>Cross Road</td>
+<td>2</td>
+<td>1994-01-01</td>
+<td>1994-10-18</td>
+<td>0</td>
+<td>78</td>
+<td>78</td>
+<td>5.88</td>
+<td>5.88</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>2305</th>
+<td>Flowers</td>
+<td>Miley Cyrus</td>
+<td>Endless Summer Vacation</td>
+<td>2</td>
+<td>2023-03-10</td>
+<td>2023-08-18</td>
+<td>6</td>
+<td>84</td>
+<td>78</td>
+<td>3.34</td>
+<td>3.34</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>7584</th>
+<td>Where Is The Love?</td>
+<td>Black Eyed Peas</td>
+<td>Elephunk</td>
+<td>2</td>
+<td>2003-01-01</td>
+<td>2003-06-24</td>
+<td>3</td>
+<td>81</td>
+<td>78</td>
+<td>4.54</td>
+<td>4.54</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>6205</th>
+<td>Star Shopping</td>
+<td>Lil Peep</td>
+<td>Star Shopping</td>
+<td>2</td>
+<td>2015-06-30</td>
+<td>2015-08-17</td>
+<td>4</td>
+<td>82</td>
+<td>78</td>
+<td>2.36</td>
+<td>2.36</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>2585</th>
+<td>Gold Digger</td>
+<td>Kanye West</td>
+<td>Late Registration</td>
+<td>2</td>
+<td>2005-01-01</td>
+<td>2005-08-30</td>
+<td>2</td>
+<td>79</td>
+<td>77</td>
+<td>3.46</td>
+<td>3.46</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>5981</th>
+<td>Sk8er Boi</td>
+<td>Avril Lavigne</td>
+<td>Let Go</td>
+<td>2</td>
+<td>2002-06-04</td>
+<td>2002-08-26</td>
+<td>1</td>
+<td>78</td>
+<td>77</td>
+<td>3.40</td>
+<td>3.40</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>7374</th>
+<td>Wake Me Up</td>
+<td>Avicii</td>
+<td>True</td>
+<td>2</td>
+<td>2013-09-13</td>
+<td>2013-09-16</td>
+<td>9</td>
+<td>85</td>
+<td>76</td>
+<td>4.12</td>
+<td>4.12</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>3983</th>
+<td>Looking Out for You</td>
+<td>Joy Again</td>
+<td>Looking Out for You</td>
+<td>2</td>
+<td>2015-11-06</td>
+<td>2016-01-15</td>
+<td>0</td>
+<td>76</td>
+<td>76</td>
+<td>2.99</td>
+<td>2.99</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>7009</th>
+<td>Thrift Shop (feat. Wanz)</td>
+<td>Macklemore &amp; Ryan Lewis</td>
+<td>The Heist</td>
+<td>2</td>
+<td>2012-10-09</td>
+<td>2012-10-10</td>
+<td>2</td>
+<td>77</td>
+<td>75</td>
+<td>3.92</td>
+<td>3.92</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>5571</th>
+<td>Rolling in the Deep</td>
+<td>Adele</td>
+<td>21</td>
+<td>2</td>
+<td>2011-01-19</td>
+<td>2011-01-24</td>
+<td>4</td>
+<td>79</td>
+<td>75</td>
+<td>3.80</td>
+<td>3.80</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>5635</th>
+<td>Running Up That Hill (A Deal With God)</td>
+<td>Kate Bush</td>
+<td>Hounds Of Love</td>
+<td>2</td>
+<td>1985-06-30</td>
+<td>1985-09-16</td>
+<td>8</td>
+<td>82</td>
+<td>74</td>
+<td>4.98</td>
+<td>4.98</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>2888</th>
+<td>Hey Brother</td>
+<td>Avicii</td>
+<td>True</td>
+<td>2</td>
+<td>2013-09-13</td>
+<td>2013-09-16</td>
+<td>4</td>
+<td>78</td>
+<td>74</td>
+<td>4.25</td>
+<td>4.25</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>2612</th>
+<td>Good Looking</td>
+<td>Suki Waterhouse</td>
+<td>Good Looking</td>
+<td>2</td>
+<td>2017-10-20</td>
+<td>2022-08-18</td>
+<td>0</td>
+<td>73</td>
+<td>73</td>
+<td>3.58</td>
+<td>3.58</td>
+<td>0.00</td>
+</tr>
+<tr>
+<th>1669</th>
+<td>Diamonds</td>
+<td>Rihanna</td>
+<td>Unapologetic (Edited Version)</td>
+<td>2</td>
+<td>2012-01-01</td>
+<td>2012-12-10</td>
+<td>0</td>
+<td>72</td>
+<td>72</td>
+<td>3.75</td>
+<td>3.75</td>
+<td>0.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Salvamento de artefatos de diagnóstico de duplicidades textuais</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">TABLES_DIR = REPORTS_DIR / "tables"
+TABLES_DIR.mkdir(parents=True, exist_ok=True)
+
+# Artefato 1 — Detalhe dos registros possivelmente duplicados
+possible_text_duplicates_export = possible_text_duplicates[
+    [
+        "track_id",
+        "track_name",
+        "artist_name",
+        "album_name",
+        "album_release_date",
+        "track_number",
+        "track_popularity",
+        "explicit",
+        "track_duration_min",
+    ]
+].copy()
+
+# Artefato 2 — Resumo por grupo textual duplicado
+text_duplicate_groups_export = text_duplicate_groups.sort_values(
+    ["group_size", "popularity_range"],
+    ascending=[False, False],
+).copy()
+
+# Caminhos de saída
+possible_duplicates_path = TABLES_DIR / "possible_text_duplicates_detail.csv"
+duplicate_groups_path = TABLES_DIR / "text_duplicate_groups_summary.csv"
+
+# Salvamento em CSV
+# sep=';' facilita abertura no Excel em ambiente PT-BR
+possible_text_duplicates_export.to_csv(
+    possible_duplicates_path,
+    index=False,
+    sep=";",
+    encoding="utf-8-sig",
+)
+
+text_duplicate_groups_export.to_csv(
+    duplicate_groups_path,
+    index=False,
+    sep=";",
+    encoding="utf-8-sig",
+)
+
+print("Artefatos salvos com sucesso:")
+print(f"- {possible_duplicates_path}")
+print(f"- {duplicate_groups_path}")</code></pre>
+</div>
+<div class="output-stream">
+<pre>Artefatos salvos com sucesso:
+- D:\_DS-Projects\Data-Science\spotify-global-music-intelligence\reports\tables\possible_text_duplicates_detail.csv
+- D:\_DS-Projects\Data-Science\spotify-global-music-intelligence\reports\tables\text_duplicate_groups_summary.csv
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>✔️ Validação dos artefatos salvos</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">saved_artifacts_check = pd.DataFrame(
+    {
+        "artifact": [
+            "possible_text_duplicates_detail.csv",
+            "text_duplicate_groups_summary.csv",
+        ],
+        "path": [
+            possible_duplicates_path,
+            duplicate_groups_path,
+        ],
+        "exists": [
+            possible_duplicates_path.exists(),
+            duplicate_groups_path.exists(),
+        ],
+        "file_size_kb": [
+            round(possible_duplicates_path.stat().st_size / 1024, 2)
+            if possible_duplicates_path.exists()
+            else None,
+            round(duplicate_groups_path.stat().st_size / 1024, 2)
+            if duplicate_groups_path.exists()
+            else None,
+        ],
+    }
+)
+
+saved_artifacts_check</code></pre>
+</div>
+<div class="output-html table-output">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>artifact</th>
+<th>path</th>
+<th>exists</th>
+<th>file_size_kb</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>possible_text_duplicates_detail.csv</td>
+<td>D:\_DS-Projects\Data-Science\spotify-global-music-intelligence\reports\tables\possible_text_duplicates_detail.csv</td>
+<td>True</td>
+<td>20.82</td>
+</tr>
+<tr>
+<th>1</th>
+<td>text_duplicate_groups_summary.csv</td>
+<td>D:\_DS-Projects\Data-Science\spotify-global-music-intelligence\reports\tables\text_duplicate_groups_summary.csv</td>
+<td>True</td>
+<td>10.95</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 11. Salvamento dos artefatos de diagnóstico</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Salvar os artefatos gerados durante a análise de possíveis duplicidades textuais da base <code>spotify_data_clean.csv</code>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Artefatos gerados</strong><ul>
+<li>Foram gerados dois arquivos CSV na pasta <code>reports/tables/</code>:</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Artefato | Descrição |
+|---|---|
+| <code>possible_text_duplicates_detail.csv</code> | Lista detalhada dos registros com possível duplicidade textual |
+| <code>text_duplicate_groups_summary.csv</code> | Resumo agrupado por música, artista e álbum, com diferenças de popularidade, datas e duração |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>Esses arquivos preservam evidências da etapa de Data Understanding e serão usados como apoio para o Notebook 02 — Data Quality and Preparation.</li>
+<li>A decisão atual é não remover automaticamente esses registros, pois cada linha possui um <code>track_id</code> único.</li>
+<li>No entanto, os artefatos salvos permitem revisar os casos e definir uma regra futura para criação de uma visão canônica da base.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Decisão</strong><ul>
+<li>Os registros serão mantidos na base principal nesta etapa.</li>
+<li>A deduplicação canônica, se necessária, será tratada no Notebook 02, possivelmente criando duas visões:</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Visão | Descrição |
+|---|---|
+| <code>df_tracks_catalog</code> | Mantém uma linha por <code>track_id</code> |
+| <code>df_tracks_canonical</code> | Mantém uma linha por música, artista e álbum, priorizando maior popularidade |</p>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 12. Síntese do Data Understanding</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Consolidar os principais achados da fase de Data Understanding do projeto <strong>Spotify Global Music Intelligence</strong>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Esta etapa resume o que foi aprendido sobre a base principal <code>spotify_data_clean.csv</code>, destacando estrutura, qualidade inicial,<ul>
+<li>cobertura temporal, duplicidades, limitações e decisões metodológicas para continuidade do projeto.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Base principal definida</strong><ul>
+<li>Após avaliação inicial das fontes disponíveis, foi tomada a decisão metodológica de conduzir a EDA principal do Cap01 com o dataset:<ul>
+<li><code>spotify_data_clean.csv</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>O dataset complementar <code>spotify-tracks-dataset.csv</code> será preservado para uma etapa futura, possivelmente voltada a enriquecimento, ABT, análise de atributos musicais, segmentação ou modelagem.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essa decisão mantém o projeto focado e evita complexidade prematura.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Principais achados técnicos</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Dimensão | Achado | Interpretação |
+|---|---|---|
+| Volume | A base possui 8.582 registros e 15 colunas | Volume adequado para EDA inicial |
+| Chave técnica | <code>track_id</code> possui 8.582 valores únicos | Cada linha possui identificador técnico único |
+| Duplicidade exata | Não foram encontradas linhas totalmente duplicadas | Boa integridade inicial |
+| Duplicidade textual | Foram identificados 117 possíveis duplicados por música, artista e álbum | Prováveis versões, relançamentos ou registros alternativos |
+| Datas | <code>album_release_date</code> foi convertida sem erros | A base permite análise temporal |
+| Cobertura temporal | A base cobre registros entre 1952 e 2025 | Há faixas históricas além do recorte moderno |
+| Gêneros | <code>artist_genres</code> possui 39,16% de valores ausentes | Análises por gênero exigem cautela |
+| Artistas | <code>artist_name</code> possui apenas 3 valores ausentes | Problema pequeno, mas deve ser tratado no Notebook 02 |
+| Popularidade | <code>track_popularity</code> não possui valores ausentes | Variável central está disponível para EDA |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Achado → Evidência → Implicação → Próxima ação</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Achado | Evidência | Implicação | Próxima ação |
+|---|---|---|---|
+| A base tem chave técnica consistente | <code>track_id</code> é 100% único | Podemos usar <code>track_id</code> como unidade técnica principal | Manter visão de catálogo por <code>track_id</code> |
+| Existem possíveis duplicados textuais | 117 casos por <code>track_name + artist_name + album_name</code> | Rankings podem ser distorcidos se a mesma música aparecer em múltiplas versões | Criar visão canônica no Notebook 02 |
+| A base possui registros anteriores a 2009 | Ano mínimo identificado: 1952 | O dataset contém catálogo histórico, não apenas lançamentos modernos | Criar variável de período analítico |
+| <code>artist_genres</code> tem alta ausência | 39,16% de nulos | Análises por gênero não devem ser interpretadas como completas | Tratar como <code>sem_genero_informado</code> |
+| Dataset complementar tem match parcial | Apenas 16,37% da base principal possui match por <code>track_id</code> | Não é adequado enriquecer a base principal nesta fase | Guardar para etapa futura |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Decisões metodológicas tomadas</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Decisão | Justificativa |
+|---|---|
+| Usar <code>spotify_data_clean.csv</code> como base principal | Mantém o projeto focado no escopo inicial |
+| Não enriquecer com <code>spotify-tracks-dataset.csv</code> nesta fase | A interseção por <code>track_id</code> foi parcial |
+| Manter todos os registros por enquanto | Não há duplicidade técnica por <code>track_id</code> |
+| Investigar duplicados textuais no Notebook 02 | Podem representar versões reais do catálogo |
+| Criar variável temporal auxiliar | A base contém registros de 1952 a 2025 |
+| Tratar ausência de gênero como limitação | <code>artist_genres</code> tem percentual relevante de nulos |
+| Salvar artefatos de duplicidade | Garante rastreabilidade e apoio ao tratamento futuro |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Limitações identificadas</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A fase de Data Understanding também revelou algumas limitações importantes:<ul>
+<li>o dataset contém registros anteriores ao recorte inicialmente esperado de 2009–2025;</li>
+<li>a variável <code>artist_genres</code> possui alta taxa de ausência;</li>
+<li>algumas músicas aparecem em múltiplas versões textualmente semelhantes;</li>
+<li>a popularidade pode refletir um snapshot temporal específico;</li>
+<li>não há atributos musicais detalhados, como energia, dançabilidade ou valência, nesta base principal;</li>
+<li>o dataset complementar possui apenas interseção parcial com a base principal.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essas limitações não impedem a continuidade do projeto, mas deverão ser consideradas na preparação dos dados e na interpretação da EDA.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Conclusão da etapa</strong><ul>
+<li>A base <code>spotify_data_clean.csv</code> foi considerada adequada para continuidade do projeto.</li>
+<li>Ela possui boa integridade estrutural, chave técnica consistente, variável de popularidade completa e cobertura temporal ampla.</li>
+<li>Os principais pontos que exigem tratamento no próximo notebook são:<ol>
+<li>conversão e padronização de datas;</li>
+<li>criação de variáveis temporais;</li>
+<li>tratamento de <code>artist_genres</code> ausente;</li>
+<li>investigação dos registros sem <code>artist_name</code>;</li>
+<li>marcação ou criação de visão canônica para possíveis duplicados textuais;</li>
+<li>preparação de uma base Silver confiável para EDA.</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 13. Critérios de passagem para o Notebook 02</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Definir os critérios mínimos para avançar do <strong>Notebook 01 — Data Understanding</strong> para o <strong>Notebook 02 — Data Quality and Preparation</strong>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>O objetivo é garantir que a próxima fase comece com clareza sobre o que precisa ser tratado, padronizado e preparado.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Critérios avaliados</strong></li>
+</ul>
+</blockquote>
+<blockquote>
+<p>| Critério | Status | Observação |
+|---|---|---|
+| Base principal definida | Concluído | <code>spotify_data_clean.csv</code> será a fonte principal |
+| Arquivo carregado corretamente | Concluído | Dataset carregado sem erros críticos |
+| Estrutura inicial compreendida | Concluído | 8.582 registros e 15 colunas |
+| Chave técnica avaliada | Concluído | <code>track_id</code> é único |
+| Duplicidade exata avaliada | Concluído | Nenhuma linha totalmente duplicada |
+| Duplicidade textual avaliada | Concluído | 117 possíveis casos identificados |
+| Artefatos de duplicidade salvos | Concluído | CSVs salvos em <code>reports/tables/</code> |
+| Tipos de dados avaliados | Concluído | Algumas conversões serão necessárias |
+| Datas avaliadas | Concluído | Datas válidas entre 1952 e 2025 |
+| Valores ausentes avaliados | Concluído | Atenção para <code>artist_genres</code> e <code>artist_name</code> |
+| Fonte complementar analisada | Concluído | Uso adiado para etapa futura |
+| Próximas ações definidas | Concluído | Tratamentos serão feitos no Notebook 02 |</p>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Decisão de passagem</strong><ul>
+<li>A fase de Data Understanding está suficientemente concluída para avançar ao <strong>Notebook 02 — Data Quality and Preparation</strong>.</li>
+<li>A próxima etapa terá como foco transformar o diagnóstico obtido neste notebook em ações práticas de preparação dos dados.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Ações previstas para o Notebook 02</strong><ul>
+<li>O Notebook 02 deverá executar:<ol>
+<li>criação de cópia controlada da base principal;</li>
+<li>padronização de tipos;</li>
+<li>conversão de <code>album_release_date</code> para data;</li>
+<li>criação de <code>release_year</code>, <code>release_month</code> e <code>periodo_analitico</code>;</li>
+<li>tratamento de <code>artist_genres</code> ausente;</li>
+<li>investigação dos registros sem <code>artist_name</code>;</li>
+<li>criação de marcação para possíveis duplicados textuais;</li>
+<li>construção de visão de catálogo por <code>track_id</code>;</li>
+<li>possível criação de visão canônica por música, artista e álbum;</li>
+<li>salvamento da base preparada na camada Silver;</li>
+<li>geração de relatório de qualidade dos dados.</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Encerramento do Notebook 01</strong><ul>
+<li>O <strong>Notebook 01 — Data Understanding</strong> cumpriu seu papel de compreender a base principal antes da preparação e da análise exploratória.</li>
+<li>A partir deste ponto, o projeto está pronto para avançar para a fase de <strong>Data Quality and Preparation</strong>,<ul>
+<li>onde os problemas identificados serão tratados de forma controlada, documentada e reprodutível.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">%reload_ext watermark 
+%watermark -a "Roberto-SSoares-LfLngLrnng" -d -t -u --iversions -v -m -h</code></pre>
+</div>
+<div class="output-stream">
+<pre>Author: Roberto-SSoares-LfLngLrnng
+
+Last updated: 2026-05-05 03:19:49
+
+Python implementation: CPython
+Python version       : 3.12.12
+IPython version      : 9.13.0
+
+Compiler    : MSC v.1944 64 bit (AMD64)
+OS          : Windows
+Release     : 11
+Machine     : AMD64
+Processor   : Intel64 Family 6 Model 158 Stepping 9, GenuineIntel
+CPU cores   : 4
+Architecture: 64bit
+
+Hostname: PC-ROBERTO
+
+IPython: 9.13.0
+numpy  : 2.4.4
+pandas : 3.0.2
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="6"><strong>FIM</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"></code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"></code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"></code></pre>
+</div>
+</div>
+<div class="footer">
+<p>RobertoSSoares-LfLngLrnng — <span id="datetime"></span></p>
+</div>
+<script>
+            document.getElementById("datetime").innerText = new Date().toLocaleString('pt-BR');
+        </script>
+</div>
+</body>
+</html>

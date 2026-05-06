@@ -1,0 +1,5413 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>00_business_understanding</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/jupyterlab/3.6.3/themes/JupyterLab-light-theme.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@300;400;600&amp;family=Reddit+Sans:wght@300;400;600&amp;family=Courier+Prime:wght@400;700&amp;family=Montserrat:wght@300;400;600;700&amp;family=Source+Code+Pro:wght@400&amp;family=Red+Hat+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['\\(', '\\)'], ['$', '$']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+          ignoreHtmlClass: 'tex2jax_ignore',
+          processHtmlClass: 'mathjax_process'
+        }
+      };
+    </script>
+<script async="" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+        :root{
+            --bg:#f5f5f5;
+            --paper:#ffffff;
+            --text:#1f2937;
+            --muted:#6b7280;
+            --border:#d9dde3;
+            --shadow:0 4px 12px rgba(0,0,0,.08);
+            --shadow-soft:0 2px 8px rgba(15,23,42,.06);
+            --md-bg:#f3f2ee;
+            --md-accent:#ff9800;
+            --code-bg:#f7f7f7;
+            --code-accent:#4caf50;
+            --out-bg:#f3f9fa;
+            --out-accent:#2196f3;
+            --stream-bg:#eef8ff;
+            --table-head:#f8fafc;
+            --table-zebra:#f6f8fa;
+            --exec-bg:#f7fbff;
+            --exec-border:#2E86C1;
+            --insight-bg:#f8fffb;
+            --insight-border:#22a06b;
+            --warning-bg:#fffaf2;
+            --warning-border:#f59e0b;
+            --danger-bg:#fff6f6;
+            --danger-border:#ef4444;
+            --metric-bg:#ffffff;
+            --metric-border:#d6e7f7;
+        }
+
+        *{ box-sizing:border-box; }
+
+        body{
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            background:var(--bg);
+            padding:40px 0;
+            color:var(--text);
+            line-height:1.55;
+        }
+
+        .container{
+            max-width:1550px;
+            margin:auto;
+            background:var(--paper);
+            padding:20px 30px 28px;
+            border-radius:8px;
+            box-shadow:var(--shadow);
+        }
+
+        .cell{ margin-bottom:10px; }
+
+        h1.title-header{
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            font-weight:700;
+            color:#8eb4c4;
+            text-transform:uppercase;
+            text-align:center;
+            margin:0 0 24px;
+            letter-spacing:.04em;
+        }
+
+        .markdown{
+            background:var(--md-bg);
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            padding:10px 15px;
+            border-left:5px solid var(--md-accent);
+            border-radius:4px;
+            margin:4px 0 8px;
+            line-height:1.6;
+        }
+        .markdown h1,.markdown h2,.markdown h3,.markdown h4,.markdown h5,.markdown h6{
+            margin-top:0;
+            color:#d64545;
+        }
+        .markdown p:last-child,
+        .markdown ul:last-child,
+        .markdown ol:last-child{ margin-bottom:0; }
+
+        img, svg, figure img{
+            max-width:100%;
+            height:auto;
+            display:block;
+            margin-left:auto;
+            margin-right:auto;
+            border:1px solid #ddd;
+            border-radius:6px;
+            box-shadow:0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        figure{ margin:20px auto; text-align:center; }
+        figure figcaption{ font-size:13px; color:#555; margin-top:6px; }
+
+        .cell-toolbar{
+            display:flex;
+            justify-content:flex-end;
+            margin:0 0 4px;
+            gap:6px;
+            flex-wrap:wrap;
+        }
+        .cell-badge{
+            display:inline-block;
+            background:#eef2f7;
+            border:1px solid #d7dee8;
+            color:#516072;
+            border-radius:999px;
+            font-size:11px;
+            font-weight:600;
+            padding:2px 8px;
+            letter-spacing:.02em;
+        }
+
+        .code_cell{
+            background:var(--code-bg);
+            border-left:5px solid var(--code-accent);
+            padding:6px 8px;
+            margin:4px 0;
+            overflow-x:auto;
+            border-radius:4px;
+        }
+        .code_cell pre,
+        .code_cell .hljs{
+            margin:0;
+            background:transparent !important;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+            white-space:pre;
+        }
+
+        .output-text,
+        .output-stream,
+        .output-error,
+        .output-image,
+        .output-html{
+            margin:4px 0;
+            border-radius:4px;
+            overflow-x:auto;
+        }
+
+        .output-text{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:10px 10px 10px 8px;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+        }
+        .output-text pre{
+            margin:0;
+            white-space:pre-wrap;
+            word-break:break-word;
+            font-family:inherit;
+            font-size:inherit;
+            line-height:inherit;
+        }
+
+        .output-stream{
+            background:var(--stream-bg);
+            border-left:5px solid var(--out-accent);
+            padding:8px 10px;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.55;
+        }
+        .output-stream pre{ margin:0; white-space:pre-wrap; word-break:break-word; }
+
+        .output-image{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:10px;
+        }
+
+        .output-html{
+            background:var(--out-bg);
+            border-left:5px solid var(--out-accent);
+            padding:8px 10px;
+            color:var(--text);
+            font-family:'Montserrat','Reddit Sans',sans-serif;
+            font-size:14px;
+            line-height:1.55;
+            white-space:normal;
+        }
+        .output-html *{ white-space:normal; word-break:normal; max-width:100%; }
+        .output-html p{ margin:0 0 10px; }
+        .output-html p:last-child{ margin-bottom:0; }
+        .output-html h1,.output-html h2,.output-html h3,.output-html h4,.output-html h5,.output-html h6{
+            margin:0 0 10px;
+            color:var(--text);
+            line-height:1.3;
+        }
+        .output-html ul,
+        .output-html ol{ margin:0 0 10px 20px; padding-left:12px; }
+        .output-html li{ margin-bottom:4px; }
+        .output-html li:last-child{ margin-bottom:0; }
+        .output-html code{ font-family:'Red Hat Mono','Noto Sans Mono',monospace; font-size:.95em; }
+        .output-html pre{
+            white-space:pre-wrap;
+            word-break:break-word;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.5;
+            margin:0;
+        }
+
+        .table-output{ padding:8px 10px; }
+        .table-output table,
+        .table-output table.dataframe{
+            border-collapse:collapse;
+            border-spacing:0;
+            width:auto;
+            max-width:100%;
+            margin:0;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.45;
+            color:#263238;
+            background:#fff;
+        }
+        .table-output table th,
+        .table-output table td,
+        .table-output table.dataframe th,
+        .table-output table.dataframe td{
+            padding:8px 10px;
+            border:1px solid var(--border);
+            vertical-align:top;
+            text-align:left;
+        }
+        .table-output table thead,
+        .table-output table.dataframe thead{ background:var(--table-head); font-weight:600; }
+        .table-output table tbody tr:nth-child(even),
+        .table-output table.dataframe tbody tr:nth-child(even){ background:var(--table-zebra); }
+        .table-output .dataframe tbody tr:hover,
+        .table-output table tbody tr:hover{ background:#eef6ff; }
+
+        /* Premium HTML blocks */
+        .output-html .executive-card,
+        .output-html .insight-card,
+        .output-html .warning-card,
+        .output-html .danger-card,
+        .output-html .summary-card{
+            border-radius:10px;
+            padding:14px 16px;
+            box-shadow:var(--shadow-soft);
+            border:1px solid #dbe5ef;
+            margin:4px 0;
+        }
+        .output-html .executive-card{
+            background:var(--exec-bg);
+            border-left:6px solid var(--exec-border);
+        }
+        .output-html .summary-card{
+            background:#f8fbff;
+            border-left:6px solid #64748b;
+        }
+        .output-html .insight-card{
+            background:var(--insight-bg);
+            border-left:6px solid var(--insight-border);
+        }
+        .output-html .warning-card{
+            background:var(--warning-bg);
+            border-left:6px solid var(--warning-border);
+        }
+        .output-html .danger-card{
+            background:var(--danger-bg);
+            border-left:6px solid var(--danger-border);
+        }
+        .output-html .card-title{
+            margin:0 0 10px;
+            font-size:20px;
+            font-weight:700;
+            color:#1f2937;
+            line-height:1.25;
+        }
+        .output-html .card-subtitle{
+            margin:0 0 12px;
+            font-size:13px;
+            font-weight:600;
+            color:#64748b;
+            text-transform:uppercase;
+            letter-spacing:.03em;
+        }
+        .output-html .card-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+            gap:10px;
+            margin:10px 0 12px;
+        }
+        .output-html .metric-card{
+            background:var(--metric-bg);
+            border:1px solid var(--metric-border);
+            border-radius:10px;
+            padding:10px 12px;
+            min-height:82px;
+            box-shadow:0 1px 3px rgba(15,23,42,.05);
+        }
+        .output-html .metric-label{
+            display:block;
+            margin:0 0 6px;
+            font-size:12px;
+            font-weight:700;
+            color:#64748b;
+            text-transform:uppercase;
+            letter-spacing:.03em;
+        }
+        .output-html .metric-value{
+            display:block;
+            font-size:24px;
+            font-weight:700;
+            line-height:1.15;
+            color:#0f172a;
+        }
+        .output-html .metric-note{
+            display:block;
+            margin-top:4px;
+            font-size:12px;
+            color:#6b7280;
+        }
+        .output-html .chip-row{
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px;
+            margin:8px 0 10px;
+        }
+        .output-html .chip{
+            display:inline-flex;
+            align-items:center;
+            background:#edf4ff;
+            border:1px solid #d8e6ff;
+            color:#2457a6;
+            border-radius:999px;
+            padding:4px 10px;
+            font-size:12px;
+            font-weight:600;
+        }
+        .output-html .callout-compact p{ margin-bottom:8px; }
+        .output-html .callout-compact ul,
+        .output-html .callout-compact ol{ margin-bottom:8px; }
+
+        .output-error{
+            background:#fff5f5;
+            border-left:5px solid #ef4444;
+            padding:10px 12px;
+            color:#7f1d1d;
+            font-family:'Red Hat Mono','Noto Sans Mono',monospace;
+            font-size:13px;
+            line-height:1.5;
+        }
+        .output-error pre{ margin:8px 0 0; white-space:pre-wrap; word-break:break-word; }
+
+        .hidden-note{
+            margin:4px 0;
+            padding:6px 10px;
+            border-radius:6px;
+            background:#f8fafc;
+            border:1px dashed #cbd5e1;
+            color:#64748b;
+            font-size:12px;
+            font-weight:600;
+        }
+
+        .footer{
+            text-align:right;
+            margin-top:30px;
+            padding:12px;
+            background:#e9ecef;
+            border-radius:4px;
+            font-size:14px;
+            color:#555;
+        }
+
+        @media (max-width: 768px) {
+            body{ padding:16px 0; }
+            .container{ max-width:100%; padding:14px 16px 20px; border-radius:0; }
+            .output-html,
+            .output-text,
+            .output-stream,
+            .output-image,
+            .output-error,
+            .markdown,
+            .code_cell{ padding-left:10px; padding-right:10px; }
+            .output-html .card-title{ font-size:18px; }
+            .output-html .metric-value{ font-size:20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<h1 class="title-header">00_business_understanding</h1>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#F3F2EE">
+<br/><br/>
+<p style="text-align: center;">
+<font color="#0A1781" size="6">
+<strong>
+                    Spotify Global Music Intelligence - Data Science Projects
+                </strong>
+</font>
+</p>
+<p style="text-align: center;">
+<font color="#C58A1E" size="6">
+<strong>
+                    Business Understanding
+                </strong>
+</font>
+</p>
+<p style="text-align: center;">
+<font color="#C58A1E" size="5">
+<strong>
+                    EDA Estratégica para Tendências Musicais, Popularidade de Artistas e Potencial de Hits
+                </strong>
+</font>
+</p>
+<br/>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#F3F2EE">
+<p style="text-align: right;">
+<font color="#444444" size="4">
+            Roberto SSoares - LfLngLrnng
+      </font>
+</p>
+<p style="text-align: right;"><font color="#444444" size="2">
+<a href="https://www.linkedin.com/in/roberto-dos-santos-soares/">in/roberto-dos-santos-soares</a><br/><a href="https://roberto-ssoares.github.io/meu-portfolio/">Portifólio: roberto-ssoares</a>
+</font></p>
+<p style="text-align: right;">
+<font color="#444444" size="4">
+            Data Science = { "+"; "Faturamento", "-"; "Custo", "&gt;"; "Qualidade de vida" }
+        </font>
+<br/>
+<font color="#918e8e" size="2">"Mestre Bruno Jardim"
+        </font>
+</p>
+<p style="text-align: right;">
+<font color="#918e8e" size="2">
+</font>
+</p>
+</div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 Abertura executiva</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Este notebook marca o início do projeto <strong>Spotify Global Music Intelligence</strong>,<ul>
+<li>uma iniciativa analítica orientada à investigação de padrões de popularidade musical,</li>
+<li>evolução temporal de faixas,</li>
+<li>comportamento de artistas e</li>
+<li>oportunidades de aplicação de dados no mercado de streaming.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>O projeto utiliza o dataset <strong>Spotify Global Music Dataset (2009–2025)</strong> como base para construir uma análise exploratória de dados com abordagem profissional,<ul>
+<li>conectando fundamentos de EDA,</li>
+<li>entendimento de negócio,</li>
+<li>hipóteses analíticas,</li>
+<li>qualidade de dados,</li>
+<li>visualização e</li>
+<li>preparação para futuras etapas de modelagem preditiva.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A proposta central é tratar este projeto não apenas como um exercício técnico,<ul>
+<li>mas como uma simulação realista de consultoria em dados para uma empresa fictícia de inteligência musical, interessada em compreender:</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><em><strong>Quais características tornam músicas e artistas mais populares ao longo do tempo, e como esses padrões podem apoiar decisões de marketing, curadoria, produto e investimento musical?</strong></em></li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 Papel deste notebook no projeto</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Este notebook representa a fase de <strong>Business Understanding</strong> dentro do framework <strong>CRISP-DM+</strong>, funcionando como o contrato analítico inicial do projeto.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Antes de carregar arquivos CSV, gerar gráficos ou aplicar estatísticas, é necessário compreender:<ul>
+<li><em><strong>qual problema de negócio está sendo investigado;</strong></em></li>
+<li><em><strong>quais decisões podem ser apoiadas pelos dados;</strong></em></li>
+<li><em><strong>quais stakeholders se beneficiam da análise;</strong></em></li>
+<li><em><strong>quais hipóteses serão exploradas;</strong></em></li>
+<li><em><strong>quais critérios indicarão sucesso analítico;</strong></em></li>
+<li><em><strong>quais limitações precisam ser reconhecidas desde o início.</strong></em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essa abordagem reforça que uma EDA profissional não começa pelos gráficos, mas sim pela formulação correta do problema.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 1. Objetivo</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Apresentar a visão executiva inicial do projeto, posicionando a análise exploratória como uma entrega orientada a negócio, portfólio e preparação para futuras soluções de dados.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Ações realizadas</strong><ul>
+<li><em>o posicionamento do projeto;</em></li>
+<li><em>a motivação analítica;</em></li>
+<li><em>o papel do notebook dentro do ciclo CRISP-DM+;</em></li>
+<li><em>a intenção de transformar a EDA em uma entrega profissional;</em></li>
+<li><em>a conexão entre análise exploratória, tomada de decisão e evolução para modelagem.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Justificativa técnica</strong><ul>
+<li>Projetos de dados bem estruturados precisam partir de um entendimento claro do problema antes da manipulação dos dados.</li>
+<li>Essa etapa reduz o risco de análises desconectadas do negócio, evita gráficos sem finalidade analítica<ul>
+<li>e direciona as próximas fases do projeto para perguntas relevantes, hipóteses testáveis e entregáveis úteis.</li>
+</ul>
+</li>
+<li>No contexto deste projeto, o entendimento inicial é especialmente importante porque a popularidade musical pode ser influenciada por múltiplos fatores,<ul>
+<li>como artista, período, atributos sonoros, tendências culturais, comportamento de consumo e dinâmica das plataformas de streaming.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultados esperados</strong><ul>
+<li>Ao final desta célula, espera-se estabelecer uma base narrativa clara para o projeto, permitindo que as próximas etapas avancem com foco em:<ul>
+<li>entendimento do mercado musical;</li>
+<li>definição da dor de negócio;</li>
+<li>formulação de perguntas analíticas;</li>
+<li>construção de hipóteses;</li>
+<li>avaliação dos dados disponíveis;</li>
+<li>preparação para EDA;</li>
+<li>planejamento de evolução para modelos e produto de dados.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resumo executivo inicial</strong><ul>
+<li>O projeto <strong>Spotify Global Music Intelligence</strong> será conduzido como uma entrega analítica de mercado, com foco em transformar dados musicais em conhecimento acionável.</li>
+<li>A primeira fase buscará compreender o problema, estruturar hipóteses e preparar o caminho para uma EDA robusta.</li>
+<li>As fases seguintes irão avançar para entendimento dos dados, qualidade, preparação, exploração visual, insights executivos e recomendações para futuras soluções preditivas.</li>
+<li>Este notebook, portanto, inicia a jornada do projeto como uma peça estratégica de portfólio, demonstrando raciocínio analítico, visão de negócio e maturidade metodológica.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<h2 id="%F0%9F%93%9A-Instalando-e-Carregando-os-Pacotes"><font color="#FF5733" size="3"><strong>📚 Instalando e Carregando os Pacotes</strong></font><a class="anchor-link" href="#%F0%9F%93%9A-Instalando-e-Carregando-os-Pacotes">¶</a></h2><p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">#!uv pip install watermark -q -U</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">from pathlib import Path</code></pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">PROJECT_ROOT = Path.cwd().parent if Path.cwd().name == "notebooks" else Path.cwd()
+
+DATA_DIR = PROJECT_ROOT / "data"
+RAW_DIR = DATA_DIR / "00_raw"
+BRONZE_DIR = DATA_DIR / "01_bronze"
+SILVER_DIR = DATA_DIR / "02_silver"
+GOLD_DIR = DATA_DIR / "03_gold"
+
+REPORTS_DIR = PROJECT_ROOT / "reports"
+FIGURES_DIR = REPORTS_DIR / "figures"
+HTML_DIR = REPORTS_DIR / "html"
+
+PROJECT_ROOT</code></pre>
+</div>
+<div class="output-text">
+<pre>WindowsPath('D:/_DS-Projects/Data-Science/spotify-global-music-intelligence')</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python"># Versões dos pacotes usados neste jupyter notebook
+%reload_ext watermark
+%watermark -a "RobertoSSoares-LfLngLrnng"</code></pre>
+</div>
+<div class="output-stream">
+<pre>Author: RobertoSSoares-LfLngLrnng
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 2. Contexto de mercado e motivação do projeto</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 2.1 Contexto geral</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>O mercado musical passou por uma transformação significativa com a consolidação das plataformas de streaming.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Nesse ambiente, músicas, artistas, álbuns e playlists passaram a gerar grandes volumes de dados comportamentais,<ul>
+<li>permitindo que decisões antes fortemente baseadas em intuição também sejam apoiadas por evidências quantitativas.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Plataformas como o Spotify concentram informações relevantes sobre faixas, artistas, popularidade, datas de lançamento, atributos musicais e padrões de consumo.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Esses dados podem ser explorados para compreender como determinadas músicas se destacam, como artistas evoluem ao longo do tempo<ul>
+<li>e quais características podem estar associadas ao sucesso comercial de uma faixa.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>No contexto deste projeto, a análise exploratória de dados será utilizada como uma etapa estratégica para transformar dados musicais em conhecimento acionável.</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 2.2 Cenário fictício de negócio</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Para tornar o projeto mais próximo de uma entrega real de mercado, será adotado o seguinte cenário fictício:<ul>
+<li>A empresa <strong>SoundWave Analytics</strong> é uma consultoria especializada em inteligência musical e análise de dados para o setor de entretenimento.</li>
+<li>Seus clientes incluem gravadoras, equipes de marketing musical, curadores editoriais, gestores de artistas e times de produto de plataformas digitais.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A empresa foi contratada para analisar um conjunto histórico de dados do Spotify com registros entre <strong>2009 e 2025</strong>,<ul>
+<li>buscando entender padrões de popularidade,</li>
+<li>evolução temporal de músicas,</li>
+<li>comportamento de artistas</li>
+<li>e possíveis oportunidades para construção futura de modelos preditivos.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 2.3 Problema observado no mercado</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Apesar do avanço das plataformas digitais, muitas decisões no mercado musical ainda são influenciadas por fatores subjetivos,<ul>
+<li>como percepção de tendência,</li>
+<li>reputação do artista,</li>
+<li>experiência de produtores,</li>
+<li>engajamento momentâneo em redes sociais ou desempenho isolado em rankings.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essas informações são importantes, mas podem ser insuficientes quando analisadas sem uma base estruturada de dados.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Alguns desafios recorrentes incluem:<ul>
+<li><em>dificuldade de identificar padrões objetivos em músicas populares;</em></li>
+<li><em>baixa visibilidade sobre mudanças de tendência ao longo dos anos;</em></li>
+<li><em>decisões de marketing baseadas apenas em rankings agregados;</em></li>
+<li><em>ausência de critérios quantitativos para comparar artistas e faixas;</em></li>
+<li><em>dificuldade de antecipar quais músicas possuem maior potencial de destaque;</em></li>
+<li><em>pouca integração entre análise histórica, curadoria e estratégia comercial.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 2.4 Motivação analítica</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A motivação deste projeto é investigar se os dados musicais disponíveis permitem responder perguntas relevantes para o negócio, como:<ul>
+<li><em>Quais artistas apresentam maior recorrência de popularidade?</em></li>
+<li><em>A popularidade média das músicas varia ao longo dos anos?</em></li>
+<li><em>Existem diferenças entre músicas populares antigas e recentes?</em></li>
+<li><em>Determinados atributos musicais aparecem com mais frequência em faixas populares?</em></li>
+<li><em>É possível criar uma base analítica para futuros modelos de previsão de popularidade?</em></li>
+<li><em>O dataset possui qualidade suficiente para sustentar uma análise confiável?</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essas perguntas reforçam o papel da EDA como uma etapa de descoberta, diagnóstico e formulação de caminhos analíticos.</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 2.5 Relação com EDA profissional</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Neste projeto, a EDA será conduzida com foco em três dimensões:</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Dimensão</th>
+<th>Foco da análise</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Técnica</td>
+<td>Estrutura, tipos de dados, nulos, duplicidades, cardinalidade e consistência</td>
+</tr>
+<tr>
+<td>Analítica</td>
+<td>Distribuições, relações entre variáveis, padrões temporais e hipóteses</td>
+</tr>
+<tr>
+<td>Executiva</td>
+<td>Insights, recomendações, limitações e oportunidades para tomada de decisão</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<ul>
+<li>Essa abordagem evita que a análise exploratória se limite à geração de gráficos.</li>
+<li>O objetivo é construir uma narrativa analítica que conecte dados, negócio e próximos passos.</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 2.6 Conexão com o ciclo do projeto</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>O contexto de mercado definido nesta célula orientará as próximas etapas do projeto:<ol>
+<li>definição clara da dor de negócio;</li>
+<li>formulação dos objetivos analíticos;</li>
+<li>identificação dos stakeholders;</li>
+<li>criação de perguntas de negócio;</li>
+<li>construção de hipóteses;</li>
+<li>avaliação da qualidade dos dados;</li>
+<li>desenvolvimento da EDA;</li>
+<li>geração de recomendações;</li>
+<li>preparação para modelagem futura.</li>
+</ol>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Dessa forma, o projeto será conduzido como uma entrega analítica estruturada, com foco em valor de negócio e potencial de evolução para produto de dados.</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 2.7 Resultado esperado desta etapa</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Ao final desta etapa, espera-se ter uma visão clara do contexto em que o projeto está inserido,<ul>
+<li>demonstrando por que a análise de dados é relevante para o mercado musical</li>
+<li>e como a EDA pode apoiar decisões mais bem fundamentadas.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Este contexto servirá como base para a próxima etapa: a definição formal da dor de negócio.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 3. Dor de negócio e problema analítico</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 3.1 Dor central do negócio</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A principal dor de negócio deste projeto está relacionada à dificuldade de transformar dados musicais em decisões estratégicas, mensuráveis e replicáveis.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>No mercado musical, decisões sobre investimento em artistas, promoção de faixas, posicionamento de campanhas, curadoria de playlists<ul>
+<li>e identificação de tendências frequentemente dependem de sinais fragmentados,</li>
+<li>como rankings, percepção de popularidade, engajamento em redes sociais e experiência subjetiva de profissionais do setor.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Embora esses sinais sejam relevantes, eles nem sempre oferecem uma visão estruturada sobre os fatores que explicam a popularidade musical ao longo do tempo.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A dor central pode ser sintetizada da seguinte forma:<ul>
+<li>Como identificar, com base em dados históricos do Spotify, quais padrões estão associados à popularidade de músicas e artistas,<ul>
+<li>permitindo apoiar decisões de marketing, curadoria, produto e investimento musical?</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 3.2 Problemas enfrentados pelos stakeholders</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A ausência de uma análise estruturada pode gerar diferentes impactos para os stakeholders envolvidos.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Stakeholder</th>
+<th>Dor observada</th>
+<th>Consequência potencial</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gravadoras</td>
+<td>Dificuldade em priorizar artistas e faixas com maior potencial</td>
+<td>Investimentos promocionais mal direcionados</td>
+</tr>
+<tr>
+<td>Marketing musical</td>
+<td>Baixa clareza sobre perfis de músicas populares</td>
+<td>Campanhas genéricas e pouco segmentadas</td>
+</tr>
+<tr>
+<td>Curadoria editorial</td>
+<td>Dependência excessiva de rankings e percepção subjetiva</td>
+<td>Playlists menos alinhadas a padrões reais de consumo</td>
+</tr>
+<tr>
+<td>Gestores de artistas</td>
+<td>Falta de comparação analítica com outros artistas</td>
+<td>Estratégias de posicionamento menos precisas</td>
+</tr>
+<tr>
+<td>Times de produto</td>
+<td>Pouca exploração histórica de tendências musicais</td>
+<td>Recomendações e experiências menos contextualizadas</td>
+</tr>
+<tr>
+<td>Cientistas de dados</td>
+<td>Ausência de base analítica confiável para modelagem</td>
+<td>Modelos frágeis ou desconectados do negócio</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 3.3 Problema de negócio</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>O problema de negócio pode ser definido como:<ul>
+<li>A empresa precisa compreender quais características, padrões temporais e comportamentos de artistas estão associados à popularidade musical no Spotify,<ul>
+<li>para apoiar decisões mais assertivas em marketing, curadoria, produto e desenvolvimento de modelos analíticos.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essa definição posiciona o projeto como uma investigação orientada a decisão, e não apenas como uma exploração técnica do dataset.</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 3.4 Problema analítico</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Do ponto de vista analítico, o problema pode ser traduzido para a seguinte pergunta:<ul>
+<li>Quais variáveis, padrões e relações presentes no dataset Spotify Global Music Dataset (2009–2025) ajudam a explicar diferenças de popularidade entre músicas, artistas e períodos?</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essa pergunta será explorada inicialmente por meio de EDA, considerando:<ul>
+<li><em>análise da estrutura dos dados;</em></li>
+<li><em>avaliação da qualidade das variáveis;</em></li>
+<li><em>identificação de nulos, duplicidades e inconsistências;</em></li>
+<li><em>distribuição da popularidade;</em></li>
+<li><em>evolução temporal das músicas;</em></li>
+<li><em>comparação entre artistas e faixas;</em></li>
+<li><em>análise de atributos musicais;</em></li>
+<li><em>investigação de correlações;</em></li>
+<li><em>identificação de padrões relevantes para modelagem futura.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 3.5 Riscos de não resolver o problema</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Caso a empresa não avance em uma abordagem orientada por dados, alguns riscos permanecem:</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Risco</th>
+<th>Impacto</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Decisões baseadas apenas em intuição</td>
+<td>Maior chance de erro estratégico</td>
+</tr>
+<tr>
+<td>Baixa compreensão sobre tendências históricas</td>
+<td>Dificuldade de antecipar mudanças no mercado</td>
+</tr>
+<tr>
+<td>Campanhas pouco segmentadas</td>
+<td>Menor eficiência em marketing</td>
+</tr>
+<tr>
+<td>Falta de critérios para comparar artistas</td>
+<td>Priorização subjetiva de investimentos</td>
+</tr>
+<tr>
+<td>Ausência de base preparada para modelos</td>
+<td>Dificuldade de evoluir para soluções preditivas</td>
+</tr>
+<tr>
+<td>Baixa rastreabilidade analítica</td>
+<td>Menor confiança nas recomendações geradas</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 3.6 Oportunidade analítica</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A análise exploratória pode transformar esse cenário ao oferecer uma visão estruturada sobre:<ul>
+<li><em>quais artistas aparecem com maior força no dataset;</em></li>
+<li><em>quais faixas concentram maior popularidade;</em></li>
+<li><em>como a popularidade varia ao longo do tempo;</em></li>
+<li><em>quais atributos musicais apresentam relação com popularidade;</em></li>
+<li><em>quais períodos possuem perfis musicais distintos;</em></li>
+<li><em>quais variáveis podem ser úteis em uma futura etapa de modelagem;</em></li>
+<li><em>quais limitações precisam ser consideradas antes de produzir recomendações.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Assim, a EDA passa a funcionar como uma etapa de diagnóstico estratégico, reduzindo incertezas e criando uma ponte entre dados brutos e decisões de negócio.</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 3.7 Delimitação do problema nesta fase</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Nesta primeira fase, o projeto não buscará construir imediatamente um modelo preditivo.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>O foco será compreender os dados, validar a qualidade da base e identificar padrões relevantes.</li>
+<li>A modelagem será considerada uma etapa posterior, dependente da maturidade analítica construída durante a EDA.</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>Portanto, a entrega desta fase será concentrada em:</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Frente</th>
+<th>Entrega esperada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Negócio</td>
+<td>Clareza sobre a dor e as perguntas relevantes</td>
+</tr>
+<tr>
+<td>Dados</td>
+<td>Diagnóstico de estrutura, qualidade e limitações</td>
+</tr>
+<tr>
+<td>EDA</td>
+<td>Identificação de padrões, tendências e relações</td>
+</tr>
+<tr>
+<td>Decisão</td>
+<td>Geração de insights executivos</td>
+</tr>
+<tr>
+<td>Futuro ML</td>
+<td>Indicação de caminhos possíveis para modelagem</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 3.8 Resultado esperado desta etapa</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Ao final desta etapa, espera-se ter uma definição clara do problema de negócio e de sua tradução analítica.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essa definição será usada como referência para as próximas células do notebook, especialmente na formulação dos objetivos do projeto,<ul>
+<li>stakeholders, perguntas analíticas, hipóteses e critérios de sucesso.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 4. Objetivos do projeto</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 4.1 Objetivo principal</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>O objetivo principal deste projeto é construir uma análise exploratória de dados profissional sobre o <strong>Spotify Global Music Dataset (2009–2025)</strong>,<ul>
+<li>com foco em identificar padrões de popularidade musical, evolução temporal de artistas e faixas,</li>
+<li>características associadas ao desempenho das músicas e oportunidades para futuras soluções analíticas e preditivas.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A análise será conduzida com uma abordagem orientada a negócio, buscando transformar dados musicais em conhecimento acionável para apoiar decisões de marketing,<ul>
+<li>curadoria, produto, investimento artístico e desenvolvimento de modelos de machine learning.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 4.2 Objetivo executivo</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Do ponto de vista executivo, o projeto busca responder à seguinte pergunta:<ul>
+<li>Como os dados históricos do Spotify podem ajudar a compreender padrões de popularidade musical e apoiar decisões estratégicas no mercado de streaming?</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essa pergunta orienta a entrega para além da exploração técnica, conectando a EDA com possíveis decisões de negócio.</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 4.3 Objetivos específicos</strong></font></p>
+<font color="#66666" size="2">
+<ul>
+<li>Os objetivos específicos do projeto estão organizados em seis frentes principais:</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Frente</th>
+<th>Objetivo específico</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Negócio</td>
+<td>Compreender a dor do mercado musical relacionada à identificação de tendências, popularidade e potencial comercial de faixas</td>
+</tr>
+<tr>
+<td>Dados</td>
+<td>Avaliar a estrutura, granularidade, qualidade e limitações dos arquivos disponíveis</td>
+</tr>
+<tr>
+<td>Qualidade</td>
+<td>Identificar nulos, duplicidades, inconsistências, problemas de tipo e possíveis limitações analíticas</td>
+</tr>
+<tr>
+<td>EDA</td>
+<td>Explorar distribuições, rankings, padrões temporais, relações entre variáveis e comportamento de artistas</td>
+</tr>
+<tr>
+<td>Insights</td>
+<td>Traduzir achados técnicos em interpretações executivas e recomendações iniciais</td>
+</tr>
+<tr>
+<td>Futuro ML</td>
+<td>Preparar o caminho para modelos de previsão de popularidade, classificação de potencial de hit ou segmentação musical</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 4.4 Objetivos técnicos</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Do ponto de vista técnico, o projeto deverá:<ul>
+<li><em>carregar e inspecionar os arquivos originais do dataset;</em></li>
+<li><em>avaliar a consistência entre os arquivos <code>spotify_data_clean.csv</code> e <code>track_data_final.csv</code>;</em></li>
+<li><em>padronizar nomes de colunas;</em></li>
+<li><em>verificar tipos de dados;</em></li>
+<li><em>identificar variáveis numéricas, categóricas e temporais;</em></li>
+<li><em>avaliar valores ausentes;</em></li>
+<li><em>identificar registros duplicados;</em></li>
+<li><em>criar uma visão unificada dos dados quando tecnicamente viável;</em></li>
+<li><em>salvar bases intermediárias em formato Parquet;</em></li>
+<li><em>gerar tabelas analíticas em camadas Bronze, Silver e Gold;</em></li>
+<li><em>produzir visualizações relevantes para análise exploratória;</em></li>
+<li><em>documentar decisões técnicas tomadas durante o processo.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 4.5 Objetivos analíticos</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Do ponto de vista analítico, o projeto deverá investigar:<ul>
+<li><em>distribuição da popularidade das músicas;</em></li>
+<li><em>artistas com maior presença e maior popularidade média;</em></li>
+<li><em>faixas mais populares no período analisado;</em></li>
+<li><em>evolução temporal da popularidade;</em></li>
+<li><em>diferenças entre músicas antigas e recentes;</em></li>
+<li><em>concentração de popularidade por artista;</em></li>
+<li><em>possíveis relações entre atributos musicais e popularidade;</em></li>
+<li><em>presença de outliers;</em></li>
+<li><em>correlações entre variáveis numéricas;</em></li>
+<li><em>grupos ou perfis musicais com comportamento semelhante;</em></li>
+<li><em>sinais úteis para futuras etapas de feature engineering e modelagem.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 4.6 Objetivos de negócio</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Do ponto de vista de negócio, a análise deverá apoiar decisões relacionadas a:</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Decisão</th>
+<th>Como a análise pode apoiar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Priorização de artistas</td>
+<td>Identificando artistas com popularidade recorrente ou trajetória relevante</td>
+</tr>
+<tr>
+<td>Curadoria de playlists</td>
+<td>Revelando padrões de faixas populares e perfis musicais predominantes</td>
+</tr>
+<tr>
+<td>Marketing musical</td>
+<td>Indicando características associadas a músicas com maior alcance</td>
+</tr>
+<tr>
+<td>Estratégia de lançamento</td>
+<td>Comparando padrões entre períodos históricos</td>
+</tr>
+<tr>
+<td>Produto e recomendação</td>
+<td>Sugerindo variáveis úteis para segmentação e recomendação futura</td>
+</tr>
+<tr>
+<td>Investimento musical</td>
+<td>Criando evidências para reduzir subjetividade na priorização de faixas e artistas</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 4.7 Objetivos de portfólio</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Como projeto de portfólio, esta entrega também deverá demonstrar domínio em:<ul>
+<li><em>estruturação de projeto de dados;</em></li>
+<li><em>raciocínio de negócio;</em></li>
+<li><em>aplicação do CRISP-DM+;</em></li>
+<li><em>organização em camadas de dados;</em></li>
+<li><em>boas práticas de notebooks;</em></li>
+<li><em>análise exploratória profissional;</em></li>
+<li><em>storytelling analítico;</em></li>
+<li><em>interpretação executiva;</em></li>
+<li><em>preparação para machine learning;</em></li>
+<li><em>documentação clara e reutilizável.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>O objetivo é construir uma peça de portfólio que comunique maturidade técnica e capacidade de transformar dados em decisão.</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 4.8 O que este projeto não pretende resolver nesta fase</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Nesta fase inicial, o projeto não tem como objetivo:<ul>
+<li><em>construir um modelo preditivo final;</em></li>
+<li><em>realizar deploy de API;</em></li>
+<li><em>criar dashboard em produção;</em></li>
+<li><em>consumir diretamente a API do Spotify;</em></li>
+<li><em>inferir causalidade entre atributos musicais e popularidade;</em></li>
+<li><em>afirmar que determinado atributo musical causa sucesso comercial;</em></li>
+<li><em>substituir decisões humanas de curadoria ou estratégia musical.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A proposta desta etapa é criar uma base sólida de entendimento e exploração, deixando a modelagem e a produção para fases posteriores.</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 4.9 Resultado esperado desta etapa</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Ao final desta etapa, espera-se ter uma definição clara dos objetivos do projeto em diferentes níveis:<ul>
+<li><em>objetivo principal;</em></li>
+<li><em>objetivo executivo;</em></li>
+<li><em>objetivos técnicos;</em></li>
+<li><em>objetivos analíticos;</em></li>
+<li><em>objetivos de negócio;</em></li>
+<li><em>objetivos de portfólio;</em></li>
+<li><em>delimitação do que está fora do escopo inicial.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essa definição servirá como guia para as próximas etapas do notebook, especialmente na identificação dos stakeholders, perguntas analíticas, hipóteses e critérios de sucesso.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 5. Stakeholders e usuários da análise</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 5.1 Visão geral</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Um projeto de dados orientado a negócio precisa identificar claramente quem utilizará os resultados da análise e quais decisões poderão ser apoiadas pelos dados.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>No contexto do projeto <strong>Spotify Global Music Intelligence</strong>, os stakeholders representam diferentes áreas interessadas em compreender padrões<ul>
+<li>de popularidade musical, evolução de artistas, comportamento de faixas e oportunidades para futuras soluções analíticas.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A identificação desses públicos ajuda a direcionar as perguntas analíticas, priorizar métricas relevantes e traduzir os achados técnicos em recomendações úteis.</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 5.2 Stakeholders principais</strong></font></p>
+<font color="#66666" size="2">
+<table>
+<thead>
+<tr>
+<th>Stakeholder</th>
+<th>Papel no negócio</th>
+<th>Interesse principal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Diretoria de gravadora</td>
+<td>Define investimentos em artistas, campanhas e lançamentos</td>
+<td>Identificar artistas e faixas com maior potencial comercial</td>
+</tr>
+<tr>
+<td>Marketing musical</td>
+<td>Planeja campanhas de divulgação e posicionamento</td>
+<td>Entender características de músicas populares para segmentar ações</td>
+</tr>
+<tr>
+<td>Curadoria editorial</td>
+<td>Organiza playlists e recomendações musicais</td>
+<td>Identificar padrões de faixas com alto engajamento e popularidade</td>
+</tr>
+<tr>
+<td>Gestores de artistas</td>
+<td>Apoiam posicionamento e desenvolvimento de carreira</td>
+<td>Comparar desempenho de artistas ao longo do tempo</td>
+</tr>
+<tr>
+<td>Time de produto</td>
+<td>Desenvolve experiências digitais e sistemas de recomendação</td>
+<td>Explorar variáveis úteis para personalização e descoberta musical</td>
+</tr>
+<tr>
+<td>Cientistas de dados</td>
+<td>Constroem análises, features e modelos preditivos</td>
+<td>Avaliar qualidade dos dados e viabilidade de modelagem</td>
+</tr>
+<tr>
+<td>Analistas de negócio</td>
+<td>Traduzem dados em relatórios e recomendações</td>
+<td>Gerar insights claros para apoiar decisões estratégicas</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 5.3 Necessidades analíticas por stakeholder</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Cada stakeholder possui uma necessidade diferente em relação aos dados.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Stakeholder</th>
+<th>Necessidade analítica</th>
+<th>Exemplo de pergunta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Diretoria de gravadora</td>
+<td>Priorização de investimento</td>
+<td>Quais artistas apresentam maior recorrência de popularidade?</td>
+</tr>
+<tr>
+<td>Marketing musical</td>
+<td>Segmentação de campanhas</td>
+<td>Quais características aparecem em faixas mais populares?</td>
+</tr>
+<tr>
+<td>Curadoria editorial</td>
+<td>Seleção de músicas e playlists</td>
+<td>Quais faixas ou perfis musicais se destacam em determinados períodos?</td>
+</tr>
+<tr>
+<td>Gestores de artistas</td>
+<td>Posicionamento competitivo</td>
+<td>Como determinado artista se compara com outros artistas populares?</td>
+</tr>
+<tr>
+<td>Time de produto</td>
+<td>Recomendação e descoberta</td>
+<td>Quais atributos podem apoiar agrupamento ou recomendação musical?</td>
+</tr>
+<tr>
+<td>Cientistas de dados</td>
+<td>Preparação para ML</td>
+<td>O dataset possui variáveis consistentes para modelagem futura?</td>
+</tr>
+<tr>
+<td>Analistas de negócio</td>
+<td>Comunicação executiva</td>
+<td>Quais insights podem ser traduzidos em recomendações práticas?</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 5.4 Como a EDA gera valor para cada público</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A EDA será usada como ponte entre os dados brutos e as decisões dos stakeholders.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Público</th>
+<th>Valor gerado pela EDA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Liderança executiva</td>
+<td>Visão consolidada sobre tendências e oportunidades</td>
+</tr>
+<tr>
+<td>Marketing</td>
+<td>Evidências para melhorar campanhas e segmentações</td>
+</tr>
+<tr>
+<td>Curadoria</td>
+<td>Identificação de padrões musicais relevantes</td>
+</tr>
+<tr>
+<td>Produto</td>
+<td>Base para futuras funcionalidades analíticas</td>
+</tr>
+<tr>
+<td>Dados e Analytics</td>
+<td>Diagnóstico técnico e base preparada para modelagem</td>
+</tr>
+<tr>
+<td>Portfólio profissional</td>
+<td>Demonstração de raciocínio analítico orientado a negócio</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 5.5 Usuários finais da entrega</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Além dos stakeholders de negócio, também existem usuários finais da entrega analítica.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Usuário final</th>
+<th>Uso esperado da análise</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Recrutadores técnicos</td>
+<td>Avaliar domínio de EDA, Python, organização de projeto e interpretação de dados</td>
+</tr>
+<tr>
+<td>Gestores de dados</td>
+<td>Avaliar maturidade na condução de projeto analítico</td>
+</tr>
+<tr>
+<td>Profissionais de negócio</td>
+<td>Entender como dados podem apoiar decisões no setor musical</td>
+</tr>
+<tr>
+<td>Comunidade de dados</td>
+<td>Usar o projeto como referência de EDA estruturada</td>
+</tr>
+<tr>
+<td>O próprio autor do projeto</td>
+<td>Reutilizar o framework em novos projetos de portfólio</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 5.6 Decisões que poderão ser apoiadas</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A análise exploratória deste projeto poderá apoiar decisões como:<ul>
+<li><em>priorizar artistas ou faixas para análise mais aprofundada;</em></li>
+<li><em>identificar períodos de maior concentração de popularidade;</em></li>
+<li><em>comparar músicas recentes e antigas;</em></li>
+<li><em>entender padrões de popularidade por artista;</em></li>
+<li><em>avaliar se atributos musicais têm relação com popularidade;</em></li>
+<li><em>definir variáveis candidatas para feature engineering;</em></li>
+<li><em>planejar modelos futuros de previsão ou classificação;</em></li>
+<li><em>construir uma narrativa executiva para apresentação do projeto.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 5.7 Riscos de desalinhamento com stakeholders</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Caso os stakeholders não sejam considerados desde o início, o projeto pode gerar análises tecnicamente corretas, mas pouco úteis para decisão.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Risco</th>
+<th>Consequência</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Foco excessivo em gráficos sem pergunta de negócio</td>
+<td>Análise visualmente interessante, mas sem direção</td>
+</tr>
+<tr>
+<td>Métricas desalinhadas com a decisão</td>
+<td>Baixa utilidade executiva</td>
+</tr>
+<tr>
+<td>Linguagem técnica demais</td>
+<td>Dificuldade de comunicação com áreas de negócio</td>
+</tr>
+<tr>
+<td>Ausência de critérios de sucesso</td>
+<td>Dificuldade de avaliar se a entrega gerou valor</td>
+</tr>
+<tr>
+<td>Falta de priorização</td>
+<td>EDA extensa, porém dispersa</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 5.8 Estratégia de comunicação dos resultados</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Os resultados da análise deverão ser comunicados em diferentes níveis de profundidade:</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Nível</th>
+<th>Público</th>
+<th>Forma de comunicação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Executivo</td>
+<td>Liderança, marketing e curadoria</td>
+<td>Resumos, rankings, recomendações e insights</td>
+</tr>
+<tr>
+<td>Técnico</td>
+<td>Cientistas e analistas de dados</td>
+<td>Notebooks, diagnósticos, tabelas e gráficos</td>
+</tr>
+<tr>
+<td>Portfólio</td>
+<td>Recrutadores e comunidade</td>
+<td>README, HTML exportado, storytelling e visualizações</td>
+</tr>
+<tr>
+<td>Produto</td>
+<td>Times digitais</td>
+<td>Possíveis features, segmentações e oportunidades futuras</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 5.9 Resultado esperado desta etapa</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Ao final desta etapa, espera-se ter clareza sobre quem se beneficia da análise, quais decisões podem ser apoiadas e como os resultados deverão ser comunicados.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essa definição será usada como base para a próxima etapa do notebook: a formulação das perguntas analíticas.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 6. Perguntas analíticas do projeto</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 6.1 Visão geral</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>As perguntas analíticas são responsáveis por transformar a dor de negócio em caminhos objetivos de investigação.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>No projeto <strong>Spotify Global Music Intelligence</strong>, essas perguntas irão orientar as próximas etapas da análise, especialmente o entendimento dos dados,<ul>
+<li>a avaliação de qualidade, a exploração visual, a construção de hipóteses e a definição de possíveis variáveis para futuras etapas de modelagem.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Uma boa pergunta analítica deve conectar três elementos:<ol>
+<li><em>uma necessidade de negócio;</em></li>
+<li><em>uma possibilidade de investigação com dados;</em></li>
+<li><em>uma decisão ou interpretação que possa ser gerada a partir da análise.</em></li>
+</ol>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 6.2 Pergunta central do projeto</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A pergunta central que orienta este projeto é:<ul>
+<li>Quais fatores ajudam a explicar a popularidade de músicas e artistas no Spotify ao longo do tempo, e como esses padrões podem apoiar<ul>
+<li>decisões de marketing, curadoria, produto e desenvolvimento de modelos preditivos?</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essa pergunta será desdobrada em perguntas menores, mais específicas e investigáveis.</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 6.3 Perguntas sobre estrutura e qualidade dos dados</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Antes de analisar popularidade, artistas ou tendências, é necessário avaliar se os dados disponíveis são confiáveis.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Pergunta analítica</th>
+<th>Objetivo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>QD01</td>
+<td>Quantas linhas e colunas existem em cada arquivo do dataset?</td>
+<td>Entender o volume inicial de dados</td>
+</tr>
+<tr>
+<td>QD02</td>
+<td>Os arquivos possuem a mesma estrutura de colunas?</td>
+<td>Avaliar possibilidade de unificação</td>
+</tr>
+<tr>
+<td>QD03</td>
+<td>Existem colunas com nomes diferentes, mas significado semelhante?</td>
+<td>Identificar necessidade de padronização</td>
+</tr>
+<tr>
+<td>QD04</td>
+<td>Quais colunas possuem valores ausentes?</td>
+<td>Avaliar qualidade e completude</td>
+</tr>
+<tr>
+<td>QD05</td>
+<td>Existem registros duplicados?</td>
+<td>Medir risco de contagem ou análise inflada</td>
+</tr>
+<tr>
+<td>QD06</td>
+<td>As variáveis possuem tipos de dados adequados?</td>
+<td>Validar consistência técnica</td>
+</tr>
+<tr>
+<td>QD07</td>
+<td>Existem valores extremos ou inconsistentes?</td>
+<td>Identificar possíveis outliers ou erros</td>
+</tr>
+<tr>
+<td>QD08</td>
+<td>O período 2009–2025 está corretamente representado?</td>
+<td>Validar cobertura temporal</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 6.4 Perguntas sobre popularidade musical</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A popularidade é uma das principais variáveis de interesse do projeto.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Pergunta analítica</th>
+<th>Objetivo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>QP01</td>
+<td>Como a popularidade das músicas está distribuída?</td>
+<td>Entender concentração, dispersão e assimetria</td>
+</tr>
+<tr>
+<td>QP02</td>
+<td>Quais são as músicas mais populares do dataset?</td>
+<td>Identificar faixas de maior destaque</td>
+</tr>
+<tr>
+<td>QP03</td>
+<td>Quais artistas possuem maior popularidade média?</td>
+<td>Comparar desempenho agregado por artista</td>
+</tr>
+<tr>
+<td>QP04</td>
+<td>Existem artistas com alta recorrência de músicas populares?</td>
+<td>Avaliar consistência de popularidade</td>
+</tr>
+<tr>
+<td>QP05</td>
+<td>A popularidade varia significativamente entre períodos?</td>
+<td>Investigar evolução temporal</td>
+</tr>
+<tr>
+<td>QP06</td>
+<td>Existem músicas com popularidade muito acima do padrão?</td>
+<td>Identificar outliers positivos</td>
+</tr>
+<tr>
+<td>QP07</td>
+<td>Existem músicas com baixa popularidade apesar de artistas conhecidos?</td>
+<td>Explorar possíveis discrepâncias</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 6.5 Perguntas sobre artistas</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A análise por artista ajuda a entender concentração, recorrência e relevância no catálogo.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Pergunta analítica</th>
+<th>Objetivo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>QA01</td>
+<td>Quais artistas aparecem com maior frequência no dataset?</td>
+<td>Medir presença no catálogo</td>
+</tr>
+<tr>
+<td>QA02</td>
+<td>Quais artistas combinam alta frequência e alta popularidade?</td>
+<td>Identificar relevância recorrente</td>
+</tr>
+<tr>
+<td>QA03</td>
+<td>Existem artistas com poucas músicas, mas alta popularidade média?</td>
+<td>Identificar possíveis casos de alto impacto</td>
+</tr>
+<tr>
+<td>QA04</td>
+<td>Existem artistas com muitas músicas, mas popularidade média baixa?</td>
+<td>Avaliar volume versus desempenho</td>
+</tr>
+<tr>
+<td>QA05</td>
+<td>Como a popularidade dos artistas evolui ao longo do tempo?</td>
+<td>Identificar trajetórias e ciclos</td>
+</tr>
+<tr>
+<td>QA06</td>
+<td>A popularidade está concentrada em poucos artistas?</td>
+<td>Avaliar concentração do mercado musical</td>
+</tr>
+<tr>
+<td>QA07</td>
+<td>Existem artistas emergentes no período mais recente?</td>
+<td>Explorar sinais de renovação musical</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 6.6 Perguntas sobre evolução temporal</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Como o dataset cobre diferentes anos, a dimensão temporal será essencial para o projeto.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Pergunta analítica</th>
+<th>Objetivo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>QT01</td>
+<td>Quantas músicas existem por ano de lançamento?</td>
+<td>Avaliar distribuição temporal do dataset</td>
+</tr>
+<tr>
+<td>QT02</td>
+<td>A popularidade média muda ao longo dos anos?</td>
+<td>Identificar tendências gerais</td>
+</tr>
+<tr>
+<td>QT03</td>
+<td>Existem períodos com maior concentração de músicas populares?</td>
+<td>Comparar fases históricas</td>
+</tr>
+<tr>
+<td>QT04</td>
+<td>O perfil das músicas populares mudou entre 2009–2015, 2016–2020 e 2021–2025?</td>
+<td>Investigar mudança de padrão</td>
+</tr>
+<tr>
+<td>QT05</td>
+<td>Músicas recentes apresentam atributos diferentes das músicas antigas?</td>
+<td>Avaliar evolução musical</td>
+</tr>
+<tr>
+<td>QT06</td>
+<td>Existem anos com comportamento atípico de popularidade?</td>
+<td>Detectar anomalias temporais</td>
+</tr>
+<tr>
+<td>QT07</td>
+<td>O ano de lançamento influencia a leitura da popularidade atual?</td>
+<td>Avaliar possível viés temporal</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 6.7 Perguntas sobre atributos musicais</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Caso o dataset contenha atributos como energia, dançabilidade, valência, tempo, duração ou acústica, eles serão analisados como possíveis fatores associados à popularidade.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Pergunta analítica</th>
+<th>Objetivo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>QM01</td>
+<td>Quais atributos musicais estão disponíveis no dataset?</td>
+<td>Mapear variáveis analíticas</td>
+</tr>
+<tr>
+<td>QM02</td>
+<td>Como esses atributos estão distribuídos?</td>
+<td>Entender perfil sonoro geral</td>
+</tr>
+<tr>
+<td>QM03</td>
+<td>Músicas mais populares possuem maior energia ou dançabilidade?</td>
+<td>Investigar possíveis associações</td>
+</tr>
+<tr>
+<td>QM04</td>
+<td>Existe relação entre duração da música e popularidade?</td>
+<td>Avaliar efeito de formato</td>
+</tr>
+<tr>
+<td>QM05</td>
+<td>A valência ou positividade da música varia ao longo do tempo?</td>
+<td>Explorar mudanças de estilo</td>
+</tr>
+<tr>
+<td>QM06</td>
+<td>Certos atributos musicais se tornaram mais comuns em anos recentes?</td>
+<td>Avaliar evolução sonora</td>
+</tr>
+<tr>
+<td>QM07</td>
+<td>Existem combinações de atributos associadas a faixas populares?</td>
+<td>Preparar terreno para segmentação</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 6.8 Perguntas sobre segmentação e perfis musicais</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Além de rankings, o projeto buscará entender se existem grupos ou perfis recorrentes.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Pergunta analítica</th>
+<th>Objetivo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>QS01</td>
+<td>Existem perfis distintos de músicas no dataset?</td>
+<td>Identificar possíveis segmentos</td>
+</tr>
+<tr>
+<td>QS02</td>
+<td>Músicas populares se concentram em determinados perfis?</td>
+<td>Relacionar grupos com desempenho</td>
+</tr>
+<tr>
+<td>QS03</td>
+<td>Artistas podem ser agrupados por padrão de popularidade?</td>
+<td>Explorar segmentação por artista</td>
+</tr>
+<tr>
+<td>QS04</td>
+<td>Existem diferenças entre músicas modernas e clássicas/populares?</td>
+<td>Comparar bases e períodos</td>
+</tr>
+<tr>
+<td>QS05</td>
+<td>É possível criar uma classificação exploratória de potencial de hit?</td>
+<td>Preparar futura modelagem</td>
+</tr>
+<tr>
+<td>QS06</td>
+<td>Quais variáveis parecem mais úteis para segmentação futura?</td>
+<td>Apoiar feature engineering</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 6.9 Perguntas orientadas à modelagem futura</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Embora a modelagem não seja o foco imediato desta fase, a EDA deve preparar o caminho para ela.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Pergunta analítica</th>
+<th>Objetivo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>QMLO1</td>
+<td>A variável de popularidade pode ser usada como target?</td>
+<td>Avaliar viabilidade preditiva</td>
+</tr>
+<tr>
+<td>QMLO2</td>
+<td>A popularidade deve ser tratada como regressão ou classificação?</td>
+<td>Definir abordagem futura</td>
+</tr>
+<tr>
+<td>QMLO3</td>
+<td>Existem variáveis suficientes para explicar diferenças de popularidade?</td>
+<td>Avaliar potencial de ML</td>
+</tr>
+<tr>
+<td>QMLO4</td>
+<td>Há risco de vazamento de informação entre variáveis?</td>
+<td>Prevenir problemas de modelagem</td>
+</tr>
+<tr>
+<td>QMLO5</td>
+<td>É possível criar classes como baixa, média e alta popularidade?</td>
+<td>Preparar classificação</td>
+</tr>
+<tr>
+<td>QMLO6</td>
+<td>Quais features podem ser derivadas dos dados originais?</td>
+<td>Planejar feature engineering</td>
+</tr>
+<tr>
+<td>QMLO7</td>
+<td>A base possui qualidade mínima para treinar modelos?</td>
+<td>Avaliar prontidão técnica</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 6.10 Priorização inicial das perguntas</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Nem todas as perguntas serão respondidas no mesmo momento. Para orientar a execução, será adotada a seguinte priorização inicial:</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Prioridade</th>
+<th>Grupo de perguntas</th>
+<th>Justificativa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alta</td>
+<td>Estrutura e qualidade dos dados</td>
+<td>Sem dados confiáveis, a EDA perde validade</td>
+</tr>
+<tr>
+<td>Alta</td>
+<td>Popularidade musical</td>
+<td>É o eixo central do projeto</td>
+</tr>
+<tr>
+<td>Alta</td>
+<td>Evolução temporal</td>
+<td>O dataset cobre diferentes períodos históricos</td>
+</tr>
+<tr>
+<td>Média</td>
+<td>Artistas</td>
+<td>Apoia decisões de marketing, curadoria e investimento</td>
+</tr>
+<tr>
+<td>Média</td>
+<td>Atributos musicais</td>
+<td>Ajuda a entender características associadas à popularidade</td>
+</tr>
+<tr>
+<td>Média</td>
+<td>Segmentação</td>
+<td>Prepara caminho para clusters e perfis musicais</td>
+</tr>
+<tr>
+<td>Futura</td>
+<td>Modelagem</td>
+<td>Será aprofundada após validação da base e da EDA</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 6.11 Relação entre perguntas e próximos notebooks</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>As perguntas desta célula serão distribuídas ao longo dos próximos notebooks do projeto.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Notebook</th>
+<th>Perguntas mais relacionadas</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Notebook 01 — Data Understanding</td>
+<td>QD01 a QD08</td>
+</tr>
+<tr>
+<td>Notebook 02 — Data Quality and Preparation</td>
+<td>QD03 a QD08</td>
+</tr>
+<tr>
+<td>Notebook 03 — Exploratory Data Analysis</td>
+<td>QP, QA, QT, QM e QS</td>
+</tr>
+<tr>
+<td>Notebook 04 — Executive Insights and Next Steps</td>
+<td>Consolidação das respostas e recomendações</td>
+</tr>
+<tr>
+<td>Fase futura de ML</td>
+<td>QMLO1 a QMLO7</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 6.12 Resultado esperado desta etapa</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Ao final desta etapa, espera-se ter um conjunto estruturado de perguntas analíticas capazes de orientar a execução do projeto.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essas perguntas serão usadas como referência para:<ul>
+<li><em>planejar o entendimento dos dados;</em></li>
+<li><em>direcionar a limpeza e preparação;</em></li>
+<li><em>escolher visualizações adequadas;</em></li>
+<li><em>validar hipóteses;</em></li>
+<li><em>construir insights executivos;</em></li>
+<li><em>avaliar oportunidades de modelagem futura;</em></li>
+<li><em>comunicar resultados de forma clara e orientada à decisão.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 7. Hipóteses analíticas do projeto</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 7.1 Visão geral</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>As hipóteses analíticas representam suposições iniciais sobre o comportamento dos dados e sobre os possíveis fatores associados à popularidade musical no Spotify.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>No projeto <strong>Spotify Global Music Intelligence</strong>, essas hipóteses serão usadas para orientar a análise exploratória, estruturar comparações,<ul>
+<li>definir visualizações e preparar a interpretação executiva dos resultados.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>É importante destacar que uma hipótese não é uma conclusão.</li>
+<li>Ela é uma afirmação inicial que deverá ser investigada com base nos dados disponíveis.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Ao longo dos próximos notebooks, cada hipótese poderá ser:<ul>
+<li><strong>confirmada</strong>, quando os dados apresentarem evidências consistentes;</li>
+<li><strong>refutada</strong>, quando os dados não sustentarem a suposição inicial;</li>
+<li><strong>parcialmente confirmada</strong>, quando a hipótese fizer sentido apenas em determinados recortes;</li>
+<li><strong>inconclusiva</strong>, quando os dados não forem suficientes para uma avaliação segura.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 7.2 Papel das hipóteses no projeto</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>As hipóteses cumprem quatro papéis principais neste projeto:</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Papel</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Direcionar a EDA</td>
+<td>Evita uma exploração dispersa e sem objetivo</td>
+</tr>
+<tr>
+<td>Conectar dados ao negócio</td>
+<td>Relaciona padrões técnicos com decisões estratégicas</td>
+</tr>
+<tr>
+<td>Apoiar storytelling</td>
+<td>Facilita a construção de uma narrativa analítica</td>
+</tr>
+<tr>
+<td>Preparar modelagem futura</td>
+<td>Ajuda a identificar variáveis candidatas para features</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<ul>
+<li>Essa abordagem segue o princípio de uma análise exploratória estruturada: partir do problema de negócio, formular hipóteses,<ul>
+<li>entender os dados, preparar a base, visualizar padrões e extrair recomendações.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 7.3 Hipóteses sobre qualidade e estrutura dos dados</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Antes de analisar popularidade, artistas ou tendências, é necessário avaliar se os dados possuem qualidade suficiente para sustentar a análise.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Hipótese</th>
+<th>Como será investigada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H-DQ01</td>
+<td>Os dois arquivos possuem estruturas compatíveis para integração analítica.</td>
+<td>Comparação de colunas, tipos e granularidade</td>
+</tr>
+<tr>
+<td>H-DQ02</td>
+<td>Existem colunas com nomes diferentes, mas conceitos equivalentes.</td>
+<td>Análise semântica dos nomes das variáveis</td>
+</tr>
+<tr>
+<td>H-DQ03</td>
+<td>O dataset possui valores ausentes que podem impactar análises de popularidade e atributos musicais.</td>
+<td>Relatório de nulos por coluna</td>
+</tr>
+<tr>
+<td>H-DQ04</td>
+<td>Existem registros duplicados ou quase duplicados de músicas/artistas.</td>
+<td>Verificação por linha completa e chaves compostas</td>
+</tr>
+<tr>
+<td>H-DQ05</td>
+<td>Algumas variáveis precisarão de padronização antes da EDA.</td>
+<td>Avaliação de nomes, tipos, datas e categorias</td>
+</tr>
+<tr>
+<td>H-DQ06</td>
+<td>A cobertura temporal 2009–2025 pode não estar uniformemente distribuída.</td>
+<td>Contagem de registros por ano/período</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 7.4 Hipóteses sobre popularidade musical</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A popularidade será o principal eixo analítico do projeto.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Hipótese</th>
+<th>Racional de negócio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H-POP01</td>
+<td>A popularidade das músicas não está distribuída de forma uniforme.</td>
+<td>Poucas músicas tendem a concentrar maior destaque</td>
+</tr>
+<tr>
+<td>H-POP02</td>
+<td>Existe concentração de músicas muito populares em determinados artistas.</td>
+<td>Artistas consolidados podem dominar parte do catálogo</td>
+</tr>
+<tr>
+<td>H-POP03</td>
+<td>Músicas com popularidade muito alta representam outliers positivos.</td>
+<td>Faixas excepcionais podem distorcer médias e rankings</td>
+</tr>
+<tr>
+<td>H-POP04</td>
+<td>A popularidade média varia entre diferentes períodos históricos.</td>
+<td>O mercado musical muda com o tempo</td>
+</tr>
+<tr>
+<td>H-POP05</td>
+<td>Músicas recentes podem apresentar padrões diferentes das músicas antigas.</td>
+<td>Streaming, redes sociais e consumo digital alteram dinâmica de sucesso</td>
+</tr>
+<tr>
+<td>H-POP06</td>
+<td>A popularidade de uma faixa não depende apenas da popularidade do artista.</td>
+<td>Algumas músicas podem performar acima ou abaixo do padrão do artista</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 7.4 Hipóteses sobre popularidade musical</strong></font></p>
+<font color="#66666" size="2">
+<ul>
+<li>A popularidade será o principal eixo analítico do projeto.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Hipótese</th>
+<th>Racional de negócio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H-POP01</td>
+<td>A popularidade das músicas não está distribuída de forma uniforme.</td>
+<td>Poucas músicas tendem a concentrar maior destaque</td>
+</tr>
+<tr>
+<td>H-POP02</td>
+<td>Existe concentração de músicas muito populares em determinados artistas.</td>
+<td>Artistas consolidados podem dominar parte do catálogo</td>
+</tr>
+<tr>
+<td>H-POP03</td>
+<td>Músicas com popularidade muito alta representam outliers positivos.</td>
+<td>Faixas excepcionais podem distorcer médias e rankings</td>
+</tr>
+<tr>
+<td>H-POP04</td>
+<td>A popularidade média varia entre diferentes períodos históricos.</td>
+<td>O mercado musical muda com o tempo</td>
+</tr>
+<tr>
+<td>H-POP05</td>
+<td>Músicas recentes podem apresentar padrões diferentes das músicas antigas.</td>
+<td>Streaming, redes sociais e consumo digital alteram dinâmica de sucesso</td>
+</tr>
+<tr>
+<td>H-POP06</td>
+<td>A popularidade de uma faixa não depende apenas da popularidade do artista.</td>
+<td>Algumas músicas podem performar acima ou abaixo do padrão do artista</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 7.5 Hipóteses sobre artistas</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A análise por artista permitirá entender recorrência, concentração e trajetórias de popularidade.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Hipótese</th>
+<th>Racional de negócio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H-ART01</td>
+<td>Poucos artistas concentram grande parte das faixas mais populares.</td>
+<td>Pode existir concentração de mercado</td>
+</tr>
+<tr>
+<td>H-ART02</td>
+<td>Existem artistas com muitas músicas, mas popularidade média moderada.</td>
+<td>Volume de catálogo não garante alto desempenho</td>
+</tr>
+<tr>
+<td>H-ART03</td>
+<td>Existem artistas com poucas faixas, mas alta popularidade média.</td>
+<td>Alguns artistas/faixas podem ter impacto concentrado</td>
+</tr>
+<tr>
+<td>H-ART04</td>
+<td>Certos artistas apresentam popularidade mais consistente ao longo do tempo.</td>
+<td>Consistência pode indicar força de marca/artista</td>
+</tr>
+<tr>
+<td>H-ART05</td>
+<td>Artistas recentes podem apresentar padrões diferentes de artistas consolidados.</td>
+<td>O mercado pode indicar renovação ou mudança de estilo</td>
+</tr>
+<tr>
+<td>H-ART06</td>
+<td>A popularidade dos artistas pode variar por período, indicando ciclos de ascensão, pico e queda.</td>
+<td>Trajetórias musicais podem não ser lineares</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 7.6 Hipóteses sobre evolução temporal</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Como o dataset cobre o período de 2009 a 2025, a dimensão temporal será fundamental.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Hipótese</th>
+<th>Racional de negócio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H-TEMP01</td>
+<td>A quantidade de músicas por ano não é uniforme.</td>
+<td>O dataset pode ter maior concentração em determinados períodos</td>
+</tr>
+<tr>
+<td>H-TEMP02</td>
+<td>A popularidade média muda ao longo dos anos.</td>
+<td>Mudanças de consumo podem alterar padrões de sucesso</td>
+</tr>
+<tr>
+<td>H-TEMP03</td>
+<td>O perfil das músicas populares mudou entre 2009–2015, 2016–2020 e 2021–2025.</td>
+<td>Diferentes ciclos do streaming podem gerar padrões distintos</td>
+</tr>
+<tr>
+<td>H-TEMP04</td>
+<td>Existem anos com comportamento atípico de popularidade.</td>
+<td>Eventos de mercado ou composição do dataset podem gerar anomalias</td>
+</tr>
+<tr>
+<td>H-TEMP05</td>
+<td>Músicas recentes tendem a refletir tendências mais próximas do consumo atual.</td>
+<td>O recorte de 2025 pode carregar sinais de tendência contemporânea</td>
+</tr>
+<tr>
+<td>H-TEMP06</td>
+<td>Músicas antigas ainda populares podem representar faixas de catálogo duradouro.</td>
+<td>Alguns hits podem manter relevância ao longo do tempo</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 7.7 Hipóteses sobre atributos musicais</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Caso o dataset contenha atributos como energia, dançabilidade, valência, tempo, duração, acústica ou instrumentalidade, eles serão analisados como possíveis fatores associados à popularidade.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Hipótese</th>
+<th>Racional analítico</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H-MUS01</td>
+<td>Músicas mais populares apresentam diferenças em atributos musicais quando comparadas às menos populares.</td>
+<td>Atributos sonoros podem indicar padrões de preferência</td>
+</tr>
+<tr>
+<td>H-MUS02</td>
+<td>Faixas com maior dançabilidade podem apresentar maior popularidade média.</td>
+<td>Músicas mais dançantes podem ter maior apelo em playlists e consumo social</td>
+</tr>
+<tr>
+<td>H-MUS03</td>
+<td>Faixas com maior energia podem se destacar em determinados períodos.</td>
+<td>O perfil energético pode variar conforme tendências musicais</td>
+</tr>
+<tr>
+<td>H-MUS04</td>
+<td>A duração das músicas pode ter relação com popularidade.</td>
+<td>Formatos mais curtos podem ser favorecidos em consumo digital</td>
+</tr>
+<tr>
+<td>H-MUS05</td>
+<td>A valência das músicas pode variar ao longo dos anos.</td>
+<td>O tom emocional das faixas pode refletir mudanças culturais</td>
+</tr>
+<tr>
+<td>H-MUS06</td>
+<td>Combinações de atributos musicais podem ser mais relevantes do que atributos isolados.</td>
+<td>Popularidade pode depender da interação entre características</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 7.8 Hipóteses sobre segmentação musical</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Além de rankings e estatísticas descritivas, o projeto poderá investigar perfis de músicas e artistas.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Hipótese</th>
+<th>Racional analítico</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H-SEG01</td>
+<td>Existem grupos distintos de músicas com características semelhantes.</td>
+<td>Atributos musicais podem formar perfis naturais</td>
+</tr>
+<tr>
+<td>H-SEG02</td>
+<td>Músicas populares podem se concentrar em alguns perfis específicos.</td>
+<td>Certos padrões sonoros podem estar associados a maior desempenho</td>
+</tr>
+<tr>
+<td>H-SEG03</td>
+<td>Artistas podem ser agrupados por recorrência e intensidade de popularidade.</td>
+<td>Perfis de artista podem apoiar decisões de investimento</td>
+</tr>
+<tr>
+<td>H-SEG04</td>
+<td>Músicas recentes e antigas podem pertencer a segmentos diferentes.</td>
+<td>A evolução musical pode alterar o perfil dos grupos</td>
+</tr>
+<tr>
+<td>H-SEG05</td>
+<td>Uma segmentação exploratória pode apoiar futura classificação de potencial de hit.</td>
+<td>Clusters podem servir como base para feature engineering</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 7.9 Hipóteses sobre modelagem futura</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Embora o foco atual seja EDA, algumas hipóteses ajudam a preparar o caminho para machine learning.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Hipótese</th>
+<th>Implicação futura</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H-ML01</td>
+<td>A popularidade pode ser usada como variável alvo em uma modelagem futura.</td>
+<td>Possível problema de regressão ou classificação</td>
+</tr>
+<tr>
+<td>H-ML02</td>
+<td>Será possível criar classes de popularidade como baixa, média e alta.</td>
+<td>Caminho para classificação supervisionada</td>
+</tr>
+<tr>
+<td>H-ML03</td>
+<td>O dataset contém variáveis suficientes para gerar features relevantes.</td>
+<td>Avaliação de viabilidade preditiva</td>
+</tr>
+<tr>
+<td>H-ML04</td>
+<td>A base precisará de tratamento antes de qualquer modelo.</td>
+<td>Necessidade de camada Silver e feature engineering</td>
+</tr>
+<tr>
+<td>H-ML05</td>
+<td>Pode existir risco de vazamento de informação dependendo das variáveis disponíveis.</td>
+<td>Exigirá cuidado na seleção de features</td>
+</tr>
+<tr>
+<td>H-ML06</td>
+<td>Modelos simples poderão servir como baseline antes de algoritmos mais complexos.</td>
+<td>Comparação futura entre regressão, árvores e boosting</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 7.10 Priorização das hipóteses</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Nem todas as hipóteses serão investigadas com a mesma profundidade nesta fase inicial. A priorização será feita de acordo com a importância para a EDA e para a continuidade do projeto.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Prioridade</th>
+<th>Grupo de hipóteses</th>
+<th>Justificativa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alta</td>
+<td>Qualidade e estrutura dos dados</td>
+<td>Sem dados confiáveis, as demais análises perdem validade</td>
+</tr>
+<tr>
+<td>Alta</td>
+<td>Popularidade musical</td>
+<td>É o eixo central do projeto</td>
+</tr>
+<tr>
+<td>Alta</td>
+<td>Evolução temporal</td>
+<td>O dataset cobre múltiplos anos e períodos</td>
+</tr>
+<tr>
+<td>Média</td>
+<td>Artistas</td>
+<td>Apoia decisões de marketing, curadoria e investimento</td>
+</tr>
+<tr>
+<td>Média</td>
+<td>Atributos musicais</td>
+<td>Ajuda a explicar padrões de popularidade</td>
+</tr>
+<tr>
+<td>Média</td>
+<td>Segmentação</td>
+<td>Prepara futura análise de perfis musicais</td>
+</tr>
+<tr>
+<td>Futura</td>
+<td>Modelagem</td>
+<td>Será aprofundada após a EDA e preparação dos dados</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 7.11 Como as hipóteses serão avaliadas</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>As hipóteses serão investigadas ao longo dos próximos notebooks utilizando diferentes técnicas de análise exploratória.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Tipo de evidência</th>
+<th>Exemplos de técnica</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Estrutura dos dados</td>
+<td><code>shape</code>, tipos, colunas, amostras e chaves</td>
+</tr>
+<tr>
+<td>Qualidade dos dados</td>
+<td>nulos, duplicados, cardinalidade e inconsistências</td>
+</tr>
+<tr>
+<td>Estatística descritiva</td>
+<td>média, mediana, desvio padrão, quartis e percentis</td>
+</tr>
+<tr>
+<td>Distribuições</td>
+<td>histogramas, boxplots e densidades</td>
+</tr>
+<tr>
+<td>Rankings</td>
+<td>top músicas, top artistas e rankings por período</td>
+</tr>
+<tr>
+<td>Comparações temporais</td>
+<td>análise por ano, período e coortes temporais</td>
+</tr>
+<tr>
+<td>Relações entre variáveis</td>
+<td>correlação, dispersão e agrupamentos</td>
+</tr>
+<tr>
+<td>Segmentações</td>
+<td>perfis exploratórios de músicas e artistas</td>
+</tr>
+<tr>
+<td>Interpretação executiva</td>
+<td>síntese dos achados e recomendações</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 7.12 Cuidados de interpretação</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Durante a análise, será necessário evitar conclusões indevidas.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Este projeto buscará identificar associações e padrões exploratórios, mas não afirmará causalidade sem metodologia adequada.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Por exemplo, mesmo que músicas mais populares apresentem maior energia ou dançabilidade, isso não significa necessariamente que esses atributos causam popularidade.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A popularidade musical pode depender de fatores externos que não estão presentes no dataset, como:<ul>
+<li><em>investimento em marketing;</em></li>
+<li><em>presença em playlists oficiais;</em></li>
+<li><em>base prévia de fãs;</em></li>
+<li><em>gravadora;</em></li>
+<li><em>redes sociais;</em></li>
+<li><em>região geográfica;</em></li>
+<li><em>momento cultural;</em></li>
+<li><em>colaborações entre artistas;</em></li>
+<li><em>exposição em mídia;</em></li>
+<li><em>algoritmo de recomendação da plataforma.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Portanto, as hipóteses serão avaliadas com cautela, distinguindo evidência exploratória de conclusão causal.</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 7.13 Resultado esperado desta etapa</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Ao final desta etapa, espera-se ter um conjunto estruturado de hipóteses que oriente a execução dos próximos notebooks.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essas hipóteses serão usadas como referência para:<ul>
+<li><em>organizar o entendimento dos dados;</em></li>
+<li><em>priorizar análises de qualidade;</em></li>
+<li><em>orientar visualizações;</em></li>
+<li><em>interpretar padrões;</em></li>
+<li><em>validar ou refutar suposições iniciais;</em></li>
+<li><em>construir insights executivos;</em></li>
+<li><em>preparar futuras etapas de feature engineering e machine learning.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A partir deste ponto, o projeto passa a ter uma matriz analítica clara, conectando problema de negócio, perguntas investigativas, hipóteses e próximos passos de execução.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 8. Critérios de sucesso do projeto</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 8.1 Visão geral</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Os critérios de sucesso definem como será avaliado se o projeto <strong>Spotify Global Music Intelligence</strong> atingiu seus objetivos analíticos, técnicos, executivos e de portfólio.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Nesta fase, o sucesso não será medido pela construção de um modelo preditivo final, mas pela capacidade de estruturar uma análise exploratória robusta,<ul>
+<li>orientada a negócio, tecnicamente confiável e preparada para evolução futura.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A definição prévia desses critérios ajuda a manter o projeto focado, evita análises dispersas e cria uma base clara para validar se a entrega gerou valor.</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 8.2 Critério principal de sucesso</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>O projeto será considerado bem-sucedido nesta fase se conseguir transformar os dados brutos do Spotify em uma análise exploratória estruturada,<ul>
+<li>capaz de responder perguntas relevantes sobre popularidade musical, evolução temporal, comportamento de artistas, qualidade dos dados e oportunidades futuras de modelagem.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>De forma resumida:<ul>
+<li><em><strong>O sucesso do projeto será alcançado se a EDA conseguir gerar entendimento confiável, acionável e bem documentado sobre padrões de popularidade musical no Spotify,</strong></em><ul>
+<li><em><strong>preparando uma base analítica sólida para futuras etapas de machine learning e produto de dados.</strong></em></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 8.3 Critérios de sucesso de negócio</strong></font></p>
+<font color="#66666" size="2">
+<table>
+<thead>
+<tr>
+<th>Critério</th>
+<th>Descrição</th>
+<th>Evidência esperada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Clareza da dor de negócio</td>
+<td>O problema precisa estar bem definido e conectado ao mercado musical</td>
+<td>Seção de problema de negócio documentada</td>
+</tr>
+<tr>
+<td>Relevância das perguntas analíticas</td>
+<td>As perguntas devem apoiar decisões reais de marketing, curadoria, produto e investimento</td>
+<td>Matriz de perguntas analíticas</td>
+</tr>
+<tr>
+<td>Conexão com stakeholders</td>
+<td>A análise deve considerar diferentes públicos interessados</td>
+<td>Mapeamento de stakeholders e necessidades</td>
+</tr>
+<tr>
+<td>Geração de insights acionáveis</td>
+<td>A EDA deve produzir interpretações úteis, não apenas gráficos</td>
+<td>Síntese executiva ao final da EDA</td>
+</tr>
+<tr>
+<td>Apoio à tomada de decisão</td>
+<td>Os resultados devem indicar possíveis caminhos de ação</td>
+<td>Recomendações finais documentadas</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 8.4 Critérios de sucesso técnico</strong></font></p>
+<font color="#66666" size="2">
+<table>
+<thead>
+<tr>
+<th>Critério</th>
+<th>Descrição</th>
+<th>Evidência esperada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Estrutura de projeto organizada</td>
+<td>O projeto deve seguir estrutura profissional de diretórios</td>
+<td>Pastas <code>data</code>, <code>notebooks</code>, <code>src</code> e <code>reports</code> criadas</td>
+</tr>
+<tr>
+<td>Ambiente reprodutível</td>
+<td>Dependências devem estar documentadas e instaláveis</td>
+<td>Arquivo <code>pyproject.toml</code> e ambiente <code>uv</code></td>
+</tr>
+<tr>
+<td>Código reutilizável</td>
+<td>Funções auxiliares devem ser separadas em módulos</td>
+<td>Pacote <code>src/spotify_intelligence</code></td>
+</tr>
+<tr>
+<td>Camadas de dados definidas</td>
+<td>Dados devem seguir fluxo Raw, Bronze, Silver e Gold</td>
+<td>Diretórios de dados em camadas</td>
+</tr>
+<tr>
+<td>Notebooks organizados</td>
+<td>Cada notebook deve ter papel claro no ciclo analítico</td>
+<td>Sequência de notebooks 00 a 04</td>
+</tr>
+<tr>
+<td>Exportabilidade</td>
+<td>A análise deve poder ser exportada para HTML futuramente</td>
+<td>Pasta <code>reports/html</code> e notebooks documentados</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 8.5 Critérios de sucesso de qualidade dos dados</strong></font></p>
+<font color="#66666" size="2">
+<table>
+<thead>
+<tr>
+<th>Critério</th>
+<th>Descrição</th>
+<th>Evidência esperada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Leitura correta dos arquivos</td>
+<td>Os CSVs devem ser carregados sem erros críticos</td>
+<td>DataFrames carregados no Notebook 01</td>
+</tr>
+<tr>
+<td>Diagnóstico de estrutura</td>
+<td>Linhas, colunas e tipos devem ser conhecidos</td>
+<td>Relatório de estrutura dos datasets</td>
+</tr>
+<tr>
+<td>Avaliação de nulos</td>
+<td>Colunas com valores ausentes devem ser identificadas</td>
+<td>Tabela de nulos e percentual por coluna</td>
+</tr>
+<tr>
+<td>Avaliação de duplicidades</td>
+<td>Registros duplicados devem ser mensurados</td>
+<td>Relatório de duplicidade</td>
+</tr>
+<tr>
+<td>Padronização de colunas</td>
+<td>Nomes e tipos devem ser ajustados quando necessário</td>
+<td>Dataset tratado na camada Silver</td>
+</tr>
+<tr>
+<td>Cobertura temporal validada</td>
+<td>O período 2009–2025 deve ser analisado criticamente</td>
+<td>Distribuição por ano ou período</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 8.6 Critérios de sucesso analítico</strong></font></p>
+<font color="#66666" size="2">
+<table>
+<thead>
+<tr>
+<th>Critério</th>
+<th>Descrição</th>
+<th>Evidência esperada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Distribuição de popularidade analisada</td>
+<td>Entender como a popularidade se comporta no dataset</td>
+<td>Histogramas, estatísticas e interpretação</td>
+</tr>
+<tr>
+<td>Artistas relevantes identificados</td>
+<td>Mapear artistas com maior presença e popularidade</td>
+<td>Rankings por artista</td>
+</tr>
+<tr>
+<td>Faixas de destaque identificadas</td>
+<td>Listar músicas mais populares do dataset</td>
+<td>Ranking de faixas</td>
+</tr>
+<tr>
+<td>Evolução temporal analisada</td>
+<td>Avaliar mudanças por ano ou período</td>
+<td>Gráficos temporais</td>
+</tr>
+<tr>
+<td>Atributos musicais explorados</td>
+<td>Investigar variáveis como energia, dança, valência ou duração, caso disponíveis</td>
+<td>Análises univariadas e bivariadas</td>
+</tr>
+<tr>
+<td>Correlações avaliadas</td>
+<td>Medir relações entre variáveis numéricas</td>
+<td>Matriz de correlação</td>
+</tr>
+<tr>
+<td>Outliers identificados</td>
+<td>Detectar músicas ou artistas com comportamento atípico</td>
+<td>Boxplots e análises de extremos</td>
+</tr>
+<tr>
+<td>Hipóteses avaliadas</td>
+<td>Confirmar, refutar ou classificar hipóteses como inconclusivas</td>
+<td>Matriz de validação de hipóteses</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 8.7 Critérios de sucesso executivo</strong></font></p>
+<font color="#66666" size="2">
+<table>
+<thead>
+<tr>
+<th>Critério</th>
+<th>Descrição</th>
+<th>Evidência esperada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Storytelling claro</td>
+<td>A análise deve contar uma história compreensível</td>
+<td>Notebook com narrativa progressiva</td>
+</tr>
+<tr>
+<td>Linguagem acessível</td>
+<td>Os resultados devem ser entendidos por públicos técnicos e não técnicos</td>
+<td>Explicações executivas após gráficos</td>
+</tr>
+<tr>
+<td>Recomendações objetivas</td>
+<td>A entrega deve indicar próximos passos claros</td>
+<td>Seção de recomendações</td>
+</tr>
+<tr>
+<td>Limitações reconhecidas</td>
+<td>A análise deve explicitar riscos e restrições</td>
+<td>Seção de limitações</td>
+</tr>
+<tr>
+<td>Próximos passos definidos</td>
+<td>A EDA deve apontar caminho para modelagem ou produto</td>
+<td>Roadmap futuro documentado</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 8.8 Critérios de sucesso para portfólio</strong></font></p>
+<font color="#66666" size="2">
+<table>
+<thead>
+<tr>
+<th>Critério</th>
+<th>Descrição</th>
+<th>Evidência esperada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Projeto com narrativa profissional</td>
+<td>O projeto deve parecer uma entrega de mercado</td>
+<td>README e notebooks bem documentados</td>
+</tr>
+<tr>
+<td>Demonstração de raciocínio analítico</td>
+<td>O trabalho deve mostrar pensamento estruturado</td>
+<td>Problema, perguntas, hipóteses e critérios claros</td>
+</tr>
+<tr>
+<td>Demonstração técnica</td>
+<td>O projeto deve evidenciar domínio de Python, Pandas, EDA e organização</td>
+<td>Código limpo e módulos auxiliares</td>
+</tr>
+<tr>
+<td>Demonstração executiva</td>
+<td>O projeto deve traduzir análise em decisão</td>
+<td>Insights e recomendações</td>
+</tr>
+<tr>
+<td>Reutilização futura</td>
+<td>A estrutura deve servir como template para novos projetos</td>
+<td>Framework replicável de EDA</td>
+</tr>
+<tr>
+<td>Potencial de publicação</td>
+<td>O projeto deve poder virar página HTML, post ou apresentação</td>
+<td>Relatórios e exportações planejadas</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 8.9 Critérios de prontidão para modelagem futura</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Embora a modelagem não seja o objetivo desta fase, a EDA deve indicar se o projeto pode evoluir para machine learning.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Critério</th>
+<th>Descrição</th>
+<th>Evidência esperada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Target potencial identificado</td>
+<td>A variável de popularidade pode ser analisada como alvo</td>
+<td>Discussão sobre regressão ou classificação</td>
+</tr>
+<tr>
+<td>Features candidatas mapeadas</td>
+<td>Variáveis relevantes devem ser identificadas</td>
+<td>Lista de variáveis úteis</td>
+</tr>
+<tr>
+<td>Riscos de modelagem identificados</td>
+<td>Possíveis problemas devem ser documentados</td>
+<td>Discussão sobre vazamento, viés e qualidade</td>
+</tr>
+<tr>
+<td>Classes de popularidade avaliadas</td>
+<td>Possibilidade de criar baixa, média e alta popularidade</td>
+<td>Análise por percentis</td>
+</tr>
+<tr>
+<td>Baseline futuro proposto</td>
+<td>Indicação de modelo simples inicial</td>
+<td>Sugestão de regressão ou classificação baseline</td>
+</tr>
+<tr>
+<td>Viabilidade técnica avaliada</td>
+<td>A base deve ser considerada adequada ou não para ML</td>
+<td>Diagnóstico final da fase EDA</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 8.10 Matriz resumida de sucesso</strong></font></p>
+<font color="#66666" size="2">
+<table>
+<thead>
+<tr>
+<th>Dimensão</th>
+<th>Pergunta de validação</th>
+<th>Status esperado ao final da fase</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Negócio</td>
+<td>O problema foi bem definido?</td>
+<td>Sim</td>
+</tr>
+<tr>
+<td>Dados</td>
+<td>A estrutura dos datasets foi compreendida?</td>
+<td>Sim</td>
+</tr>
+<tr>
+<td>Qualidade</td>
+<td>Os principais problemas foram identificados?</td>
+<td>Sim</td>
+</tr>
+<tr>
+<td>EDA</td>
+<td>As perguntas principais foram exploradas?</td>
+<td>Sim</td>
+</tr>
+<tr>
+<td>Hipóteses</td>
+<td>As hipóteses foram avaliadas com evidências?</td>
+<td>Sim ou parcialmente</td>
+</tr>
+<tr>
+<td>Insights</td>
+<td>Os achados foram traduzidos para negócio?</td>
+<td>Sim</td>
+</tr>
+<tr>
+<td>Portfólio</td>
+<td>O projeto comunica valor profissional?</td>
+<td>Sim</td>
+</tr>
+<tr>
+<td>Futuro ML</td>
+<td>Há caminho claro para modelagem?</td>
+<td>Sim, se os dados permitirem</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 8.11 Critérios mínimos para fechamento do Cap01</strong></font></p>
+<font color="#66666" size="2">
+<ul>
+<li>Para considerar a etapa de EDA do Cap01 concluída, os seguintes itens mínimos deverão estar prontos:<ul>
+<li><em>estrutura do projeto criada;</em></li>
+<li><em>ambiente Python configurado;</em></li>
+<li><em>Notebook 00 concluído;</em></li>
+<li><em>datasets carregados no Notebook 01;</em></li>
+<li><em>diagnóstico inicial dos dados realizado;</em></li>
+<li><em>análise de qualidade executada;</em></li>
+<li><em>base tratada salva em camada Silver;</em></li>
+<li><em>EDA principal executada no Notebook 03;</em></li>
+<li><em>principais insights consolidados;</em></li>
+<li><em>recomendações documentadas;</em></li>
+<li><em>próximos passos para modelagem definidos;</em></li>
+<li><em>README atualizado;</em></li>
+<li><em>exportação HTML planejada ou realizada.</em></li>
+</ul>
+</li>
+</ul>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 8.12 Resultado esperado desta etapa</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Ao final desta etapa, espera-se ter uma definição clara de sucesso para o projeto, cobrindo as dimensões de negócio, técnica,<ul>
+<li>qualidade dos dados, análise exploratória, comunicação executiva, portfólio e evolução futura.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Esses critérios serão utilizados como referência ao longo dos próximos notebooks para avaliar se a entrega está avançando de forma consistente, profissional e orientada a valor.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Com isso, o projeto passa a ter não apenas perguntas e hipóteses, mas também uma forma objetiva de medir se a análise gerou o resultado esperado.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 9. Escopo, não escopo e premissas do projeto</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 9.1 Visão geral</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Definir o escopo de um projeto analítico é essencial para evitar dispersão, controlar expectativas e garantir que a entrega esteja alinhada aos objetivos definidos.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>No projeto <strong>Spotify Global Music Intelligence</strong>, o escopo inicial está concentrado na construção de uma análise exploratória profissional,<ul>
+<li>orientada a negócio, qualidade dos dados, identificação de padrões e preparação para futuras etapas de modelagem.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Esta etapa não tem como objetivo entregar imediatamente um modelo em produção, mas sim criar a base analítica necessária para que essa evolução seja tecnicamente viável e estrategicamente justificável.</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 9.2 Escopo principal da fase atual</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A fase atual do projeto contempla as etapas de entendimento de negócio, entendimento dos dados, preparação inicial e análise exploratória.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Área</th>
+<th>Dentro do escopo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Business Understanding</td>
+<td>Definir contexto, problema, objetivos, stakeholders, perguntas, hipóteses e critérios de sucesso</td>
+</tr>
+<tr>
+<td>Data Understanding</td>
+<td>Compreender estrutura dos arquivos, colunas, tipos, granularidade e período coberto</td>
+</tr>
+<tr>
+<td>Data Quality</td>
+<td>Avaliar nulos, duplicidades, cardinalidade, inconsistências e limitações</td>
+</tr>
+<tr>
+<td>Data Preparation</td>
+<td>Padronizar colunas, ajustar tipos e preparar base analítica intermediária</td>
+</tr>
+<tr>
+<td>EDA</td>
+<td>Explorar popularidade, artistas, faixas, evolução temporal, atributos musicais e relações entre variáveis</td>
+</tr>
+<tr>
+<td>Insights</td>
+<td>Traduzir achados técnicos em interpretações executivas</td>
+</tr>
+<tr>
+<td>Portfólio</td>
+<td>Documentar o projeto com narrativa profissional, notebooks e README</td>
+</tr>
+<tr>
+<td>Continuidade</td>
+<td>Preparar caminho para modelagem, dashboard e produto de dados</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 9.3 Escopo dos notebooks planejados</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>O projeto será organizado em notebooks sequenciais, cada um com uma função clara dentro do ciclo analítico.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Notebook</th>
+<th>Papel no projeto</th>
+<th>Escopo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Notebook 00 — Business Understanding</td>
+<td>Definir o contrato analítico do projeto</td>
+<td>Contexto, problema, objetivos, stakeholders, perguntas, hipóteses e critérios de sucesso</td>
+</tr>
+<tr>
+<td>Notebook 01 — Data Understanding</td>
+<td>Avaliar os dados disponíveis</td>
+<td>Leitura dos arquivos, estrutura, tipos, granularidade, colunas e primeiras observações</td>
+</tr>
+<tr>
+<td>Notebook 02 — Data Quality and Preparation</td>
+<td>Preparar dados confiáveis para análise</td>
+<td>Tratamento inicial, padronização, nulos, duplicidades, tipos e camada Silver</td>
+</tr>
+<tr>
+<td>Notebook 03 — Exploratory Data Analysis</td>
+<td>Investigar padrões e relações</td>
+<td>Popularidade, artistas, faixas, períodos, atributos musicais, correlações e outliers</td>
+</tr>
+<tr>
+<td>Notebook 04 — Executive Insights and Next Steps</td>
+<td>Consolidar a entrega</td>
+<td>Principais achados, recomendações, limitações e próximos passos</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 9.4 Escopo de dados</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Nesta fase, o projeto utilizará os arquivos disponibilizados no dataset <strong>Spotify Global Music Dataset (2009–2025)</strong>.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Arquivo</th>
+<th>Uso previsto</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>spotify_data_clean.csv</code></td>
+<td>Base com músicas modernas e artistas recentes</td>
+</tr>
+<tr>
+<td><code>track_data_final.csv</code></td>
+<td>Base com músicas clássicas/populares de artistas entre 2009 e 2023</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>A análise irá verificar se esses arquivos podem ser integrados em uma base unificada ou se deverão ser analisados separadamente em alguns momentos.</p>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 9.5 Escopo analítico</strong></font></p>
+<font color="#66666" size="2">
+<ul>
+<li>As análises exploratórias planejadas incluem:<ul>
+<li><em>distribuição geral da popularidade;</em></li>
+<li><em>ranking de músicas mais populares;</em></li>
+<li><em>ranking de artistas por popularidade média;</em></li>
+<li><em>quantidade de faixas por artista;</em></li>
+<li><em>concentração de popularidade;</em></li>
+<li><em>evolução temporal por ano ou período;</em></li>
+<li><em>comparação entre músicas antigas e recentes;</em></li>
+<li><em>análise de atributos musicais, caso disponíveis;</em></li>
+<li><em>investigação de correlações entre variáveis numéricas;</em></li>
+<li><em>identificação de outliers;</em></li>
+<li><em>preparação de insights executivos;</em></li>
+<li><em>avaliação da viabilidade de modelagem futura.</em></li>
+</ul>
+</li>
+</ul>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 9.6 Não escopo da fase atual</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Para manter o projeto controlado e bem organizado, alguns itens não serão tratados nesta primeira fase.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Item fora do escopo</th>
+<th>Motivo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Construção de modelo preditivo final</td>
+<td>Será uma etapa posterior, após EDA e preparação dos dados</td>
+</tr>
+<tr>
+<td>Deploy de modelo em produção</td>
+<td>Depende de validação prévia da viabilidade analítica</td>
+</tr>
+<tr>
+<td>API de recomendação musical</td>
+<td>Exige arquitetura e escopo próprios</td>
+</tr>
+<tr>
+<td>Dashboard Streamlit final</td>
+<td>Será considerado após a consolidação dos insights</td>
+</tr>
+<tr>
+<td>Integração direta com a API do Spotify</td>
+<td>O projeto utilizará inicialmente os arquivos do Kaggle</td>
+</tr>
+<tr>
+<td>Inferência causal</td>
+<td>A EDA identifica associações, não causalidade</td>
+</tr>
+<tr>
+<td>Análise regional de consumo</td>
+<td>Depende de variáveis geográficas disponíveis</td>
+</tr>
+<tr>
+<td>Análise de usuários ou comportamento individual</td>
+<td>O dataset está no nível de músicas, artistas e faixas</td>
+</tr>
+<tr>
+<td>Estratégia real de lançamento musical</td>
+<td>O projeto simula contexto de negócio para fins analíticos e de portfólio</td>
+</tr>
+<tr>
+<td>Uso comercial dos resultados</td>
+<td>A análise tem finalidade educacional, técnica e demonstrativa</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 9.7 Premissas do projeto</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Algumas premissas serão adotadas para conduzir a análise.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Premissa</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fonte de dados</td>
+<td>Os dados disponíveis serão tratados como base inicial confiável para fins educacionais</td>
+</tr>
+<tr>
+<td>Popularidade</td>
+<td>A variável de popularidade será considerada um indicador relevante de desempenho musical</td>
+</tr>
+<tr>
+<td>Granularidade</td>
+<td>A principal unidade de análise será a faixa musical</td>
+</tr>
+<tr>
+<td>Período</td>
+<td>O projeto considerará o recorte temporal informado de 2009 a 2025</td>
+</tr>
+<tr>
+<td>Integração</td>
+<td>A união dos arquivos dependerá da compatibilidade de colunas e conceitos</td>
+</tr>
+<tr>
+<td>Qualidade</td>
+<td>Problemas de nulos, duplicidades e tipos serão documentados antes de qualquer análise conclusiva</td>
+</tr>
+<tr>
+<td>Interpretação</td>
+<td>Resultados serão tratados como evidências exploratórias, não como verdades causais</td>
+</tr>
+<tr>
+<td>Evolução</td>
+<td>A EDA deverá preparar caminho para feature engineering e modelagem futura</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 9.8 Restrições conhecidas</strong></font></p>
+<font color="#66666" size="2">
+<p>Antes da análise dos dados, algumas restrições já podem ser reconhecidas.</p>
+<table>
+<thead>
+<tr>
+<th>Restrição</th>
+<th>Possível impacto</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dados coletados via API pública</td>
+<td>Pode haver limitação de variáveis disponíveis</td>
+</tr>
+<tr>
+<td>Ausência de dados de usuários</td>
+<td>Não será possível analisar comportamento individual de consumo</td>
+</tr>
+<tr>
+<td>Ausência de dados financeiros</td>
+<td>Não será possível estimar receita ou retorno sobre investimento</td>
+</tr>
+<tr>
+<td>Possível viés de seleção</td>
+<td>O dataset pode representar apenas faixas escolhidas ou populares</td>
+</tr>
+<tr>
+<td>Popularidade como métrica agregada</td>
+<td>Pode não capturar todos os fatores de sucesso musical</td>
+</tr>
+<tr>
+<td>Ausência de contexto externo</td>
+<td>Marketing, redes sociais, playlists e mídia podem não estar representados</td>
+</tr>
+<tr>
+<td>Diferenças entre arquivos</td>
+<td>Pode haver necessidade de harmonização antes da integração</td>
+</tr>
+<tr>
+<td>Atualização temporal</td>
+<td>Dados de 2025 podem representar um recorte específico e não o ano completo</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 9.9 Riscos analíticos</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Alguns riscos deverão ser monitorados ao longo do projeto.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Risco</th>
+<th>Mitigação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Interpretar correlação como causalidade</td>
+<td>Deixar claro que a EDA identifica associações</td>
+</tr>
+<tr>
+<td>Gerar rankings sem considerar volume de músicas</td>
+<td>Usar métricas complementares como contagem e média</td>
+</tr>
+<tr>
+<td>Comparar períodos com volumes muito diferentes</td>
+<td>Normalizar ou contextualizar análises temporais</td>
+</tr>
+<tr>
+<td>Unificar bases incompatíveis</td>
+<td>Validar colunas, tipos e granularidade antes da junção</td>
+</tr>
+<tr>
+<td>Usar variável de popularidade sem entender sua distribuição</td>
+<td>Analisar estatísticas, percentis e outliers</td>
+</tr>
+<tr>
+<td>Tirar conclusões com dados incompletos</td>
+<td>Documentar limitações e lacunas</td>
+</tr>
+<tr>
+<td>Excesso de gráficos sem narrativa</td>
+<td>Conectar cada visualização a uma pergunta analítica</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 9.10 Decisões metodológicas iniciais</strong></font></p>
+<font color="#66666" size="2">
+<p>Para manter o projeto consistente, serão adotadas algumas decisões metodológicas.</p>
+<table>
+<thead>
+<tr>
+<th>Decisão</th>
+<th>Justificativa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Utilizar CRISP-DM+ como estrutura orientadora</td>
+<td>Garante organização entre negócio, dados, análise e evolução futura</td>
+</tr>
+<tr>
+<td>Separar notebooks por fase</td>
+<td>Melhora legibilidade, manutenção e narrativa do projeto</td>
+</tr>
+<tr>
+<td>Usar camadas Raw, Bronze, Silver e Gold</td>
+<td>Aproxima o projeto de uma arquitetura real de dados</td>
+</tr>
+<tr>
+<td>Documentar cada etapa em Markdown</td>
+<td>Facilita comunicação técnica e executiva</td>
+</tr>
+<tr>
+<td>Criar funções reutilizáveis em <code>src</code></td>
+<td>Evita repetição de código e melhora profissionalismo</td>
+</tr>
+<tr>
+<td>Salvar bases tratadas em Parquet</td>
+<td>Melhora performance e padronização para análises futuras</td>
+</tr>
+<tr>
+<td>Manter foco inicial em EDA</td>
+<td>Evita antecipar modelagem antes da compreensão dos dados</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 9.11 Entregáveis dentro do escopo</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Ao final da fase atual, espera-se produzir os seguintes entregáveis:</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Entregável</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Notebook 00</td>
+<td>Entendimento de negócio completo</td>
+</tr>
+<tr>
+<td>Notebook 01</td>
+<td>Diagnóstico inicial dos dados</td>
+</tr>
+<tr>
+<td>Notebook 02</td>
+<td>Qualidade e preparação dos dados</td>
+</tr>
+<tr>
+<td>Notebook 03</td>
+<td>Análise exploratória principal</td>
+</tr>
+<tr>
+<td>Notebook 04</td>
+<td>Insights executivos e próximos passos</td>
+</tr>
+<tr>
+<td>Dataset Bronze</td>
+<td>Base bruta unificada ou organizada</td>
+</tr>
+<tr>
+<td>Dataset Silver</td>
+<td>Base limpa e preparada para EDA</td>
+</tr>
+<tr>
+<td>Tabelas Gold</td>
+<td>Sumarizações por artista, faixa e período</td>
+</tr>
+<tr>
+<td>README</td>
+<td>Documentação executiva do projeto</td>
+</tr>
+<tr>
+<td>Relatório HTML</td>
+<td>Exportação futura para portfólio</td>
+</tr>
+<tr>
+<td>Recomendações</td>
+<td>Próximos passos para modelagem e produto</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 9.12 Resultado esperado desta etapa</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Ao final desta etapa, espera-se ter uma definição clara sobre o que será entregue, o que ficará fora da fase atual, quais premissas orientam o projeto e quais riscos precisam ser considerados.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essa definição ajudará a manter o projeto organizado, profissional e alinhado ao objetivo principal: construir uma EDA robusta, orientada a negócio e preparada para evolução futura.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Com isso, o projeto passa a ter limites bem definidos, evitando dispersão e garantindo que as próximas etapas sejam executadas com foco, rastreabilidade e clareza.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 10. Roadmap CRISP-DM+ do projeto</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 10.1 Visão geral</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>O projeto <strong>Spotify Global Music Intelligence</strong> será conduzido com base no framework <strong>CRISP-DM+</strong>, uma extensão prática do CRISP-DM tradicional<ul>
+<li>adaptada para projetos modernos de dados, portfólio, engenharia analítica e preparação para produção.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A proposta é organizar o projeto em fases progressivas, garantindo que cada etapa tenha objetivo claro, entregáveis definidos e conexão com a geração de valor para o negócio.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>No contexto deste projeto, o CRISP-DM+ será usado para conectar:<ul>
+<li>entendimento do domínio musical;</li>
+<li>entendimento do problema de negócio;</li>
+<li>avaliação dos dados disponíveis;</li>
+<li>preparação e organização em camadas;</li>
+<li>análise exploratória;</li>
+<li>geração de insights;</li>
+<li>preparação para modelagem;</li>
+<li>possível evolução para produto de dados;</li>
+<li>monitoramento futuro.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essa abordagem está alinhada à lógica de uma EDA profissional, que parte do entendimento do problema, passa pelo entendimento dos dados,<ul>
+<li>formulação de hipóteses, preparação, visualização, insights e recomendações.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 10.2 Roadmap geral do CRISP-DM+</strong></font></p>
+<font color="#66666" size="2">
+<table>
+<thead>
+<tr>
+<th>Fase</th>
+<th>Nome da fase</th>
+<th>Objetivo no projeto</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Domain Understanding</td>
+<td>Compreender o domínio musical, streaming, popularidade e dinâmica de mercado</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Business Understanding</td>
+<td>Definir problema, objetivos, stakeholders, perguntas, hipóteses e critérios de sucesso</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Data Understanding</td>
+<td>Entender os arquivos, colunas, tipos, granularidade, períodos e limitações</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Data Preparation</td>
+<td>Limpar, padronizar, integrar e preparar os dados em camadas analíticas</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Exploratory Data Analysis</td>
+<td>Investigar padrões de popularidade, artistas, faixas, períodos e atributos musicais</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Modeling Readiness</td>
+<td>Avaliar viabilidade para modelos de popularidade, classificação ou segmentação</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Evaluation &amp; Business Interpretation</td>
+<td>Consolidar achados, validar hipóteses e traduzir resultados em recomendações</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Deployment &amp; Monitoring Vision</td>
+<td>Planejar evolução futura para dashboard, API, modelo ou produto de dados</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 10.3 Fase 0 — Domain Understanding</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li><strong>Objetivo</strong><ul>
+<li>Compreender o contexto do mercado musical e da indústria de streaming antes de analisar os dados.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Aplicação no projeto</strong><ul>
+<li>Nesta fase, o projeto busca entender conceitos como:<ul>
+<li>popularidade musical;</li>
+<li>artistas;</li>
+<li>faixas;</li>
+<li>álbuns;</li>
+<li>streaming;</li>
+<li>playlists;</li>
+<li>atributos musicais;</li>
+<li>comportamento temporal;</li>
+<li>dinâmica de hits;</li>
+<li>catálogo musical;</li>
+<li>tendências de consumo.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>Criar uma base conceitual mínima para interpretar os dados corretamente e evitar análises desconectadas do domínio.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 10.4 Fase 1 — Business Understanding</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li><strong>Objetivo</strong><ul>
+<li>Definir o problema de negócio, os objetivos da análise e as perguntas que orientarão o projeto.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Aplicação no projeto</strong><ul>
+<li>Esta fase está concentrada no <strong>Notebook 00 — Business Understanding</strong>.</li>
+<li>Ela contempla:<ul>
+<li>abertura executiva do projeto;</li>
+<li>contexto de mercado;</li>
+<li>dor de negócio;</li>
+<li>objetivos;</li>
+<li>stakeholders;</li>
+<li>perguntas analíticas;</li>
+<li>hipóteses;</li>
+<li>critérios de sucesso;</li>
+<li>escopo;</li>
+<li>premissas;</li>
+<li>roadmap analítico.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>Um contrato analítico claro, demonstrando por que o projeto existe, quais decisões pretende apoiar e como a EDA será conduzida.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 10.5 Fase 2 — Data Understanding</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li><strong>Objetivo</strong><ul>
+<li>Compreender os dados disponíveis antes de qualquer tratamento ou análise avançada.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Aplicação no projeto</strong><ul>
+<li>Esta fase será executada no <strong>Notebook 01 — Data Understanding</strong>.</li>
+<li>As principais atividades serão:<ul>
+<li>carregar os arquivos CSV;</li>
+<li>verificar dimensões dos datasets;</li>
+<li>listar colunas disponíveis;</li>
+<li>comparar estrutura dos arquivos;</li>
+<li>identificar tipos de dados;</li>
+<li>avaliar granularidade;</li>
+<li>verificar período coberto;</li>
+<li>analisar primeiras amostras;</li>
+<li>identificar chaves potenciais;</li>
+<li>avaliar possibilidade de integração.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>Diagnóstico inicial dos dados, indicando se os arquivos podem ser integrados, quais variáveis existem e quais cuidados serão necessários.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 10.6 Fase 3 — Data Preparation</strong></font></p>
+<font color="#66666" size="2">
+<ul>
+<li><p><strong>Objetivo</strong></p>
+<ul>
+<li>Preparar os dados para uma análise exploratória confiável.</li>
+</ul>
+</li>
+<li><p><strong>Aplicação no projeto</strong></p>
+<ul>
+<li>Esta fase será executada no <strong>Notebook 02 — Data Quality and Preparation</strong>.</li>
+<li>As principais atividades serão:<ul>
+<li>padronizar nomes de colunas;</li>
+<li>ajustar tipos de dados;</li>
+<li>tratar datas;</li>
+<li>avaliar valores nulos;</li>
+<li>identificar duplicidades;</li>
+<li>analisar cardinalidade;</li>
+<li>verificar inconsistências;</li>
+<li>harmonizar arquivos;</li>
+<li>criar colunas auxiliares;</li>
+<li>salvar base tratada em Parquet;</li>
+<li>estruturar camadas Bronze, Silver e Gold.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Resultado esperado</strong></p>
+<ul>
+<li>Uma base Silver limpa e confiável para a EDA, além de tabelas Gold sumarizadas por artista, faixa e período.</li>
+</ul>
+</li>
+</ul>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 10.7 Fase 4 — Exploratory Data Analysis</strong></font></p>
+<font color="#66666" size="2">
+<ul>
+<li><p><strong>Objetivo</strong></p>
+<ul>
+<li>Investigar padrões, relações, distribuições e tendências presentes nos dados.</li>
+</ul>
+</li>
+<li><p><strong>Aplicação no projeto</strong></p>
+<ul>
+<li>Esta fase será executada no <strong>Notebook 03 — Exploratory Data Analysis</strong>.</li>
+<li>As análises planejadas incluem:<ul>
+<li>distribuição da popularidade;</li>
+<li>rankings de faixas;</li>
+<li>rankings de artistas;</li>
+<li>análise de concentração;</li>
+<li>evolução temporal;</li>
+<li>comparação entre períodos;</li>
+<li>análise de atributos musicais;</li>
+<li>correlação entre variáveis;</li>
+<li>identificação de outliers;</li>
+<li>avaliação das hipóteses;</li>
+<li>preparação de insights executivos.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Resultado esperado</strong></p>
+<ul>
+<li>Um conjunto robusto de evidências exploratórias que ajude a explicar padrões de popularidade musical no dataset.</li>
+</ul>
+</li>
+</ul>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 10.8 Fase 5 — Modeling Readiness</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li><strong>Objetivo</strong><ul>
+<li>Avaliar se os dados estão prontos para uma futura etapa de modelagem.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Aplicação no projeto</strong><ul>
+<li>Nesta fase, ainda não será criado um modelo final. O foco será avaliar possibilidades como:<ul>
+<li>previsão de popularidade;</li>
+<li>classificação de potencial de hit;</li>
+<li>segmentação de músicas;</li>
+<li>agrupamento de artistas;</li>
+<li>criação de features;</li>
+<li>definição de target;</li>
+<li>identificação de riscos de vazamento;</li>
+<li>escolha de baseline futuro.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Possíveis abordagens futuras</strong></li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Abordagem</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Regressão</td>
+<td>Prever popularidade como variável numérica</td>
+</tr>
+<tr>
+<td>Classificação</td>
+<td>Classificar músicas em baixa, média ou alta popularidade</td>
+</tr>
+<tr>
+<td>Clusterização</td>
+<td>Agrupar músicas por atributos musicais</td>
+</tr>
+<tr>
+<td>Ranking</td>
+<td>Priorizar faixas com maior potencial analítico</td>
+</tr>
+<tr>
+<td>Recomendação</td>
+<td>Explorar similaridade entre músicas ou artistas</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>Definir se o projeto tem maturidade suficiente para avançar para machine learning e quais seriam os caminhos mais adequados.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 10.9 Fase 6 — Evaluation &amp; Business Interpretation</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li><strong>Objetivo</strong><ul>
+<li>Consolidar os resultados da análise e traduzir os achados técnicos em interpretação executiva.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Aplicação no projeto</strong><ul>
+<li>Esta fase será trabalhada principalmente no <strong>Notebook 04 — Executive Insights and Next Steps</strong>.</li>
+<li>As atividades incluem:<ul>
+<li>consolidar principais achados;</li>
+<li>validar hipóteses;</li>
+<li>destacar limitações;</li>
+<li>identificar recomendações;</li>
+<li>conectar resultados aos stakeholders;</li>
+<li>documentar aprendizados;</li>
+<li>propor próximos passos;</li>
+<li>preparar narrativa para portfólio.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>Uma conclusão executiva clara, com recomendações e direcionamentos para evolução do projeto.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 10.10 Fase 7 — Deployment &amp; Monitoring Vision</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li><strong>Objetivo</strong><ul>
+<li>Planejar como o projeto poderia evoluir para uma solução analítica ou produto de dados.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Aplicação futura</strong><ul>
+<li>Embora o deploy não esteja dentro do escopo inicial, o projeto será desenhado para permitir evolução futura para:<ul>
+<li>dashboard em Streamlit;</li>
+<li>relatório HTML interativo;</li>
+<li>API de scoring de popularidade;</li>
+<li>modelo batch para ranking de faixas;</li>
+<li>monitoramento de mudanças de popularidade;</li>
+<li>acompanhamento de drift temporal;</li>
+<li>integração com pipeline de dados;</li>
+<li>publicação no GitHub Pages.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li><strong>Resultado esperado</strong><ul>
+<li>Uma visão clara de continuidade, mostrando que a EDA é a fundação para produtos analíticos mais avançados.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 10.11 Relação entre fases e notebooks</strong></font></p>
+<font color="#66666" size="2">
+<table>
+<thead>
+<tr>
+<th>Fase CRISP-DM+</th>
+<th>Notebook relacionado</th>
+<th>Entregável</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Domain Understanding</td>
+<td>Notebook 00</td>
+<td>Contexto de domínio e motivação</td>
+</tr>
+<tr>
+<td>Business Understanding</td>
+<td>Notebook 00</td>
+<td>Problema, objetivos, stakeholders, perguntas e hipóteses</td>
+</tr>
+<tr>
+<td>Data Understanding</td>
+<td>Notebook 01</td>
+<td>Diagnóstico inicial dos dados</td>
+</tr>
+<tr>
+<td>Data Preparation</td>
+<td>Notebook 02</td>
+<td>Dados tratados e camadas Bronze/Silver/Gold</td>
+</tr>
+<tr>
+<td>Exploratory Data Analysis</td>
+<td>Notebook 03</td>
+<td>Análises, gráficos, padrões e hipóteses avaliadas</td>
+</tr>
+<tr>
+<td>Evaluation &amp; Interpretation</td>
+<td>Notebook 04</td>
+<td>Insights executivos e recomendações</td>
+</tr>
+<tr>
+<td>Deployment Vision</td>
+<td>Notebook 04 / fases futuras</td>
+<td>Plano para dashboard, modelo ou produto de dados</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 10.12 Roadmap operacional do projeto</strong></font></p>
+<font color="#66666" size="2">
+<table>
+<thead>
+<tr>
+<th>Etapa</th>
+<th>Atividade</th>
+<th>Status inicial</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Criar estrutura do projeto</td>
+<td>Planejado/concluído</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Configurar ambiente Python</td>
+<td>Planejado/concluído</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Criar Notebook 00</td>
+<td>Em execução</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Finalizar Business Understanding</td>
+<td>Em andamento</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Carregar datasets no Notebook 01</td>
+<td>Pendente</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Diagnosticar estrutura dos dados</td>
+<td>Pendente</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Avaliar qualidade dos dados</td>
+<td>Pendente</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Preparar camada Silver</td>
+<td>Pendente</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Executar EDA principal</td>
+<td>Pendente</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Consolidar insights executivos</td>
+<td>Pendente</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Atualizar README</td>
+<td>Pendente</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Exportar HTML para portfólio</td>
+<td>Pendente</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Planejar modelagem futura</td>
+<td>Pendente</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 10.13 Entregáveis por fase</strong></font></p>
+<font color="#66666" size="2">
+<table>
+<thead>
+<tr>
+<th>Fase</th>
+<th>Entregável principal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Business Understanding</td>
+<td>Notebook 00 completo</td>
+</tr>
+<tr>
+<td>Data Understanding</td>
+<td>Relatório inicial de estrutura dos dados</td>
+</tr>
+<tr>
+<td>Data Preparation</td>
+<td>Base Silver em Parquet</td>
+</tr>
+<tr>
+<td>EDA</td>
+<td>Notebook com gráficos, tabelas e interpretações</td>
+</tr>
+<tr>
+<td>Executive Insights</td>
+<td>Síntese executiva e recomendações</td>
+</tr>
+<tr>
+<td>Portfolio Packaging</td>
+<td>README, HTML e narrativa para divulgação</td>
+</tr>
+<tr>
+<td>Future Modeling</td>
+<td>Plano de modelagem e critérios de viabilidade</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 10.14 Resultado esperado desta etapa</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Ao final desta etapa, espera-se ter um roadmap completo para orientar a execução do projeto.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Esse roadmap conecta metodologia, notebooks, entregáveis e evolução futura, garantindo que o projeto seja conduzido com clareza, rastreabilidade e maturidade profissional.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Com isso, o <strong>Spotify Global Music Intelligence</strong> passa a ter uma rota analítica completa, partindo do entendimento do negócio até<ul>
+<li>a preparação para futuras soluções de machine learning, produto de dados e portfólio.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="4"><strong>📌 11. Próximos passos e encerramento do Notebook 00</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 11.1 Visão geral</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Este notebook teve como objetivo estruturar a fase de <strong>Business Understanding</strong> do projeto <strong>Spotify Global Music Intelligence</strong>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Antes de iniciar qualquer carregamento de dados, tratamento de arquivos ou geração de gráficos, o projeto foi contextualizado<ul>
+<li>como uma entrega analítica orientada a negócio, com problema definido, stakeholders mapeados, perguntas analíticas formuladas,</li>
+<li>hipóteses estruturadas, critérios de sucesso estabelecidos e roadmap metodológico definido.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Essa abordagem reforça que uma EDA profissional deve começar pela compreensão do problema, e não pela visualização imediata dos dados.</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 11.2 O que foi construído neste notebook</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Ao longo deste notebook, foram definidos os principais elementos estratégicos do projeto.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Etapa</th>
+<th>Entrega realizada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Abertura executiva</td>
+<td>Apresentação do projeto e de sua proposta analítica</td>
+</tr>
+<tr>
+<td>Contexto de mercado</td>
+<td>Descrição do cenário de streaming, música e inteligência musical</td>
+</tr>
+<tr>
+<td>Dor de negócio</td>
+<td>Formulação do problema central a ser investigado</td>
+</tr>
+<tr>
+<td>Objetivos do projeto</td>
+<td>Definição dos objetivos técnicos, analíticos, executivos e de portfólio</td>
+</tr>
+<tr>
+<td>Stakeholders</td>
+<td>Mapeamento dos públicos interessados e suas necessidades</td>
+</tr>
+<tr>
+<td>Perguntas analíticas</td>
+<td>Construção da matriz de perguntas que guiará a investigação</td>
+</tr>
+<tr>
+<td>Hipóteses</td>
+<td>Formulação de suposições testáveis para a EDA</td>
+</tr>
+<tr>
+<td>Critérios de sucesso</td>
+<td>Definição de como avaliar se a entrega gerou valor</td>
+</tr>
+<tr>
+<td>Escopo e premissas</td>
+<td>Delimitação do que será feito, do que ficará fora e das restrições conhecidas</td>
+</tr>
+<tr>
+<td>Roadmap CRISP-DM+</td>
+<td>Organização das fases, notebooks e entregáveis do projeto</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 11.3 Principais decisões tomadas</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Durante a fase de Business Understanding, algumas decisões metodológicas importantes foram estabelecidas.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Decisão</th>
+<th>Justificativa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tratar o projeto como uma simulação real de consultoria</td>
+<td>Aumenta o valor profissional e executivo da entrega</td>
+</tr>
+<tr>
+<td>Usar CRISP-DM+ como estrutura orientadora</td>
+<td>Garante rastreabilidade entre negócio, dados, EDA e evolução futura</td>
+</tr>
+<tr>
+<td>Separar o projeto em notebooks sequenciais</td>
+<td>Melhora organização, leitura e manutenção</td>
+</tr>
+<tr>
+<td>Trabalhar com camadas Raw, Bronze, Silver e Gold</td>
+<td>Aproxima o projeto de práticas reais de engenharia analítica</td>
+</tr>
+<tr>
+<td>Priorizar EDA antes de modelagem</td>
+<td>Evita construir modelos antes de entender qualidade, estrutura e padrões dos dados</td>
+</tr>
+<tr>
+<td>Documentar perguntas e hipóteses antes da análise</td>
+<td>Reduz exploração dispersa e fortalece o storytelling analítico</td>
+</tr>
+<tr>
+<td>Considerar a popularidade como eixo central do projeto</td>
+<td>Mantém foco em uma métrica relevante para negócio e modelagem futura</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 11.4 Estado atual do projeto</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Neste ponto, o projeto encontra-se na seguinte situação:</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Dimensão</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Estrutura de diretórios</td>
+<td>Preparada</td>
+</tr>
+<tr>
+<td>Ambiente Python</td>
+<td>Preparado</td>
+</tr>
+<tr>
+<td>Notebook 00</td>
+<td>Em fase de conclusão</td>
+</tr>
+<tr>
+<td>Contexto de negócio</td>
+<td>Definido</td>
+</tr>
+<tr>
+<td>Problema analítico</td>
+<td>Definido</td>
+</tr>
+<tr>
+<td>Perguntas analíticas</td>
+<td>Definidas</td>
+</tr>
+<tr>
+<td>Hipóteses</td>
+<td>Definidas</td>
+</tr>
+<tr>
+<td>Critérios de sucesso</td>
+<td>Definidos</td>
+</tr>
+<tr>
+<td>Escopo</td>
+<td>Definido</td>
+</tr>
+<tr>
+<td>Roadmap</td>
+<td>Definido</td>
+</tr>
+<tr>
+<td>Dados carregados</td>
+<td>Próxima etapa</td>
+</tr>
+<tr>
+<td>EDA executada</td>
+<td>Etapa futura</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 11.5 Próximo notebook</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>A próxima etapa será o <strong>Notebook 01 — Data Understanding</strong>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Esse notebook terá como objetivo compreender os dados disponíveis antes de qualquer tratamento ou análise avançada.<ul>
+<li>As principais atividades previstas são:<ol>
+<li>importar bibliotecas;</li>
+<li>configurar caminhos do projeto;</li>
+<li>localizar os arquivos na camada <code>data/00_raw</code>;</li>
+<li>carregar os arquivos CSV;</li>
+<li>inspecionar dimensões dos datasets;</li>
+<li>visualizar primeiras amostras;</li>
+<li>listar colunas disponíveis;</li>
+<li>comparar estruturas dos arquivos;</li>
+<li>avaliar tipos de dados;</li>
+<li>identificar possíveis chaves de integração;</li>
+<li>verificar cobertura temporal;</li>
+<li>registrar primeiras observações sobre qualidade e viabilidade analítica.</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 11.6 Perguntas que orientarão o Notebook 01</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>O Notebook 01 será guiado principalmente pelas perguntas de estrutura e qualidade dos dados.</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Pergunta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>QD01</td>
+<td>Quantas linhas e colunas existem em cada arquivo do dataset?</td>
+</tr>
+<tr>
+<td>QD02</td>
+<td>Os arquivos possuem a mesma estrutura de colunas?</td>
+</tr>
+<tr>
+<td>QD03</td>
+<td>Existem colunas com nomes diferentes, mas significado semelhante?</td>
+</tr>
+<tr>
+<td>QD04</td>
+<td>Quais colunas possuem valores ausentes?</td>
+</tr>
+<tr>
+<td>QD05</td>
+<td>Existem registros duplicados?</td>
+</tr>
+<tr>
+<td>QD06</td>
+<td>As variáveis possuem tipos de dados adequados?</td>
+</tr>
+<tr>
+<td>QD07</td>
+<td>Existem valores extremos ou inconsistentes?</td>
+</tr>
+<tr>
+<td>QD08</td>
+<td>O período 2009–2025 está corretamente representado?</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 11.7 Entregável esperado do Notebook 01</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>Ao final do próximo notebook, espera-se produzir um diagnóstico inicial dos dados contendo:<ul>
+<li>quantidade de registros por arquivo;</li>
+<li>quantidade de colunas por arquivo;</li>
+<li>comparação entre estruturas;</li>
+<li>identificação de variáveis comuns;</li>
+<li>identificação de variáveis exclusivas;</li>
+<li>análise inicial de tipos de dados;</li>
+<li>identificação preliminar de nulos;</li>
+<li>avaliação inicial de duplicidades;</li>
+<li>validação de cobertura temporal;</li>
+<li>recomendação sobre integração ou análise separada dos arquivos.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Esse diagnóstico será essencial para decidir como avançar para o <strong>Notebook 02 — Data Quality and Preparation</strong>.</li>
+</ul>
+</blockquote>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 11.8 Critério de passagem para a próxima fase</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>O projeto estará pronto para avançar do Business Understanding para o Data Understanding quando os seguintes itens estiverem concluídos:</li>
+</ul>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Status esperado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Problema de negócio documentado</td>
+<td>Concluído</td>
+</tr>
+<tr>
+<td>Objetivos definidos</td>
+<td>Concluído</td>
+</tr>
+<tr>
+<td>Stakeholders mapeados</td>
+<td>Concluído</td>
+</tr>
+<tr>
+<td>Perguntas analíticas formuladas</td>
+<td>Concluído</td>
+</tr>
+<tr>
+<td>Hipóteses estruturadas</td>
+<td>Concluído</td>
+</tr>
+<tr>
+<td>Critérios de sucesso definidos</td>
+<td>Concluído</td>
+</tr>
+<tr>
+<td>Escopo e premissas documentados</td>
+<td>Concluído</td>
+</tr>
+<tr>
+<td>Roadmap CRISP-DM+ definido</td>
+<td>Concluído</td>
+</tr>
+<tr>
+<td>Arquivos CSV disponíveis em <code>data/00_raw</code></td>
+<td>Necessário para próxima etapa</td>
+</tr>
+</tbody>
+</table>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="3"><strong>📌 11.9 Encerramento executivo</strong></font></p>
+<font color="#66666" size="2">
+<blockquote>
+<ul>
+<li>O <strong>Notebook 00 — Business Understanding</strong> estabelece a fundação estratégica do projeto <strong>Spotify Global Music Intelligence</strong>.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>A partir dele, a análise deixa de ser apenas uma exploração técnica de arquivos CSV e passa a ser uma investigação orientada por<ul>
+<li>problema de negócio, perguntas relevantes, hipóteses testáveis, critérios de sucesso e visão de continuidade.</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>O próximo passo será entrar na fase de <strong>Data Understanding</strong>, avaliando a estrutura real dos dados disponíveis e verificando se eles sustentam as perguntas e hipóteses formuladas.</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>Com isso, o projeto avança de uma formulação estratégica para uma investigação prática baseada em dados.</li>
+</ul>
+</blockquote>
+<hr/>
+<p></p></font></div>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Code Cell" class="code_cell" role="region">
+<pre><code class="language-python">%reload_ext watermark 
+%watermark -a "Roberto-SSoares-LfLngLrnng" -d -t -u --iversions -v -m -h</code></pre>
+</div>
+<div class="output-stream">
+<pre>Author: Roberto-SSoares-LfLngLrnng
+
+Last updated: 2026-05-04 20:49:18
+
+Python implementation: CPython
+Python version       : 3.12.12
+IPython version      : 9.13.0
+
+Compiler    : MSC v.1944 64 bit (AMD64)
+OS          : Windows
+Release     : 11
+Machine     : AMD64
+Processor   : Intel64 Family 6 Model 158 Stepping 9, GenuineIntel
+CPU cores   : 4
+Architecture: 64bit
+
+Hostname: PC-ROBERTO
+
+</pre>
+</div>
+</div>
+<div class="cell">
+<div aria-label="Markdown Cell" class="markdown" role="region">
+<div style="background-color:#f3f2ee">
+<p><font color="#CC403E" size="6"><strong>FIM</strong></font></p>
+<p><font color="#66666" size="2"></font></p></div>
+</div>
+</div>
+<div class="footer">
+<p>RobertoSSoares-LfLngLrnng — <span id="datetime"></span></p>
+</div>
+<script>
+            document.getElementById("datetime").innerText = new Date().toLocaleString('pt-BR');
+        </script>
+</div>
+</body>
+</html>

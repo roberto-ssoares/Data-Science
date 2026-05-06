@@ -33,7 +33,7 @@ data/**/*.json
 # ============================================================
 # Reports generated locally
 # ============================================================
-reports/html/*.html
+#reports/html/*.html
 reports/figures/*.png
 reports/figures/*.jpg
 reports/figures/*.jpeg
